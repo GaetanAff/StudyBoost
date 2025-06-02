@@ -1,50 +1,53 @@
-# StudyBoost - Application d'aide à la révision avec IA - V2
+# StudyBoost - Application d'aide à la révision avec IA - V3
 
-Une application web moderne qui transforme vos documents de cours en contenus pédagogiques interactifs grâce à l'IA Google Gemini.
+Une application web moderne et interactive qui transforme vos documents de cours en outils pédagogiques dynamiques grâce à l'IA Google Gemini. StudyBoost vise à rendre l'apprentissage plus efficace et personnalisé.
 
-## Ajout de la mise à jour : Amélioration QCM, Options & Suivi Tokens
+## 🔥 Nouveautés de la V3 : Interactivité et Personnalisation Accrues !
 
-Cette mise à jour introduit plusieurs améliorations fonctionnelles et d'interface utilisateur pour StudyBoost :
+Cette version majeure introduit des fonctionnalités très attendues pour une expérience utilisateur encore plus riche :
 
-**Fonctionnalités & Améliorations :**
+* **Questions Ouvertes avec Correction par l'IA :**
+    * Générez des questions ouvertes basées sur le contenu de vos documents.
+    * Rédigez vos propres réponses.
+    * Soumettez vos réponses pour une évaluation et une correction constructive fournies par l'IA, vous aidant à approfondir votre compréhension.
+* **Mode Sombre Intégral :**
+    * Activez un thème sombre élégant et reposant pour vos sessions d'étude tardives.
+    * La préférence est sauvegardée dans votre navigateur pour une expérience cohérente.
+* **Support Multi-langues (Français, Anglais, Allemand, Espagnol) :**
+    * Utilisez StudyBoost dans la langue de votre choix.
+    * L'interface utilisateur s'adapte dynamiquement, et les instructions pour l'IA peuvent également tenir compte de la langue sélectionnée pour une meilleure pertinence.
+    * Votre choix de langue est mémorisé.
+* **Compteur de Tokens Amélioré avec Diagramme Circulaire :**
+    * Visualisez rapidement votre consommation de tokens d'entrée grâce à un diagramme circulaire (camembert) affichant le pourcentage utilisé par rapport à votre limite journalière de l'API Gemini.
+    * Le suivi des tokens d'entrée et de sortie reste disponible numériquement.
+
+##  предыдущие улучшения (V2) :
 
 * **Interface QCM Interactive :**
-    * Les utilisateurs peuvent désormais sélectionner une réponse à un QCM et la vérifier.
-    * La bonne réponse et une explication sont affichées après la vérification.
-    * Les options sont désactivées après la tentative pour éviter les modifications.
+    * Les utilisateurs peuvent sélectionner une réponse à un QCM et la vérifier instantanément.
+    * La bonne réponse et une explication détaillée sont affichées après la vérification.
+    * Les options sont désactivées après une tentative pour encourager la réflexion.
 * **Options de Génération Flexibles :**
-    * Le nombre de QCM et de Flashcards à générer peut être défini par l'utilisateur via un champ numérique (au lieu d'une sélection fixe).
-    * Validation ajoutée pour s'assurer que le nombre est dans les limites acceptables.
+    * Définissez le nombre exact de QCM et de Flashcards que vous souhaitez générer.
 * **Suivi de l'Utilisation des Tokens Gemini :**
-    * L'application compte désormais les tokens d'entrée et de sortie utilisés pour chaque appel à l'API Gemini.
-    * Le total des tokens utilisés est affiché dans l'interface utilisateur.
-    * Ce compteur est stocké dans le `localStorage` et est réinitialisé si la clé API est modifiée.
-* **Amélioration des Prompts :**
-    * Les prompts envoyés à l'API Gemini pour la génération de QCM et de Flashcards ont été précisés pour garantir un format JSON plus fiable en sortie.
-* **Gestion d'Erreurs Améliorée :**
-    * Meilleure gestion et affichage des erreurs potentielles lors de la communication avec l'API ou lors du parsing des réponses JSON.
+    * L'application compte les tokens d'entrée et de sortie pour chaque appel à l'API.
+    * Le compteur est stocké localement et se réinitialise si la clé API est modifiée.
+* **Amélioration des Prompts et Gestion d'Erreurs (V2).**
 
-**Modifications Techniques :**
+## 🚀 Fonctionnalités Complètes
 
-* **Frontend (`public/script.js`, `public/index.html`, `public/styles.css`) :**
-    * Mise à jour de la logique pour gérer l'affichage et l'interaction des QCM.
-    * Modification du modal d'options pour les champs numériques.
-    * Ajout d'éléments HTML et de styles CSS pour le suivi des tokens et la nouvelle interface QCM.
-    * Logique de stockage et de mise à jour des compteurs de tokens dans `localStorage`.
-* **Backend (`server.js`, `utils/aiService.js`) :**
-    * `aiService.js` retourne maintenant le texte généré ainsi que les métadonnées d'utilisation des tokens (`usageMetadata`) de l'API Gemini.
-    * `server.js` transmet ces informations complètes au client.
+* **Upload de documents variés** : PDF, Word, PowerPoint, et même des Images (avec OCR pour l'extraction de texte).
+* **Résumés intelligents** : Obtenez des résumés courts et concis ou détaillés et structurés, au format Markdown.
+* **QCM personnalisables** : Génération automatique de questions à choix multiples avec options, réponses correctes et explications.
+* **Flashcards interactives** : Créez des cartes de révision (recto/verso) pour un apprentissage actif des concepts clés.
+* **Questions Ouvertes** : Générez des questions demandant une réponse rédigée et obtenez une correction de l'IA.
+* **Fiches de révision complètes** : Des fiches structurées, prêtes à l'emploi et exportables.
+* **Questions libres sur le document** : Posez des questions spécifiques sur le contenu de votre document et obtenez des réponses basées sur celui-ci.
+* **Export PDF** : Sauvegardez facilement tous les contenus générés (résumés, QCM, fiches) au format PDF.
+* **Mode Sombre** : Changez de thème pour un meilleur confort visuel.
+* **Support Multi-langues** : Interface disponible en Français, Anglais, Allemand, Espagnol.
+* **Suivi des Tokens** : Gardez un œil sur votre utilisation de l'API Gemini avec un affichage numérique et un diagramme circulaire pour les tokens d'entrée.
 
-Ces changements visent à rendre StudyBoost plus interactif, informatif et convivial.
-## 🚀 Fonctionnalités
-
-- **Upload de documents** : PDF, Word, PowerPoint, Images (OCR)
-- **Résumés intelligents** : Courts et détaillés en Markdown
-- **QCM personnalisables** : Génération automatique avec explications
-- **Flashcards interactives** : Pour la révision active
-- **Fiches de révision** : Design et exportables
-- **Questions libres** : Posez vos questions sur le contenu
-- **Export PDF** : Sauvegardez vos révisions
 
 ## 📋 Prérequis
 
