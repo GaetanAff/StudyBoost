@@ -1,7 +1,41 @@
-# StudyBoost - Application d'aide à la révision avec IA
+# StudyBoost - Application d'aide à la révision avec IA - V2
 
 Une application web moderne qui transforme vos documents de cours en contenus pédagogiques interactifs grâce à l'IA Google Gemini.
 
+## Ajout de la mise à jour : Amélioration QCM, Options & Suivi Tokens
+
+Cette mise à jour introduit plusieurs améliorations fonctionnelles et d'interface utilisateur pour StudyBoost :
+
+**Fonctionnalités & Améliorations :**
+
+* **Interface QCM Interactive :**
+    * Les utilisateurs peuvent désormais sélectionner une réponse à un QCM et la vérifier.
+    * La bonne réponse et une explication sont affichées après la vérification.
+    * Les options sont désactivées après la tentative pour éviter les modifications.
+* **Options de Génération Flexibles :**
+    * Le nombre de QCM et de Flashcards à générer peut être défini par l'utilisateur via un champ numérique (au lieu d'une sélection fixe).
+    * Validation ajoutée pour s'assurer que le nombre est dans les limites acceptables.
+* **Suivi de l'Utilisation des Tokens Gemini :**
+    * L'application compte désormais les tokens d'entrée et de sortie utilisés pour chaque appel à l'API Gemini.
+    * Le total des tokens utilisés est affiché dans l'interface utilisateur.
+    * Ce compteur est stocké dans le `localStorage` et est réinitialisé si la clé API est modifiée.
+* **Amélioration des Prompts :**
+    * Les prompts envoyés à l'API Gemini pour la génération de QCM et de Flashcards ont été précisés pour garantir un format JSON plus fiable en sortie.
+* **Gestion d'Erreurs Améliorée :**
+    * Meilleure gestion et affichage des erreurs potentielles lors de la communication avec l'API ou lors du parsing des réponses JSON.
+
+**Modifications Techniques :**
+
+* **Frontend (`public/script.js`, `public/index.html`, `public/styles.css`) :**
+    * Mise à jour de la logique pour gérer l'affichage et l'interaction des QCM.
+    * Modification du modal d'options pour les champs numériques.
+    * Ajout d'éléments HTML et de styles CSS pour le suivi des tokens et la nouvelle interface QCM.
+    * Logique de stockage et de mise à jour des compteurs de tokens dans `localStorage`.
+* **Backend (`server.js`, `utils/aiService.js`) :**
+    * `aiService.js` retourne maintenant le texte généré ainsi que les métadonnées d'utilisation des tokens (`usageMetadata`) de l'API Gemini.
+    * `server.js` transmet ces informations complètes au client.
+
+Ces changements visent à rendre StudyBoost plus interactif, informatif et convivial.
 ## 🚀 Fonctionnalités
 
 - **Upload de documents** : PDF, Word, PowerPoint, Images (OCR)
