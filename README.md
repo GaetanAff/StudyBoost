@@ -32,12 +32,7 @@ npm install express multer cors dotenv pdf-parse mammoth tesseract.js @google/ge
 npm install
 ```
 
-3. **Créer le fichier .env**
-```bash
-cp .env.example .env
-```
-
-4. **Démarrer l'application**
+3. **Démarrer l'application**
 ```bash
 # Mode développement
 npm run dev
@@ -46,7 +41,7 @@ npm run dev
 npm start
 ```
 
-5. **Ouvrir l'application**
+4. **Ouvrir l'application**
 ```
 http://localhost:3000
 ```
