@@ -3,24 +3,40 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>StudyBoost - IA pour la Révision</title>
+    <title data-lang="appTitle">StudyBoost - IA pour la Révision</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
 </head>
-<body>
-    <div class="app-container">
+<body class=""> <div class="app-container">
         <header class="header">
             <div class="header-content">
                 <div class="logo">
                     <i class="fas fa-graduation-cap"></i>
-                    <h1>StudyBoost</h1>
+                    <h1 data-lang="appTitleShort">StudyBoost</h1>
                 </div>
                 <div class="header-actions">
-                    <div id="tokenUsageDisplay" class="token-usage-display" style="margin-right: 15px; font-size: 0.9em; color: var(--text-secondary);">
-                        Tokens Entrée: <span id="inputTokensUsed">0</span> | Tokens Sortie: <span id="outputTokensUsed">0</span>
+                    <div id="tokenUsageDisplay" class="token-usage-display">
+                        <div id="tokenPieChartContainer">
+                            <div class="pie-chart" id="inputTokenPieChart"></div>
+                        </div>
+                        <div class="token-texts">
+                            <span data-lang="inputTokensLabel">Tokens Entrée</span>: <span id="inputTokensUsed">0</span> (<span id="inputTokensPercentage">0</span>%)<br>
+                            <span data-lang="outputTokensLabel">Tokens Sortie</span>: <span id="outputTokensUsed">0</span>
+                        </div>
                     </div>
+                    <div class="language-switcher-container">
+                        <i class="fas fa-globe"></i>
+                        <select id="languageSwitcher" class="language-switcher">
+                            <option value="fr">Français</option>
+                            <option value="en">English</option>
+                            <option value="de">Deutsch</option>
+                            <option value="es">Español</option>
+                        </select>
+                    </div>
+                    <button id="darkModeToggle" class="btn-icon" aria-label="Toggle dark mode">
+                        <i class="fas fa-moon"></i> </button>
                     <button id="apiKeyBtn" class="btn-secondary">
-                        <i class="fas fa-key"></i> Clé API
+                        <i class="fas fa-key"></i> <span data-lang="apiKeyBtnLabel">Clé API</span>
                     </button>
                 </div>
             </div>
@@ -32,14 +48,14 @@
                     <div class="upload-icon">
                         <i class="fas fa-cloud-upload-alt"></i>
                     </div>
-                    <h2>Uploadez vos documents</h2>
-                    <p>PDF, Word, PowerPoint, Images (OCR)</p>
+                    <h2 data-lang="uploadTitle">Uploadez vos documents</h2>
+                    <p data-lang="uploadSubtitle">PDF, Word, PowerPoint, Images (OCR)</p>
                     
                     <div class="upload-area" id="uploadArea">
                         <input type="file" id="fileInput" accept=".pdf,.doc,.docx,.ppt,.pptx,.jpg,.jpeg,.png" hidden>
                         <div class="upload-placeholder">
                             <i class="fas fa-plus"></i>
-                            <span>Cliquez ou glissez vos fichiers ici</span>
+                            <span data-lang="uploadPlaceholder">Cliquez ou glissez vos fichiers ici</span>
                         </div>
                     </div>
                     
@@ -51,78 +67,96 @@
 
             <section class="content-section" id="contentSection" style="display: none;">
                 <div class="document-info">
-                    <h3 id="documentTitle">Document traité</h3>
+                    <h3 id="documentTitle" data-lang="processedDocumentLabel">Document traité</h3>
                     <div class="document-stats">
-                        <span id="wordCount">0 mots</span>
-                        <span id="pageCount">0 pages</span>
+                        <span id="wordCount">0 <span data-lang="wordsUnit">mots</span></span>
+                        <span id="pageCount">0 <span data-lang="pagesUnit">pages</span></span>
                     </div>
                 </div>
 
                 <div class="action-grid">
                     <button class="action-card" data-action="summary_short">
                         <i class="fas fa-compress-alt"></i>
-                        <h4>Résumé Court</h4>
-                        <p>Version condensée rapide</p>
+                        <h4 data-lang="actionSummaryShort">Résumé Court</h4>
+                        <p data-lang="actionSummaryShortDesc">Version condensée rapide</p>
                     </button>
                     <button class="action-card" data-action="summary_long">
                         <i class="fas fa-list-ul"></i>
-                        <h4>Résumé Détaillé</h4>
-                        <p>Structuré et complet</p>
+                        <h4 data-lang="actionSummaryLong">Résumé Détaillé</h4>
+                        <p data-lang="actionSummaryLongDesc">Structuré et complet</p>
                     </button>
                     <button class="action-card" data-action="qcm">
                         <i class="fas fa-question-circle"></i>
-                        <h4>QCM</h4>
-                        <p>Questions à choix multiples</p>
+                        <h4 data-lang="actionQCM">QCM</h4>
+                        <p data-lang="actionQCMDesc">Questions à choix multiples</p>
                     </button>
                     <button class="action-card" data-action="flashcards">
                         <i class="fas fa-cards-blank"></i>
-                        <h4>Flashcards</h4>
-                        <p>Cartes de révision</p>
+                        <h4 data-lang="actionFlashcards">Flashcards</h4>
+                        <p data-lang="actionFlashcardsDesc">Cartes de révision</p>
+                    </button>
+                     <button class="action-card" data-action="open_question_generate">
+                        <i class="fas fa-edit"></i>
+                        <h4 data-lang="actionOpenQuestion">Questions Ouvertes</h4>
+                        <p data-lang="actionOpenQuestionDesc">Générer une question ouverte et vérifier votre réponse</p>
                     </button>
                     <button class="action-card" data-action="revision_sheet">
                         <i class="fas fa-file-alt"></i>
-                        <h4>Fiche de Révision</h4>
-                        <p>Fiche complète et design</p>
+                        <h4 data-lang="actionRevisionSheet">Fiche de Révision</h4>
+                        <p data-lang="actionRevisionSheetDesc">Fiche complète et design</p>
                     </button>
                     <button class="action-card" data-action="question">
                         <i class="fas fa-comments"></i>
-                        <h4>Poser une Question</h4>
-                        <p>Questions libres sur le contenu</p>
+                        <h4 data-lang="actionAskQuestion">Poser une Question</h4>
+                        <p data-lang="actionAskQuestionDesc">Questions libres sur le contenu</p>
                     </button>
                 </div>
             </section>
 
             <section class="results-section" id="resultsSection" style="display: none;">
                 <div class="results-header">
-                    <h3 id="resultsTitle">Résultats</h3>
+                    <h3 id="resultsTitle" data-lang="resultsTitleLabel">Résultats</h3>
                     <div class="results-actions">
                         <button id="exportBtn" class="btn-secondary">
-                            <i class="fas fa-download"></i> Exporter
+                            <i class="fas fa-download"></i> <span data-lang="exportBtnLabel">Exporter</span>
                         </button>
                         <button id="newAnalysisBtn" class="btn-primary">
-                            <i class="fas fa-plus"></i> Nouvelle Analyse
+                            <i class="fas fa-plus"></i> <span data-lang="newAnalysisBtnLabel">Nouvelle Analyse</span>
                         </button>
                     </div>
                 </div>
                 <div class="results-content" id="resultsContent"></div>
+                <div id="openQuestionInteractionSection" style="display: none;">
+                    <h4 data-lang="openQuestionGeneratedTitle">Question Générée :</h4>
+                    <p id="generatedOpenQuestionText" class="generated-question-text"></p>
+                    <div class="form-group">
+                        <label for="userOpenAnswer" data-lang="yourAnswerLabel">Votre Réponse :</label>
+                        <textarea id="userOpenAnswer" class="form-control" rows="4" placeholder-data-lang="openAnswerPlaceholder"></textarea>
+                    </div>
+                    <button id="submitOpenAnswerBtn" class="btn-primary"><span data-lang="submitOpenAnswerBtnLabel">Soumettre pour Correction</span></button>
+                    <div id="openAnswerFeedback" class="feedback-content" style="display: none;">
+                        <h4 data-lang="aiFeedbackTitle">Correction de l'IA :</h4>
+                        <div id="openAnswerFeedbackContent"></div>
+                    </div>
+                </div>
             </section>
         </main>
 
         <div class="modal" id="apiKeyModal">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h3>Configuration API Gemini</h3>
+                    <h3 data-lang="apiKeyModalTitle">Configuration API Gemini</h3>
                     <button class="modal-close">&times;</button>
                 </div>
                 <div class="modal-body">
                     <div class="form-group">
-                        <label>Clé API Google Gemini</label>
-                        <input type="password" id="apiKeyInput" placeholder="Entrez votre clé API Gemini">
-                        <small>Obtenez votre clé sur <a href="https://makersuite.google.com/app/apikey" target="_blank">Google AI Studio</a></small>
+                        <label data-lang="apiKeyInputLabel">Clé API Google Gemini</label>
+                        <input type="password" id="apiKeyInput" placeholder-data-lang="apiKeyInputPlaceholder">
+                        <small><span data-lang="apiKeyModalDesc1">Obtenez votre clé sur</span> <a href="https://makersuite.google.com/app/apikey" target="_blank">Google AI Studio</a></small>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button id="saveApiKey" class="btn-primary">Sauvegarder</button>
+                    <button id="saveApiKey" class="btn-primary" data-lang="saveBtnLabel">Sauvegarder</button>
                 </div>
             </div>
         </div>
@@ -130,17 +164,17 @@
         <div class="modal" id="questionModal">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h3>Poser une Question</h3>
+                    <h3 data-lang="askUserQuestionModalTitle">Poser une Question</h3>
                     <button class="modal-close">&times;</button>
                 </div>
                 <div class="modal-body">
                     <div class="form-group">
-                        <label>Votre question sur le document</label>
-                        <textarea id="questionInput" placeholder="Posez votre question..."></textarea>
+                        <label data-lang="yourQuestionOnDocLabel">Votre question sur le document</label>
+                        <textarea id="questionInput" placeholder-data-lang="userQuestionPlaceholder"></textarea>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button id="submitQuestion" class="btn-primary">Poser la Question</button>
+                    <button id="submitQuestion" class="btn-primary" data-lang="submitUserQuestionBtnLabel">Poser la Question</button>
                 </div>
             </div>
         </div>
@@ -148,13 +182,13 @@
         <div class="modal" id="optionsModal">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h3 id="optionsTitle">Options</h3>
+                    <h3 id="optionsTitle" data-lang="optionsModalTitle">Options</h3>
                     <button class="modal-close">&times;</button>
                 </div>
                 <div class="modal-body" id="optionsBody">
                     </div>
                 <div class="modal-footer">
-                    <button id="confirmOptions" class="btn-primary">Générer</button>
+                    <button id="confirmOptions" class="btn-primary" data-lang="generateBtnLabel">Générer</button>
                 </div>
             </div>
         </div>
@@ -162,7 +196,7 @@
         <div class="loading-overlay" id="loadingOverlay" style="display: none;">
             <div class="loading-content">
                 <div class="spinner"></div>
-                <p id="loadingText">Traitement en cours...</p>
+                <p id="loadingText" data-lang="loadingTextDefault">Traitement en cours...</p>
             </div>
         </div>
     </div>
