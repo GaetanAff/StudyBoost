@@ -9,7 +9,6 @@
 </head>
 <body>
     <div class="app-container">
-        <!-- Header -->
         <header class="header">
             <div class="header-content">
                 <div class="logo">
@@ -17,6 +16,9 @@
                     <h1>StudyBoost</h1>
                 </div>
                 <div class="header-actions">
+                    <div id="tokenUsageDisplay" class="token-usage-display" style="margin-right: 15px; font-size: 0.9em; color: var(--text-secondary);">
+                        Tokens Entrée: <span id="inputTokensUsed">0</span> | Tokens Sortie: <span id="outputTokensUsed">0</span>
+                    </div>
                     <button id="apiKeyBtn" class="btn-secondary">
                         <i class="fas fa-key"></i> Clé API
                     </button>
@@ -24,9 +26,7 @@
             </div>
         </header>
 
-        <!-- Main Content -->
         <main class="main-content">
-            <!-- Upload Section -->
             <section class="upload-section" id="uploadSection">
                 <div class="upload-card">
                     <div class="upload-icon">
@@ -49,7 +49,6 @@
                 </div>
             </section>
 
-            <!-- Content Processing -->
             <section class="content-section" id="contentSection" style="display: none;">
                 <div class="document-info">
                     <h3 id="documentTitle">Document traité</h3>
@@ -59,38 +58,32 @@
                     </div>
                 </div>
 
-                <!-- Action Buttons -->
                 <div class="action-grid">
                     <button class="action-card" data-action="summary_short">
                         <i class="fas fa-compress-alt"></i>
                         <h4>Résumé Court</h4>
                         <p>Version condensée rapide</p>
                     </button>
-
                     <button class="action-card" data-action="summary_long">
                         <i class="fas fa-list-ul"></i>
                         <h4>Résumé Détaillé</h4>
                         <p>Structuré et complet</p>
                     </button>
-
                     <button class="action-card" data-action="qcm">
                         <i class="fas fa-question-circle"></i>
                         <h4>QCM</h4>
                         <p>Questions à choix multiples</p>
                     </button>
-
                     <button class="action-card" data-action="flashcards">
                         <i class="fas fa-cards-blank"></i>
                         <h4>Flashcards</h4>
                         <p>Cartes de révision</p>
                     </button>
-
                     <button class="action-card" data-action="revision_sheet">
                         <i class="fas fa-file-alt"></i>
                         <h4>Fiche de Révision</h4>
                         <p>Fiche complète et design</p>
                     </button>
-
                     <button class="action-card" data-action="question">
                         <i class="fas fa-comments"></i>
                         <h4>Poser une Question</h4>
@@ -99,7 +92,6 @@
                 </div>
             </section>
 
-            <!-- Results Section -->
             <section class="results-section" id="resultsSection" style="display: none;">
                 <div class="results-header">
                     <h3 id="resultsTitle">Résultats</h3>
@@ -116,8 +108,6 @@
             </section>
         </main>
 
-        <!-- Modals -->
-        <!-- API Key Modal -->
         <div class="modal" id="apiKeyModal">
             <div class="modal-content">
                 <div class="modal-header">
@@ -137,7 +127,6 @@
             </div>
         </div>
 
-        <!-- Question Modal -->
         <div class="modal" id="questionModal">
             <div class="modal-content">
                 <div class="modal-header">
@@ -156,7 +145,6 @@
             </div>
         </div>
 
-        <!-- Options Modal -->
         <div class="modal" id="optionsModal">
             <div class="modal-content">
                 <div class="modal-header">
@@ -164,15 +152,13 @@
                     <button class="modal-close">&times;</button>
                 </div>
                 <div class="modal-body" id="optionsBody">
-                    <!-- Dynamic content based on action -->
-                </div>
+                    </div>
                 <div class="modal-footer">
                     <button id="confirmOptions" class="btn-primary">Générer</button>
                 </div>
             </div>
         </div>
 
-        <!-- Loading Overlay -->
         <div class="loading-overlay" id="loadingOverlay" style="display: none;">
             <div class="loading-content">
                 <div class="spinner"></div>
@@ -181,7 +167,6 @@
         </div>
     </div>
 
-    <!-- Scripts -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/9.1.6/marked.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="script.js"></script>
