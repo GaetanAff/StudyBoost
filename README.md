@@ -22,7 +22,7 @@ Une application web moderne qui transforme vos documents de cours en contenus p√
 
 1. **Cloner le projet**
 ```bash
-git clone <repository-url>
+git clone https://github.com/GaetanAff/studyboost.git
 cd studyboost
 ```
 
