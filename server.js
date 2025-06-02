@@ -2,22 +2,20 @@ const express = require('express');
 const multer = require('multer');
 const cors = require('cors');
 const path = require('path');
-const fs = require('fs');
+const fs =require('fs');
 require('dotenv').config();
 
-// Importation des modules de traitement
 const { processDocument } = require('./utils/documentProcessor');
 const { generateContent } = require('./utils/aiService');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Middleware
 app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: '10mb' })); // Augmenter la limite pour le corps de la requête si le texte extrait est grand
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use(express.static('public'));
 
-// Configuration multer pour l'upload de fichiers
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     const uploadDir = 'uploads/';
@@ -41,18 +39,16 @@ const upload = multer({
     if (mimetype && extname) {
       return cb(null, true);
     } else {
-      cb(new Error('Type de fichier non supporté'));
+      cb(new Error('Type de fichier non supporté. Formats autorisés : PDF, DOC, DOCX, PPT, PPTX, JPG, JPEG, PNG.'));
     }
   },
   limits: { fileSize: 10 * 1024 * 1024 } // 10MB max
 });
 
-// Routes principales
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-// Upload et traitement de document
 app.post('/api/upload', upload.single('document'), async (req, res) => {
   try {
     if (!req.file) {
@@ -62,8 +58,9 @@ app.post('/api/upload', upload.single('document'), async (req, res) => {
     const filePath = req.file.path;
     const extractedText = await processDocument(filePath);
     
-    // Nettoyage du fichier temporaire
-    fs.unlinkSync(filePath);
+    fs.unlink(filePath, (err) => { // Utiliser fs.unlink asynchrone
+        if (err) console.error("Erreur lors de la suppression du fichier temporaire:", err);
+    });
     
     res.json({ 
       success: true, 
@@ -72,34 +69,38 @@ app.post('/api/upload', upload.single('document'), async (req, res) => {
     });
   } catch (error) {
     console.error('Erreur upload:', error);
-    res.status(500).json({ error: 'Erreur lors du traitement du document' });
+    // Si l'erreur vient du fileFilter de multer
+    if (error.message.startsWith('Type de fichier non supporté')) {
+        return res.status(415).json({ error: error.message });
+    }
+    res.status(500).json({ error: 'Erreur lors du traitement du document. ' + error.message });
   }
 });
 
-// Appel gemini
 app.post('/api/generate', async (req, res) => {
-  const requestTimestamp = new Date().toISOString(); // Ajoute ceci
-  console.log(`[${requestTimestamp}] Requête reçue pour /api/generate`); // Ajoute ceci
+  const requestTimestamp = new Date().toISOString();
+  console.log(`[${requestTimestamp}] Requête reçue pour /api/generate`);
 
   try {
     const { text, type, options = {}, apiKey } = req.body;
 
     if (!text || !type || !apiKey) {
-      console.log(`[${requestTimestamp}] Paramètres manquants.`); // Ajoute ceci
-      return res.status(400).json({ error: 'Paramètres manquants' });
+      console.log(`[${requestTimestamp}] Paramètres manquants.`);
+      return res.status(400).json({ error: 'Paramètres manquants: texte, type ou clé API.' });
     }
 
-    console.log(`[${requestTimestamp}] Appel de generateContent avec type: ${type}`); // Ajoute ceci
-    const result = await generateContent(text, type, options, apiKey);
-    console.log(`[${requestTimestamp}] Succès de la génération.`); // Ajoute ceci
-    res.json({ success: true, content: result });
+    console.log(`[${requestTimestamp}] Appel de generateContent avec type: ${type}`);
+    const generationResult = await generateContent(text, type, options, apiKey);
+    
+    console.log(`[${requestTimestamp}] Succès de la génération.`);
+    res.json({ success: true, content: generationResult });
+
   } catch (error) {
-    console.error(`[${requestTimestamp}] Erreur génération:`, error.message); // Modifie pour voir le message d'erreur plus clairement
-    res.status(500).json({ error: 'Erreur lors de la génération de contenu' });
+    console.error(`[${requestTimestamp}] Erreur API Gemini ou service:`, error.message, error.stack);
+    res.status(500).json({ error: error.message || 'Erreur lors de la génération de contenu par l\'IA.' });
   }
 });
 
-// Démarrage du serveur
 app.listen(PORT, () => {
   console.log(`🚀 StudyBoost démarré sur http://localhost:${PORT}`);
 });
