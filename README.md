@@ -133,9 +133,6 @@ vercel --prod
 - Les fichiers uploadés sont supprimés après traitement
 - Aucune donnée n'est conservée sur le serveur
 
-## 📄 Licence
-
-MIT License - Voir le fichier LICENSE pour plus de détails.
 
 ## 🤝 Contribution
 
