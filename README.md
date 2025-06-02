@@ -28,6 +28,7 @@ cd studyboost
 
 2. **Installer les dépendances**
 ```bash
+npm install express multer cors dotenv pdf-parse mammoth tesseract.js @google/generative-ai marked jspdf html2canvas nodemon webpack webpack-cli
 npm install
 ```
 
