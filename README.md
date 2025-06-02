@@ -21,7 +21,7 @@ Cette version majeure introduit des fonctionnalités très attendues pour une ex
     * Visualisez rapidement votre consommation de tokens d'entrée grâce à un diagramme circulaire (camembert) affichant le pourcentage utilisé par rapport à votre limite journalière de l'API Gemini.
     * Le suivi des tokens d'entrée et de sortie reste disponible numériquement.
 
-##  предыдущие улучшения (V2) :
+##  Studyboost (V2) :
 
 * **Interface QCM Interactive :**
     * Les utilisateurs peuvent sélectionner une réponse à un QCM et la vérifier instantanément.
