@@ -12,7 +12,7 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.use(cors());
-app.use(express.json({ limit: '10mb' })); // Augmenter la limite pour le corps de la requête si le texte extrait est grand
+app.use(express.json({ limit: '10mb' })); 
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use(express.static('public'));
 
@@ -58,7 +58,7 @@ app.post('/api/upload', upload.single('document'), async (req, res) => {
     const filePath = req.file.path;
     const extractedText = await processDocument(filePath);
     
-    fs.unlink(filePath, (err) => { // Utiliser fs.unlink asynchrone
+    fs.unlink(filePath, (err) => { 
         if (err) console.error("Erreur lors de la suppression du fichier temporaire:", err);
     });
     
@@ -69,7 +69,6 @@ app.post('/api/upload', upload.single('document'), async (req, res) => {
     });
   } catch (error) {
     console.error('Erreur upload:', error);
-    // Si l'erreur vient du fileFilter de multer
     if (error.message.startsWith('Type de fichier non supporté')) {
         return res.status(415).json({ error: error.message });
     }
@@ -82,15 +81,15 @@ app.post('/api/generate', async (req, res) => {
   console.log(`[${requestTimestamp}] Requête reçue pour /api/generate`);
 
   try {
-    const { text, type, options = {}, apiKey } = req.body;
+    const { text, type, options = {}, apiKey, language = 'fr' } = req.body; // Added language
 
     if (!text || !type || !apiKey) {
       console.log(`[${requestTimestamp}] Paramètres manquants.`);
       return res.status(400).json({ error: 'Paramètres manquants: texte, type ou clé API.' });
     }
 
-    console.log(`[${requestTimestamp}] Appel de generateContent avec type: ${type}`);
-    const generationResult = await generateContent(text, type, options, apiKey);
+    console.log(`[${requestTimestamp}] Appel de generateContent avec type: ${type}, lang: ${language}`);
+    const generationResult = await generateContent(text, type, options, apiKey, language); // Pass language
     
     console.log(`[${requestTimestamp}] Succès de la génération.`);
     res.json({ success: true, content: generationResult });
