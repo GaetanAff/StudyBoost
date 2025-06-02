@@ -56,7 +56,7 @@ async function generateContent(text, type, options = {}, apiKey, language = 'fr'
   const genAI = new GoogleGenerativeAI(apiKey);
   // Using gemini-1.5-flash-latest as a generally available and capable model.
   // Adjust if "gemini-2.0-flash-lite" is a specific internal/beta model you have access to.
-  const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash-latest" }); 
+  const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" }); 
 
   let prompt = '';
   const langInstructions = getLanguageInstructions(language);
