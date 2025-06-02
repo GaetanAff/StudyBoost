@@ -5,7 +5,349 @@ class StudyBoostApp {
         this.currentAction = null;
         this.inputTokensUsed = parseInt(localStorage.getItem('inputTokensUsed') || '0');
         this.outputTokensUsed = parseInt(localStorage.getItem('outputTokensUsed') || '0');
-        this.currentQCMData = null; // Pour stocker les données QCM parsées
+        this.currentQCMData = null;
+        this.currentFlashcardsData = null;
+        this.generatedOpenQuestion = null; // To store the AI-generated open question
+
+        this.dailyInputTokenLimit = 1048576; 
+
+        this.currentLanguage = localStorage.getItem('studyboost_language') || 'fr';
+        this.translations = {
+            // French (Default)
+            fr: {
+                appTitle: "StudyBoost - IA pour la Révision",
+                appTitleShort: "StudyBoost",
+                inputTokensLabel: "Tokens Entrée",
+                outputTokensLabel: "Tokens Sortie",
+                apiKeyBtnLabel: "Clé API",
+                darkModeToggleLabelLight: "Mode Clair",
+                darkModeToggleLabelDark: "Mode Sombre",
+                uploadTitle: "Uploadez vos documents",
+                uploadSubtitle: "PDF, Word, PowerPoint, Images (OCR)",
+                uploadPlaceholder: "Cliquez ou glissez vos fichiers ici",
+                processedDocumentLabel: "Document traité",
+                wordsUnit: "mots",
+                pagesUnit: "pages",
+                actionSummaryShort: "Résumé Court",
+                actionSummaryShortDesc: "Version condensée rapide",
+                actionSummaryLong: "Résumé Détaillé",
+                actionSummaryLongDesc: "Structuré et complet",
+                actionQCM: "QCM",
+                actionQCMDesc: "Questions à choix multiples",
+                actionFlashcards: "Flashcards",
+                actionFlashcardsDesc: "Cartes de révision",
+                actionOpenQuestion: "Questions Ouvertes",
+                actionOpenQuestionDesc: "Générer une question ouverte et vérifier votre réponse",
+                actionRevisionSheet: "Fiche de Révision",
+                actionRevisionSheetDesc: "Fiche complète et design",
+                actionAskQuestion: "Poser une Question",
+                actionAskQuestionDesc: "Questions libres sur le contenu",
+                resultsTitleLabel: "Résultats",
+                exportBtnLabel: "Exporter",
+                newAnalysisBtnLabel: "Nouvelle Analyse",
+                apiKeyModalTitle: "Configuration API Gemini",
+                apiKeyInputLabel: "Clé API Google Gemini",
+                apiKeyInputPlaceholder: "Entrez votre clé API Gemini",
+                apiKeyModalDesc1: "Obtenez votre clé sur",
+                saveBtnLabel: "Sauvegarder",
+                askUserQuestionModalTitle: "Poser une Question",
+                yourQuestionOnDocLabel: "Votre question sur le document",
+                userQuestionPlaceholder: "Posez votre question...",
+                submitUserQuestionBtnLabel: "Poser la Question",
+                optionsModalTitle: "Options",
+                generateBtnLabel: "Générer",
+                loadingTextDefault: "Traitement en cours...",
+                loadingTextDocument: "Traitement du document...",
+                loadingTextGenerating: "Génération du contenu avec l'IA...",
+                notificationApiKeyMissing: "Veuillez d'abord configurer votre clé API Gemini",
+                notificationDocumentMissing: "Veuillez d'abord uploader un document.",
+                notificationApiKeySaved: "Clé API sauvegardée.",
+                notificationApiKeySavedReset: "Nouvelle clé API sauvegardée. Les compteurs de tokens ont été réinitialisés.",
+                notificationApiKeyUnchanged: "Clé API sauvegardée (inchangée).",
+                notificationEnterValidApiKey: "Veuillez entrer une clé API valide",
+                notificationErrorUpload: "Erreur lors du traitement du document: ",
+                notificationErrorGeneration: "Erreur lors de la génération: ",
+                notificationNoResultsToExport: "Aucun résultat à exporter.",
+                notificationCopiedToClipboard: "Contenu copié dans le presse-papiers (jsPDF non disponible).",
+                notificationErrorCopy: "Erreur lors de la copie.",
+                notificationExportedPDF: "Résultats exportés en PDF.",
+                notificationNewAnalysisReady: "Prêt pour une nouvelle analyse.",
+                notificationSelectAnswer: "Veuillez sélectionner une réponse.",
+                notificationEnterQuestion: "Veuillez entrer une question.",
+                notificationEnterAnswer: "Veuillez entrer votre réponse.",
+                notificationQCMFormatError: "Les QCM n'ont pas pu être formatés correctement.",
+                notificationFlashcardsFormatError: "Les Flashcards n'ont pas pu être formatées correctement.",
+                optionsQCMTitle: "Options QCM",
+                optionsQCMLabel: "Nombre de questions (5-20)",
+                optionsQCMError: "Veuillez entrer un nombre de questions entre 5 et 20.",
+                optionsFlashcardsTitle: "Options Flashcards",
+                optionsFlashcardsLabel: "Nombre de flashcards (5-25)",
+                optionsFlashcardsError: "Veuillez entrer un nombre de flashcards entre 5 et 25.",
+                openQuestionGeneratedTitle: "Question Générée :",
+                yourAnswerLabel: "Votre Réponse :",
+                openAnswerPlaceholder: "Écrivez votre réponse ici...",
+                submitOpenAnswerBtnLabel: "Soumettre pour Correction",
+                aiFeedbackTitle: "Correction de l'IA :",
+                resultsSummaryShort: "Résumé Court",
+                resultsSummaryLong: "Résumé Détaillé",
+                resultsQCM: "Questions à Choix Multiples",
+                resultsFlashcards: "Flashcards",
+                resultsRevisionSheet: "Fiche de Révision",
+                resultsQuestion: "Réponse à votre Question",
+                resultsOpenQuestion: "Question Ouverte Générée",
+                resultsOpenQuestionFeedback: "Correction de votre Réponse",
+            },
+            en: {
+                appTitle: "StudyBoost - AI Study Assistant",
+                appTitleShort: "StudyBoost",
+                inputTokensLabel: "Input Tokens",
+                outputTokensLabel: "Output Tokens",
+                apiKeyBtnLabel: "API Key",
+                darkModeToggleLabelLight: "Light Mode",
+                darkModeToggleLabelDark: "Dark Mode",
+                uploadTitle: "Upload your documents",
+                uploadSubtitle: "PDF, Word, PowerPoint, Images (OCR)",
+                uploadPlaceholder: "Click or drag your files here",
+                processedDocumentLabel: "Processed Document",
+                wordsUnit: "words",
+                pagesUnit: "pages",
+                actionSummaryShort: "Short Summary",
+                actionSummaryShortDesc: "Quick condensed version",
+                actionSummaryLong: "Detailed Summary",
+                actionSummaryLongDesc: "Structured and complete",
+                actionQCM: "MCQ",
+                actionQCMDesc: "Multiple choice questions",
+                actionFlashcards: "Flashcards",
+                actionFlashcardsDesc: "Revision cards",
+                actionOpenQuestion: "Open Questions",
+                actionOpenQuestionDesc: "Generate an open question and check your answer",
+                actionRevisionSheet: "Revision Sheet",
+                actionRevisionSheetDesc: "Complete and designed sheet",
+                actionAskQuestion: "Ask a Question",
+                actionAskQuestionDesc: "Free-form questions on content",
+                resultsTitleLabel: "Results",
+                exportBtnLabel: "Export",
+                newAnalysisBtnLabel: "New Analysis",
+                apiKeyModalTitle: "Gemini API Configuration",
+                apiKeyInputLabel: "Google Gemini API Key",
+                apiKeyInputPlaceholder: "Enter your Gemini API key",
+                apiKeyModalDesc1: "Get your key from",
+                saveBtnLabel: "Save",
+                askUserQuestionModalTitle: "Ask a Question",
+                yourQuestionOnDocLabel: "Your question about the document",
+                userQuestionPlaceholder: "Ask your question...",
+                submitUserQuestionBtnLabel: "Ask Question",
+                optionsModalTitle: "Options",
+                generateBtnLabel: "Generate",
+                loadingTextDefault: "Processing...",
+                loadingTextDocument: "Processing document...",
+                loadingTextGenerating: "Generating content with AI...",
+                notificationApiKeyMissing: "Please configure your Gemini API key first",
+                notificationDocumentMissing: "Please upload a document first.",
+                notificationApiKeySaved: "API key saved.",
+                notificationApiKeySavedReset: "New API key saved. Token counters have been reset.",
+                notificationApiKeyUnchanged: "API key saved (unchanged).",
+                notificationEnterValidApiKey: "Please enter a valid API key",
+                notificationErrorUpload: "Error processing document: ",
+                notificationErrorGeneration: "Error during generation: ",
+                notificationNoResultsToExport: "No results to export.",
+                notificationCopiedToClipboard: "Content copied to clipboard (jsPDF not available).",
+                notificationErrorCopy: "Error during copy.",
+                notificationExportedPDF: "Results exported to PDF.",
+                notificationNewAnalysisReady: "Ready for a new analysis.",
+                notificationSelectAnswer: "Please select an answer.",
+                notificationEnterQuestion: "Please enter a question.",
+                notificationEnterAnswer: "Please enter your answer.",
+                notificationQCMFormatError: "MCQs could not be formatted correctly.",
+                notificationFlashcardsFormatError: "Flashcards could not be formatted correctly.",
+                optionsQCMTitle: "MCQ Options",
+                optionsQCMLabel: "Number of questions (5-20)",
+                optionsQCMError: "Please enter a number of questions between 5 and 20.",
+                optionsFlashcardsTitle: "Flashcard Options",
+                optionsFlashcardsLabel: "Number of flashcards (5-25)",
+                optionsFlashcardsError: "Please enter a number of flashcards between 5 and 25.",
+                openQuestionGeneratedTitle: "Generated Question:",
+                yourAnswerLabel: "Your Answer:",
+                openAnswerPlaceholder: "Write your answer here...",
+                submitOpenAnswerBtnLabel: "Submit for Correction",
+                aiFeedbackTitle: "AI Feedback:",
+                resultsSummaryShort: "Short Summary",
+                resultsSummaryLong: "Detailed Summary",
+                resultsQCM: "Multiple Choice Questions",
+                resultsFlashcards: "Flashcards",
+                resultsRevisionSheet: "Revision Sheet",
+                resultsQuestion: "Answer to your Question",
+                resultsOpenQuestion: "Generated Open Question",
+                resultsOpenQuestionFeedback: "Feedback on your Answer",
+            },
+            de: {
+                appTitle: "StudyBoost - KI-Lernassistent",
+                appTitleShort: "StudyBoost",
+                inputTokensLabel: "Eingabe-Tokens",
+                outputTokensLabel: "Ausgabe-Tokens",
+                apiKeyBtnLabel: "API-Schlüssel",
+                darkModeToggleLabelLight: "Heller Modus",
+                darkModeToggleLabelDark: "Dunkler Modus",
+                uploadTitle: "Laden Sie Ihre Dokumente hoch",
+                uploadSubtitle: "PDF, Word, PowerPoint, Bilder (OCR)",
+                uploadPlaceholder: "Klicken oder ziehen Sie Ihre Dateien hierher",
+                processedDocumentLabel: "Verarbeitetes Dokument",
+                wordsUnit: "Wörter",
+                pagesUnit: "Seiten",
+                actionSummaryShort: "Kurze Zusammenfassung",
+                actionSummaryShortDesc: "Schnelle komprimierte Version",
+                actionSummaryLong: "Detaillierte Zusammenfassung",
+                actionSummaryLongDesc: "Strukturiert und vollständig",
+                actionQCM: "MC-Fragen",
+                actionQCMDesc: "Multiple-Choice-Fragen",
+                actionFlashcards: "Lernkarten",
+                actionFlashcardsDesc: "Wiederholungskarten",
+                actionOpenQuestion: "Offene Fragen",
+                actionOpenQuestionDesc: "Generieren Sie eine offene Frage und überprüfen Sie Ihre Antwort",
+                actionRevisionSheet: "Revisionsblatt",
+                actionRevisionSheetDesc: "Vollständiges und gestaltetes Blatt",
+                actionAskQuestion: "Frage stellen",
+                actionAskQuestionDesc: "Freiformfragen zum Inhalt",
+                resultsTitleLabel: "Ergebnisse",
+                exportBtnLabel: "Exportieren",
+                newAnalysisBtnLabel: "Neue Analyse",
+                apiKeyModalTitle: "Gemini API-Konfiguration",
+                apiKeyInputLabel: "Google Gemini API-Schlüssel",
+                apiKeyInputPlaceholder: "Geben Sie Ihren Gemini API-Schlüssel ein",
+                apiKeyModalDesc1: "Holen Sie sich Ihren Schlüssel von",
+                saveBtnLabel: "Speichern",
+                askUserQuestionModalTitle: "Frage stellen",
+                yourQuestionOnDocLabel: "Ihre Frage zum Dokument",
+                userQuestionPlaceholder: "Stellen Sie Ihre Frage...",
+                submitUserQuestionBtnLabel: "Frage absenden",
+                optionsModalTitle: "Optionen",
+                generateBtnLabel: "Generieren",
+                loadingTextDefault: "Verarbeitung...",
+                loadingTextDocument: "Dokument wird verarbeitet...",
+                loadingTextGenerating: "Inhalt wird mit KI generiert...",
+                notificationApiKeyMissing: "Bitte konfigurieren Sie zuerst Ihren Gemini API-Schlüssel",
+                notificationDocumentMissing: "Bitte laden Sie zuerst ein Dokument hoch.",
+                notificationApiKeySaved: "API-Schlüssel gespeichert.",
+                notificationApiKeySavedReset: "Neuer API-Schlüssel gespeichert. Token-Zähler wurden zurückgesetzt.",
+                notificationApiKeyUnchanged: "API-Schlüssel gespeichert (unverändert).",
+                notificationEnterValidApiKey: "Bitte geben Sie einen gültigen API-Schlüssel ein",
+                notificationErrorUpload: "Fehler beim Verarbeiten des Dokuments: ",
+                notificationErrorGeneration: "Fehler bei der Generierung: ",
+                notificationNoResultsToExport: "Keine Ergebnisse zum Exportieren.",
+                notificationCopiedToClipboard: "Inhalt in Zwischenablage kopiert (jsPDF nicht verfügbar).",
+                notificationErrorCopy: "Fehler beim Kopieren.",
+                notificationExportedPDF: "Ergebnisse als PDF exportiert.",
+                notificationNewAnalysisReady: "Bereit für eine neue Analyse.",
+                notificationSelectAnswer: "Bitte wählen Sie eine Antwort aus.",
+                notificationEnterQuestion: "Bitte geben Sie eine Frage ein.",
+                notificationEnterAnswer: "Bitte geben Sie Ihre Antwort ein.",
+                notificationQCMFormatError: "MC-Fragen konnten nicht korrekt formatiert werden.",
+                notificationFlashcardsFormatError: "Lernkarten konnten nicht korrekt formatiert werden.",
+                optionsQCMTitle: "MC-Fragen Optionen",
+                optionsQCMLabel: "Anzahl der Fragen (5-20)",
+                optionsQCMError: "Bitte geben Sie eine Anzahl von Fragen zwischen 5 und 20 ein.",
+                optionsFlashcardsTitle: "Lernkarten Optionen",
+                optionsFlashcardsLabel: "Anzahl der Lernkarten (5-25)",
+                optionsFlashcardsError: "Bitte geben Sie eine Anzahl von Lernkarten zwischen 5 und 25 ein.",
+                openQuestionGeneratedTitle: "Generierte Frage:",
+                yourAnswerLabel: "Deine Antwort:",
+                openAnswerPlaceholder: "Schreiben Sie Ihre Antwort hier...",
+                submitOpenAnswerBtnLabel: "Zur Korrektur einreichen",
+                aiFeedbackTitle: "KI-Feedback:",
+                resultsSummaryShort: "Kurze Zusammenfassung",
+                resultsSummaryLong: "Detaillierte Zusammenfassung",
+                resultsQCM: "Multiple-Choice-Fragen",
+                resultsFlashcards: "Lernkarten",
+                resultsRevisionSheet: "Revisionsblatt",
+                resultsQuestion: "Antwort auf Ihre Frage",
+                resultsOpenQuestion: "Generierte Offene Frage",
+                resultsOpenQuestionFeedback: "Feedback zu Ihrer Antwort",
+            },
+            es: {
+                appTitle: "StudyBoost - Asistente de Estudio IA",
+                appTitleShort: "StudyBoost",
+                inputTokensLabel: "Tokens de Entrada",
+                outputTokensLabel: "Tokens de Salida",
+                apiKeyBtnLabel: "Clave API",
+                darkModeToggleLabelLight: "Modo Claro",
+                darkModeToggleLabelDark: "Modo Oscuro",
+                uploadTitle: "Sube tus documentos",
+                uploadSubtitle: "PDF, Word, PowerPoint, Imágenes (OCR)",
+                uploadPlaceholder: "Haz clic o arrastra tus archivos aquí",
+                processedDocumentLabel: "Documento Procesado",
+                wordsUnit: "palabras",
+                pagesUnit: "páginas",
+                actionSummaryShort: "Resumen Corto",
+                actionSummaryShortDesc: "Versión condensada rápida",
+                actionSummaryLong: "Resumen Detallado",
+                actionSummaryLongDesc: "Estructurado y completo",
+                actionQCM: "PEM", // Preguntas de Elección Múltiple
+                actionQCMDesc: "Preguntas de elección múltiple",
+                actionFlashcards: "Tarjetas",
+                actionFlashcardsDesc: "Tarjetas de revisión",
+                actionOpenQuestion: "Preguntas Abiertas",
+                actionOpenQuestionDesc: "Generar una pregunta abierta y verificar tu respuesta",
+                actionRevisionSheet: "Hoja de Revisión",
+                actionRevisionSheetDesc: "Hoja completa y diseñada",
+                actionAskQuestion: "Hacer una Pregunta",
+                actionAskQuestionDesc: "Preguntas libres sobre el contenido",
+                resultsTitleLabel: "Resultados",
+                exportBtnLabel: "Exportar",
+                newAnalysisBtnLabel: "Nuevo Análisis",
+                apiKeyModalTitle: "Configuración API Gemini",
+                apiKeyInputLabel: "Clave API Google Gemini",
+                apiKeyInputPlaceholder: "Introduce tu clave API Gemini",
+                apiKeyModalDesc1: "Obtén tu clave en",
+                saveBtnLabel: "Guardar",
+                askUserQuestionModalTitle: "Hacer una Pregunta",
+                yourQuestionOnDocLabel: "Tu pregunta sobre el documento",
+                userQuestionPlaceholder: "Haz tu pregunta...",
+                submitUserQuestionBtnLabel: "Enviar Pregunta",
+                optionsModalTitle: "Opciones",
+                generateBtnLabel: "Generar",
+                loadingTextDefault: "Procesando...",
+                loadingTextDocument: "Procesando documento...",
+                loadingTextGenerating: "Generando contenido con IA...",
+                notificationApiKeyMissing: "Por favor, configure primero su clave API Gemini",
+                notificationDocumentMissing: "Por favor, suba un documento primero.",
+                notificationApiKeySaved: "Clave API guardada.",
+                notificationApiKeySavedReset: "Nueva clave API guardada. Los contadores de tokens se han reiniciado.",
+                notificationApiKeyUnchanged: "Clave API guardada (sin cambios).",
+                notificationEnterValidApiKey: "Por favor, ingrese una clave API válida",
+                notificationErrorUpload: "Error al procesar el documento: ",
+                notificationErrorGeneration: "Error durante la generación: ",
+                notificationNoResultsToExport: "No hay resultados para exportar.",
+                notificationCopiedToClipboard: "Contenido copiado al portapapeles (jsPDF no disponible).",
+                notificationErrorCopy: "Error al copiar.",
+                notificationExportedPDF: "Resultados exportados a PDF.",
+                notificationNewAnalysisReady: "Listo para un nuevo análisis.",
+                notificationSelectAnswer: "Por favor, seleccione una respuesta.",
+                notificationEnterQuestion: "Por favor, ingrese una pregunta.",
+                notificationEnterAnswer: "Por favor, ingrese su respuesta.",
+                notificationQCMFormatError: "Las PEM no se pudieron formatear correctamente.",
+                notificationFlashcardsFormatError: "Las tarjetas no se pudieron formatear correctamente.",
+                optionsQCMTitle: "Opciones PEM",
+                optionsQCMLabel: "Número de preguntas (5-20)",
+                optionsQCMError: "Por favor, ingrese un número de preguntas entre 5 y 20.",
+                optionsFlashcardsTitle: "Opciones de Tarjetas",
+                optionsFlashcardsLabel: "Número de tarjetas (5-25)",
+                optionsFlashcardsError: "Por favor, ingrese un número de tarjetas entre 5 y 25.",
+                openQuestionGeneratedTitle: "Pregunta Generada:",
+                yourAnswerLabel: "Tu Respuesta:",
+                openAnswerPlaceholder: "Escribe tu respuesta aquí...",
+                submitOpenAnswerBtnLabel: "Enviar para Corrección",
+                aiFeedbackTitle: "Comentarios de la IA:",
+                resultsSummaryShort: "Resumen Corto",
+                resultsSummaryLong: "Resumen Detallado",
+                resultsQCM: "Preguntas de Elección Múltiple",
+                resultsFlashcards: "Tarjetas",
+                resultsRevisionSheet: "Hoja de Revisión",
+                resultsQuestion: "Respuesta a tu Pregunta",
+                resultsOpenQuestion: "Pregunta Abierta Generada",
+                resultsOpenQuestionFeedback: "Comentarios sobre tu Respuesta",
+            }
+        };
+
         this.init();
     }
 
@@ -13,13 +355,95 @@ class StudyBoostApp {
         this.setupEventListeners();
         this.checkApiKey();
         this.updateTokenDisplay();
+        this.setLanguage(this.currentLanguage); 
+        this.setInitialDarkMode();
     }
+    
+    setLanguage(lang) {
+        if (this.translations[lang]) {
+            this.currentLanguage = lang;
+            localStorage.setItem('studyboost_language', lang);
+            document.documentElement.lang = lang;
+
+            document.querySelectorAll('[data-lang]').forEach(el => {
+                const key = el.dataset.lang;
+                if (this.translations[lang][key]) {
+                    el.textContent = this.translations[lang][key];
+                }
+            });
+             document.querySelectorAll('[placeholder-data-lang]').forEach(el => {
+                const key = el.getAttribute('placeholder-data-lang');
+                if (this.translations[lang][key]) {
+                    el.placeholder = this.translations[lang][key];
+                }
+            });
+            // Update dynamically set texts like modal titles if needed, or ensure they also use data-lang
+            const languageSwitcher = document.getElementById('languageSwitcher');
+            if (languageSwitcher) languageSwitcher.value = lang;
+        }
+    }
+
+    _(key, replacements = {}) {
+        let translation = this.translations[this.currentLanguage]?.[key] || this.translations.en?.[key] || key;
+        for (const placeholder in replacements) {
+            translation = translation.replace(new RegExp(`{${placeholder}}`, 'g'), replacements[placeholder]);
+        }
+        return translation;
+    }
+
+    setInitialDarkMode() {
+        const darkModePreference = localStorage.getItem('studyboost_dark_mode');
+        const toggleButton = document.getElementById('darkModeToggle');
+        const icon = toggleButton.querySelector('i');
+        if (darkModePreference === 'enabled') {
+            document.body.classList.add('dark-mode');
+            icon.classList.remove('fa-moon');
+            icon.classList.add('fa-sun');
+            toggleButton.setAttribute('aria-label', this._('darkModeToggleLabelLight'));
+        } else {
+            document.body.classList.remove('dark-mode');
+            icon.classList.remove('fa-sun');
+            icon.classList.add('fa-moon');
+            toggleButton.setAttribute('aria-label', this._('darkModeToggleLabelDark'));
+        }
+    }
+
+    toggleDarkMode() {
+        document.body.classList.toggle('dark-mode');
+        const toggleButton = document.getElementById('darkModeToggle');
+        const icon = toggleButton.querySelector('i');
+        if (document.body.classList.contains('dark-mode')) {
+            localStorage.setItem('studyboost_dark_mode', 'enabled');
+            icon.classList.remove('fa-moon');
+            icon.classList.add('fa-sun');
+            toggleButton.setAttribute('aria-label', this._('darkModeToggleLabelLight'));
+        } else {
+            localStorage.setItem('studyboost_dark_mode', 'disabled');
+            icon.classList.remove('fa-sun');
+            icon.classList.add('fa-moon');
+             toggleButton.setAttribute('aria-label', this._('darkModeToggleLabelDark'));
+        }
+    }
+    
+    updateTokenPieChart() {
+        const percentage = Math.min((this.inputTokensUsed / this.dailyInputTokenLimit) * 100, 100);
+        const pieChart = document.getElementById('inputTokenPieChart');
+        const percentageText = document.getElementById('inputTokensPercentage');
+        if (pieChart) {
+            pieChart.style.setProperty('--percentage', `${percentage}%`);
+        }
+        if (percentageText) {
+            percentageText.textContent = percentage.toFixed(1);
+        }
+    }
+
 
     updateTokenDisplay() {
         const inputTokensEl = document.getElementById('inputTokensUsed');
         const outputTokensEl = document.getElementById('outputTokensUsed');
         if (inputTokensEl) inputTokensEl.textContent = this.inputTokensUsed;
         if (outputTokensEl) outputTokensEl.textContent = this.outputTokensUsed;
+        this.updateTokenPieChart();
     }
 
     updateStoredTokens(inputTokens, outputTokens) {
@@ -38,62 +462,40 @@ class StudyBoostApp {
         if (fileInput) fileInput.addEventListener('change', (e) => this.handleFileUpload(e.target.files[0]));
 
         if (uploadArea) {
-            uploadArea.addEventListener('dragover', (e) => {
-                e.preventDefault();
-                uploadArea.classList.add('dragover');
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                uploadArea.addEventListener(eventName, (e) => e.preventDefault(), false);
             });
-            uploadArea.addEventListener('dragleave', () => {
-                uploadArea.classList.remove('dragover');
-            });
+            uploadArea.addEventListener('dragenter', () => uploadArea.classList.add('dragover'));
+            uploadArea.addEventListener('dragleave', () => uploadArea.classList.remove('dragover'));
             uploadArea.addEventListener('drop', (e) => {
-                e.preventDefault();
                 uploadArea.classList.remove('dragover');
                 this.handleFileUpload(e.dataTransfer.files[0]);
             });
         }
 
-        document.getElementById('apiKeyBtn')?.addEventListener('click', () => {
-            this.showModal('apiKeyModal');
-        });
-
-        document.getElementById('saveApiKey')?.addEventListener('click', () => {
-            this.saveApiKeyAndResetTokens(); // Modifié pour potentiellement réinitialiser les tokens
-        });
+        document.getElementById('apiKeyBtn')?.addEventListener('click', () => this.showModal('apiKeyModal'));
+        document.getElementById('saveApiKey')?.addEventListener('click', () => this.saveApiKeyAndResetTokens());
+        document.getElementById('darkModeToggle')?.addEventListener('click', () => this.toggleDarkMode());
+        document.getElementById('languageSwitcher')?.addEventListener('change', (e) => this.setLanguage(e.target.value));
 
         document.querySelectorAll('.action-card').forEach(card => {
-            card.addEventListener('click', (e) => {
-                const action = e.currentTarget.dataset.action;
-                this.handleAction(action);
-            });
+            card.addEventListener('click', (e) => this.handleAction(e.currentTarget.dataset.action));
         });
 
         document.querySelectorAll('.modal-close').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                this.hideModal(e.target.closest('.modal').id);
-            });
+            btn.addEventListener('click', (e) => this.hideModal(e.target.closest('.modal').id));
         });
 
-        document.getElementById('submitQuestion')?.addEventListener('click', () => {
-            this.submitQuestion();
-        });
+        document.getElementById('submitQuestion')?.addEventListener('click', () => this.submitUserQuestion());
+        document.getElementById('confirmOptions')?.addEventListener('click', () => this.confirmOptions());
+        document.getElementById('newAnalysisBtn')?.addEventListener('click', () => this.resetApp());
+        document.getElementById('exportBtn')?.addEventListener('click', () => this.exportResults());
+        document.getElementById('submitOpenAnswerBtn')?.addEventListener('click', () => this.submitOpenAnswer());
 
-        document.getElementById('confirmOptions')?.addEventListener('click', () => {
-            this.confirmOptions();
-        });
-
-        document.getElementById('newAnalysisBtn')?.addEventListener('click', () => {
-            this.resetApp();
-        });
-
-        document.getElementById('exportBtn')?.addEventListener('click', () => {
-            this.exportResults();
-        });
 
         document.querySelectorAll('.modal').forEach(modal => {
             modal.addEventListener('click', (e) => {
-                if (e.target === modal) {
-                    this.hideModal(modal.id);
-                }
+                if (e.target === modal) this.hideModal(modal.id);
             });
         });
     }
@@ -103,26 +505,24 @@ class StudyBoostApp {
         const newApiKey = apiKeyInput.value.trim();
 
         if (!newApiKey) {
-            this.showNotification('Veuillez entrer une clé API valide', 'error');
+            this.showNotification(this._('notificationEnterValidApiKey'), 'error');
             return;
         }
 
         if (this.apiKey !== newApiKey) {
             this.apiKey = newApiKey;
             localStorage.setItem('gemini_api_key', this.apiKey);
-            // Réinitialiser les compteurs de tokens car ils sont liés à l'utilisation d'une clé spécifique
             this.inputTokensUsed = 0;
             this.outputTokensUsed = 0;
             localStorage.setItem('inputTokensUsed', '0');
             localStorage.setItem('outputTokensUsed', '0');
             this.updateTokenDisplay();
-            this.showNotification('Nouvelle clé API sauvegardée. Les compteurs de tokens ont été réinitialisés.', 'success');
+            this.showNotification(this._('notificationApiKeySavedReset'), 'success');
         } else {
-            this.showNotification('Clé API sauvegardée (inchangée).', 'success');
+            this.showNotification(this._('notificationApiKeyUnchanged'), 'success');
         }
         this.hideModal('apiKeyModal');
     }
-
 
     checkApiKey() {
         const apiKeyInput = document.getElementById('apiKeyInput');
@@ -135,12 +535,12 @@ class StudyBoostApp {
         if (!file) return;
 
         if (!this.apiKey) {
-            this.showNotification('Veuillez d\'abord configurer votre clé API Gemini', 'error');
+            this.showNotification(this._('notificationApiKeyMissing'), 'error');
             this.showModal('apiKeyModal');
             return;
         }
 
-        this.showLoading('Traitement du document...');
+        this.showLoading(this._('loadingTextDocument'));
 
         const formData = new FormData();
         formData.append('document', file);
@@ -150,7 +550,6 @@ class StudyBoostApp {
                 method: 'POST',
                 body: formData
             });
-
             const result = await response.json();
 
             if (result.success) {
@@ -160,50 +559,47 @@ class StudyBoostApp {
                 };
                 this.showDocumentProcessed(result.filename, result.text);
             } else {
-                throw new Error(result.error || "Erreur inconnue lors de l'upload");
+                throw new Error(result.error || "Unknown upload error");
             }
         } catch (error) {
-            console.error('Erreur upload:', error);
-            this.showNotification(`Erreur lors du traitement du document: ${error.message}`, 'error');
+            console.error('Upload error:', error);
+            this.showNotification(this._('notificationErrorUpload') + error.message, 'error');
         } finally {
             this.hideLoading();
         }
     }
 
     showDocumentProcessed(filename, text) {
-        const wordCount = text ? text.split(/\s+/).length : 0;
-        const pageCount = Math.ceil(wordCount / 250); 
+        const wordCount = text ? text.split(/\s+/).filter(Boolean).length : 0;
+        // A common estimate for pages is ~250-300 words per page.
+        const pageCount = Math.max(1, Math.ceil(wordCount / 250)); 
 
-        const docTitleEl = document.getElementById('documentTitle');
-        const wordCountEl = document.getElementById('wordCount');
-        const pageCountEl = document.getElementById('pageCount');
-        const uploadSectionEl = document.getElementById('uploadSection');
-        const contentSectionEl = document.getElementById('contentSection');
+        document.getElementById('documentTitle').textContent = `${this._('processedDocumentLabel')}: ${filename}`;
+        document.getElementById('wordCount').innerHTML = `${wordCount} ${this._('wordsUnit')}`;
+        document.getElementById('pageCount').innerHTML = `~${pageCount} ${this._('pagesUnit')}`;
 
-        if (docTitleEl) docTitleEl.textContent = filename;
-        if (wordCountEl) wordCountEl.textContent = `${wordCount} mots`;
-        if (pageCountEl) pageCountEl.textContent = `~${pageCount} pages`;
-
-        if (uploadSectionEl) uploadSectionEl.style.display = 'none';
-        if (contentSectionEl) contentSectionEl.style.display = 'block';
-        
-        // Cacher les résultats précédents si un nouveau document est chargé
-        const resultsSectionEl = document.getElementById('resultsSection');
-        if (resultsSectionEl) resultsSectionEl.style.display = 'none';
+        document.getElementById('uploadSection').style.display = 'none';
+        document.getElementById('contentSection').style.display = 'block';
+        document.getElementById('resultsSection').style.display = 'none';
+        document.getElementById('openQuestionInteractionSection').style.display = 'none';
     }
 
     async handleAction(action) {
         if (!this.currentDocument) {
-            this.showNotification('Veuillez d\'abord uploader un document.', 'error');
+            this.showNotification(this._('notificationDocumentMissing'), 'error');
             return;
         }
         if (!this.apiKey) {
-            this.showNotification('Veuillez configurer votre clé API Gemini.', 'error');
+            this.showNotification(this._('notificationApiKeyMissing'), 'error');
             this.showModal('apiKeyModal');
             return;
         }
 
         this.currentAction = action;
+        // Hide previous results and open question section
+        document.getElementById('resultsContent').innerHTML = '';
+        document.getElementById('openQuestionInteractionSection').style.display = 'none';
+
 
         if (action === 'question') {
             this.showModal('questionModal');
@@ -212,6 +608,11 @@ class StudyBoostApp {
 
         if (action === 'qcm' || action === 'flashcards') {
             this.showOptionsModal(action);
+            return;
+        }
+        
+        if (action === 'open_question_generate') {
+            await this.generateContent(action); // No specific options needed for generating one question
             return;
         }
 
@@ -226,25 +627,21 @@ class StudyBoostApp {
         if (!modal || !title || !body) return;
 
         let optionsHtml = '';
-
         if (action === 'qcm') {
-            title.textContent = 'Options QCM';
+            title.textContent = this._('optionsQCMTitle');
             optionsHtml = `
                 <div class="form-group">
-                    <label for="numQuestionsInput">Nombre de questions (5-20)</label>
-                    <input type="number" id="numQuestionsInput" value="10" min="5" max="20" class="form-group input">
-                </div>
-            `;
+                    <label for="numQuestionsInput">${this._('optionsQCMLabel')}</label>
+                    <input type="number" id="numQuestionsInput" value="10" min="5" max="20" class="form-control">
+                </div>`;
         } else if (action === 'flashcards') {
-            title.textContent = 'Options Flashcards';
+            title.textContent = this._('optionsFlashcardsTitle');
             optionsHtml = `
                 <div class="form-group">
-                    <label for="numCardsInput">Nombre de flashcards (5-25)</label>
-                    <input type="number" id="numCardsInput" value="15" min="5" max="25" class="form-group input">
-                </div>
-            `;
+                    <label for="numCardsInput">${this._('optionsFlashcardsLabel')}</label>
+                    <input type="number" id="numCardsInput" value="15" min="5" max="25" class="form-control">
+                </div>`;
         }
-
         body.innerHTML = optionsHtml;
         this.showModal('optionsModal');
     }
@@ -257,16 +654,14 @@ class StudyBoostApp {
             const numInput = document.getElementById('numQuestionsInput');
             options.numQuestions = parseInt(numInput.value);
             if (isNaN(options.numQuestions) || options.numQuestions < 5 || options.numQuestions > 20) {
-                this.showNotification('Veuillez entrer un nombre de questions entre 5 et 20.', 'error');
-                numInput.focus();
+                this.showNotification(this._('optionsQCMError'), 'error');
                 isValid = false;
             }
         } else if (this.currentAction === 'flashcards') {
             const numInput = document.getElementById('numCardsInput');
             options.numCards = parseInt(numInput.value);
             if (isNaN(options.numCards) || options.numCards < 5 || options.numCards > 25) {
-                this.showNotification('Veuillez entrer un nombre de flashcards entre 5 et 25.', 'error');
-                numInput.focus();
+                this.showNotification(this._('optionsFlashcardsError'), 'error');
                 isValid = false;
             }
         }
@@ -276,58 +671,79 @@ class StudyBoostApp {
         await this.generateContent(this.currentAction, options);
     }
 
-    async submitQuestion() {
+    async submitUserQuestion() { // Renamed from submitQuestion to avoid conflict
         const questionInput = document.getElementById('questionInput');
         const question = questionInput.value.trim();
         if (!question) {
-            this.showNotification('Veuillez entrer une question.', 'error');
+            this.showNotification(this._('notificationEnterQuestion'), 'error');
+            return;
+        }
+        const options = { question };
+        this.hideModal('questionModal');
+        await this.generateContent('question', options);
+        questionInput.value = '';
+    }
+    
+    async submitOpenAnswer() {
+        const userAnswerInput = document.getElementById('userOpenAnswer');
+        const userAnswer = userAnswerInput.value.trim();
+
+        if (!userAnswer) {
+            this.showNotification(this._('notificationEnterAnswer'), 'error');
+            return;
+        }
+        if (!this.generatedOpenQuestion) {
+             this.showNotification("Aucune question ouverte n'a été générée pour soumettre une réponse.", 'error'); // Should be translated
             return;
         }
 
-        const options = { question };
-        this.hideModal('questionModal');
+        const options = {
+            originalQuestion: this.generatedOpenQuestion,
+            userAnswer: userAnswer
+        };
         
-        await this.generateContent('question', options);
-        
-        questionInput.value = '';
+        // Call generateContent for correction
+        await this.generateContent('open_question_correct', options);
+        // The result will be handled by showResults, which needs to update the feedback section
     }
+
 
     async generateContent(type, options = {}) {
         if (!this.currentDocument || !this.currentDocument.text) {
-            this.showNotification('Aucun document chargé pour analyse.', 'error');
+            this.showNotification(this._('notificationDocumentMissing'), 'error');
             return;
         }
-        this.showLoading('Génération du contenu avec l\'IA...');
+        this.showLoading(this._('loadingTextGenerating'));
 
         try {
+            const requestBody = {
+                text: this.currentDocument.text,
+                type: type,
+                options: options,
+                apiKey: this.apiKey,
+                language: this.currentLanguage // Send language for AI prompts
+            };
+            
             const response = await fetch('/api/generate', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    text: this.currentDocument.text,
-                    type: type,
-                    options: options,
-                    apiKey: this.apiKey
-                })
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(requestBody)
             });
-
             const result = await response.json();
 
             if (response.ok && result.success && result.content && typeof result.content.text !== 'undefined') {
                 this.showResults(type, result.content.text); 
-                if (result.content.usage) { 
+                if (result.content.usage) {
                     const promptTokens = result.content.usage.promptTokenCount || 0;
                     const candidatesTokens = result.content.usage.candidatesTokenCount || 0; 
                     this.updateStoredTokens(promptTokens, candidatesTokens);
                 }
             } else {
-                throw new Error(result.error || `Erreur HTTP ${response.status}`);
+                throw new Error(result.error || `HTTP error ${response.status}`);
             }
         } catch (error) {
-            console.error('Erreur génération:', error);
-            this.showNotification(`Erreur lors de la génération: ${error.message}`, 'error');
+            console.error('Generation error:', error);
+            this.showNotification(this._('notificationErrorGeneration') + error.message, 'error');
         } finally {
             this.hideLoading();
         }
@@ -337,21 +753,32 @@ class StudyBoostApp {
         const resultsSection = document.getElementById('resultsSection');
         const resultsTitle = document.getElementById('resultsTitle');
         const resultsContent = document.getElementById('resultsContent');
+        const openQuestionInteractionSection = document.getElementById('openQuestionInteractionSection');
+        const generatedOpenQuestionTextEl = document.getElementById('generatedOpenQuestionText');
+        const openAnswerFeedbackContentEl = document.getElementById('openAnswerFeedbackContent');
+        const openAnswerFeedbackEl = document.getElementById('openAnswerFeedback');
 
         if (!resultsSection || !resultsTitle || !resultsContent) return;
 
-        const titles = {
-            'summary_short': 'Résumé Court',
-            'summary_long': 'Résumé Détaillé',
-            'qcm': 'Questions à Choix Multiples',
-            'flashcards': 'Flashcards',
-            'revision_sheet': 'Fiche de Révision',
-            'question': 'Réponse à votre Question'
+        const titlesMap = {
+            'summary_short': this._('resultsSummaryShort'),
+            'summary_long': this._('resultsSummaryLong'),
+            'qcm': this._('resultsQCM'),
+            'flashcards': this._('resultsFlashcards'),
+            'revision_sheet': this._('resultsRevisionSheet'),
+            'question': this._('resultsQuestion'),
+            'open_question_generate': this._('resultsOpenQuestion'),
+            'open_question_correct': this._('resultsOpenQuestionFeedback')
         };
-
-        resultsTitle.textContent = titles[type] || 'Résultats';
+        resultsTitle.textContent = titlesMap[type] || this._('resultsTitleLabel');
+        
         let html = '';
         this.currentQCMData = null;
+        this.currentFlashcardsData = null;
+        
+        // Ensure open question section is hidden unless explicitly shown
+        openQuestionInteractionSection.style.display = 'none';
+        resultsContent.style.display = 'block'; // Default to show main results content
 
         switch (type) {
             case 'summary_short':
@@ -359,17 +786,20 @@ class StudyBoostApp {
             case 'revision_sheet':
             case 'question':
                 html = `<div class="markdown-content">${marked.parse(content)}</div>`;
+                resultsContent.innerHTML = html;
                 break;
             case 'qcm':
                 try {
-                    // Tenter de nettoyer le contenu si ce n'est pas du JSON pur
                     const cleanedContent = content.trim().startsWith('```json') ? content.substring(content.indexOf('['), content.lastIndexOf(']') + 1) : content;
                     this.currentQCMData = JSON.parse(cleanedContent); 
-                    html = this.formatQCM(this.currentQCMData); // Passer les données parsées
+                    html = this.formatQCM(this.currentQCMData);
+                    resultsContent.innerHTML = html;
+                    this.setupQCMInteractions();
                 } catch (e) {
-                    console.error("Erreur parsing QCM JSON:", e, "Contenu brut:", content);
-                    html = `<div class="markdown-content"><p>Erreur de format des QCM reçus de l'IA. Le format JSON attendu n'a pas été respecté. Voici le contenu brut :</p><pre>${content}</pre></div>`;
-                    this.showNotification("Les QCM n'ont pas pu être formatés correctement.", "error");
+                    console.error("Error parsing QCM JSON:", e, "Raw content:", content);
+                    html = `<div class="markdown-content"><p>${this._('notificationQCMFormatError')} Raw:</p><pre>${content}</pre></div>`;
+                    resultsContent.innerHTML = html;
+                    this.showNotification(this._('notificationQCMFormatError'), "error");
                 }
                 break;
             case 'flashcards':
@@ -377,35 +807,44 @@ class StudyBoostApp {
                     const cleanedContent = content.trim().startsWith('```json') ? content.substring(content.indexOf('['), content.lastIndexOf(']') + 1) : content;
                     this.currentFlashcardsData = JSON.parse(cleanedContent);
                     html = this.formatFlashcards(this.currentFlashcardsData);
+                    resultsContent.innerHTML = html;
+                    this.setupFlashcards();
                 } catch (e) {
-                    console.error("Erreur parsing Flashcards JSON:", e, "Contenu brut:", content);
-                    html = `<div class="markdown-content"><p>Erreur de format des Flashcards. Le format JSON attendu n'a pas été respecté. Voici le contenu brut :</p><pre>${content}</pre></div>`;
-                    this.showNotification("Les Flashcards n'ont pas pu être formatées correctement.", "error");
+                    console.error("Error parsing Flashcards JSON:", e, "Raw content:", content);
+                    html = `<div class="markdown-content"><p>${this._('notificationFlashcardsFormatError')} Raw:</p><pre>${content}</pre></div>`;
+                    resultsContent.innerHTML = html;
+                    this.showNotification(this._('notificationFlashcardsFormatError'), "error");
                 }
                 break;
+            case 'open_question_generate':
+                this.generatedOpenQuestion = content; // Store the question
+                generatedOpenQuestionTextEl.textContent = content;
+                document.getElementById('userOpenAnswer').value = ''; // Clear previous answer
+                openAnswerFeedbackEl.style.display = 'none'; // Hide old feedback
+                openQuestionInteractionSection.style.display = 'block';
+                resultsContent.style.display = 'none'; // Hide the generic results content area
+                break;
+            case 'open_question_correct':
+                openAnswerFeedbackContentEl.innerHTML = `<div class="markdown-content">${marked.parse(content)}</div>`;
+                openAnswerFeedbackEl.style.display = 'block';
+                openQuestionInteractionSection.style.display = 'block'; // Keep it visible
+                resultsContent.style.display = 'none'; // Hide the generic results content area
+                break;
         }
-
-        resultsContent.innerHTML = html;
+        
         resultsSection.style.display = 'block';
         resultsSection.scrollIntoView({ behavior: 'smooth' });
-
-        if (type === 'flashcards' && this.currentFlashcardsData) {
-            this.setupFlashcards();
-        }
-        if (type === 'qcm' && this.currentQCMData) {
-            this.setupQCMInteractions();
-        }
     }
 
-    formatQCM(qcmDataArray) { // Prend maintenant un tableau d'objets QCM
+
+    formatQCM(qcmDataArray) {
         let html = '<div class="qcm-container">';
         qcmDataArray.forEach((q, index) => {
             const questionId = `q-${index}`;
             html += `
                 <div class="qcm-item" id="${questionId}" data-correct-answer="${q.correct_answer}">
-                    <h4>Question ${index + 1}: ${q.question}</h4>
-                    <div class="qcm-options">
-            `;
+                    <h4>${this._('actionQCM')} ${index + 1}: ${q.question}</h4>
+                    <div class="qcm-options">`;
             q.options.forEach((option, optIndex) => {
                 const optionId = `${questionId}-opt-${optIndex}`;
                 const optionLetter = String.fromCharCode(65 + optIndex);
@@ -413,17 +852,14 @@ class StudyBoostApp {
                     <label for="${optionId}" class="qcm-option">
                         <input type="radio" name="${questionId}-options" id="${optionId}" value="${optionLetter}">
                         <strong>${optionLetter}.</strong> ${option}
-                    </label>
-                `;
+                    </label>`;
             });
-            html += `
-                    </div>
-                    <button class="check-answer-btn" data-question-index="${index}">Vérifier ma réponse</button>
+            html += `</div>
+                    <button class="check-answer-btn" data-question-index="${index}">${this._('submitOpenAnswerBtnLabel').replace('Correction', 'Vérifier')}</button>
                     <div class="qcm-explanation">
-                        <strong>Explication:</strong> ${q.explanation || "Aucune explication fournie."}
+                        <strong>${this._('aiFeedbackTitle').replace('Correction', 'Explication')}:</strong> ${q.explanation || "Aucune explication fournie."}
                     </div>
-                </div>
-            `;
+                </div>`;
         });
         html += '</div>';
         return html;
@@ -441,57 +877,39 @@ class StudyBoostApp {
 
                 const selectedOptionInput = qcmItem.querySelector('input[type="radio"]:checked');
                 if (!selectedOptionInput) {
-                    this.showNotification('Veuillez sélectionner une réponse.', 'info');
+                    this.showNotification(this._('notificationSelectAnswer'), 'info');
                     return;
                 }
 
                 const userAnswerLetter = selectedOptionInput.value;
                 const correctAnswerLetter = qcmItem.dataset.correctAnswer;
 
-                const allOptionLabels = qcmItem.querySelectorAll('.qcm-option');
-                allOptionLabels.forEach(label => {
+                qcmItem.querySelectorAll('.qcm-option').forEach(label => {
                     const input = label.querySelector('input[type="radio"]');
                     label.classList.remove('selected', 'correct-answer', 'incorrect-answer'); 
-                    
-                    if (input.value === correctAnswerLetter) {
-                        label.classList.add('correct-answer');
-                    }
+                    if (input.value === correctAnswerLetter) label.classList.add('correct-answer');
                     if (input.checked) {
                         label.classList.add('selected');
-                        if (input.value !== correctAnswerLetter) {
-                            label.classList.add('incorrect-answer');
-                        }
+                        if (input.value !== correctAnswerLetter) label.classList.add('incorrect-answer');
                     }
                     input.disabled = true; 
                 });
-
-                const explanationDiv = qcmItem.querySelector('.qcm-explanation');
-                if (explanationDiv) explanationDiv.classList.add('visible');
+                qcmItem.querySelector('.qcm-explanation')?.classList.add('visible');
                 button.disabled = true; 
             }
         });
     }
 
-
-    formatFlashcards(flashcardsDataArray) { // Prend maintenant un tableau d'objets flashcard
+    formatFlashcards(flashcardsDataArray) {
         let html = '<div class="flashcards-container">';
         flashcardsDataArray.forEach((card, index) => {
             html += `
                 <div class="flashcard" data-index="${index}">
                     <div class="flashcard-inner">
-                        <div class="flashcard-front">
-                            <div class="flashcard-content">
-                                <h4>${card.front}</h4>
-                            </div>
-                        </div>
-                        <div class="flashcard-back">
-                            <div class="flashcard-content">
-                                <p>${card.back}</p>
-                            </div>
-                        </div>
+                        <div class="flashcard-front"><div class="flashcard-content"><h4>${card.front}</h4></div></div>
+                        <div class="flashcard-back"><div class="flashcard-content"><p>${card.back}</p></div></div>
                     </div>
-                </div>
-            `;
+                </div>`;
         });
         html += '</div>';
         return html;
@@ -499,142 +917,89 @@ class StudyBoostApp {
 
     setupFlashcards() {
         document.querySelectorAll('.flashcard').forEach(card => {
-            card.addEventListener('click', () => {
-                card.classList.toggle('flipped');
-            });
+            card.addEventListener('click', () => card.classList.toggle('flipped'));
         });
     }
     
     exportResults() {
         const resultsContentElement = document.getElementById('resultsContent');
         const titleElement = document.getElementById('resultsTitle');
+        const openQuestionInteractionElement = document.getElementById('openQuestionInteractionSection');
 
         if (!resultsContentElement || !titleElement) {
-            this.showNotification('Aucun résultat à exporter.', 'error');
+            this.showNotification(this._('notificationNoResultsToExport'), 'error');
             return;
         }
         
         const title = titleElement.textContent;
-        
+        let textContentToExport = "";
+
+        if (this.currentAction === 'qcm' && this.currentQCMData) {
+            this.currentQCMData.forEach((q, i) => {
+                textContentToExport += `Question ${i+1}: ${q.question}\n`;
+                q.options.forEach((opt, j) => textContentToExport += `${String.fromCharCode(65+j)}. ${opt}\n`);
+                textContentToExport += `Réponse: ${q.correct_answer}\nExplication: ${q.explanation}\n\n`;
+            });
+        } else if (this.currentAction === 'flashcards' && this.currentFlashcardsData) {
+             this.currentFlashcardsData.forEach((card, i) => textContentToExport += `Flashcard ${i+1}:\nRecto: ${card.front}\nVerso: ${card.back}\n\n`);
+        } else if (this.currentAction === 'open_question_generate' || this.currentAction === 'open_question_correct') {
+            const genQEl = document.getElementById('generatedOpenQuestionText');
+            const userAnswerEl = document.getElementById('userOpenAnswer');
+            const feedbackEl = document.getElementById('openAnswerFeedbackContent');
+            if (genQEl) textContentToExport += `${this._('openQuestionGeneratedTitle')} ${genQEl.textContent}\n\n`;
+            if (userAnswerEl && userAnswerEl.value) textContentToExport += `${this._('yourAnswerLabel')} ${userAnswerEl.value}\n\n`;
+            if (feedbackEl && feedbackEl.style.display !== 'none') textContentToExport += `${this._('aiFeedbackTitle')}\n${feedbackEl.innerText}\n\n`;
+        } else {
+            textContentToExport = resultsContentElement.innerText;
+        }
+
         if (window.jspdf && window.jspdf.jsPDF) {
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
-            
             doc.setFontSize(18);
             doc.text(title, 14, 22);
             doc.setFontSize(11);
-
-            // Utiliser html method de jsPDF pour un meilleur rendu du HTML (simplifié)
-            // Pour un rendu complexe, html2canvas est souvent combiné avec jsPDF, 
-            // mais pour du texte structuré, `html` peut suffire.
-            // Cela nécessite que le contenu soit bien structuré en HTML.
-            // La version actuelle de marked.js et le formatage QCM/Flashcards devraient être gérables.
-            
-            // Pour éviter les problèmes avec le rendu direct du HTML complexe via `doc.html`,
-            // on va garder la version `innerText` pour la simplicité de l'export PDF de base
-            // ou alors recommander html2canvas pour une capture d'image.
-            // L'export PDF direct de HTML complexe est difficile.
-            
-            let textContentToExport = "";
-            if (this.currentAction === 'qcm' && this.currentQCMData) {
-                this.currentQCMData.forEach((q, i) => {
-                    textContentToExport += `Question ${i+1}: ${q.question}\n`;
-                    q.options.forEach((opt, j) => {
-                        textContentToExport += `${String.fromCharCode(65+j)}. ${opt}\n`;
-                    });
-                    textContentToExport += `Réponse: ${q.correct_answer}\nExplication: ${q.explanation}\n\n`;
-                });
-            } else if (this.currentAction === 'flashcards' && this.currentFlashcardsData) {
-                 this.currentFlashcardsData.forEach((card, i) => {
-                    textContentToExport += `Flashcard ${i+1}:\nRecto: ${card.front}\nVerso: ${card.back}\n\n`;
-                });
-            } else {
-                 // Pour les contenus Markdown, on peut essayer de les convertir en texte simple
-                 // ou utiliser `doc.html` avec prudence.
-                 // `innerText` est le plus simple pour l'instant.
-                textContentToExport = resultsContentElement.innerText;
-            }
-
-            const lines = doc.splitTextToSize(textContentToExport, 180); // Ajuster la largeur
+            const lines = doc.splitTextToSize(textContentToExport, 180);
             doc.text(lines, 14, 32);
-            
             doc.save(`${title.toLowerCase().replace(/\s+/g, '-')}.pdf`);
-            this.showNotification('Résultats exportés en PDF.', 'success');
-
+            this.showNotification(this._('notificationExportedPDF'), 'success');
         } else {
-            const textContent = resultsContentElement.innerText;
-            navigator.clipboard.writeText(textContent).then(() => {
-                this.showNotification('Contenu copié dans le presse-papiers (jsPDF non disponible).', 'info');
-            }).catch(err => {
-                this.showNotification('Erreur lors de la copie.', 'error');
-            });
+            navigator.clipboard.writeText(textContentToExport).then(() => {
+                this.showNotification(this._('notificationCopiedToClipboard'), 'info');
+            }).catch(err => this.showNotification(this._('notificationErrorCopy'), 'error'));
         }
     }
-
 
     resetApp() {
         this.currentDocument = null;
         this.currentAction = null;
         this.currentQCMData = null;
         this.currentFlashcardsData = null;
+        this.generatedOpenQuestion = null;
         
-        const uploadSectionEl = document.getElementById('uploadSection');
-        const contentSectionEl = document.getElementById('contentSection');
-        const resultsSectionEl = document.getElementById('resultsSection');
-        const fileInputEl = document.getElementById('fileInput');
+        document.getElementById('uploadSection').style.display = 'block';
+        document.getElementById('contentSection').style.display = 'none';
+        document.getElementById('resultsSection').style.display = 'none';
+        document.getElementById('openQuestionInteractionSection').style.display = 'none';
+        const fileInput = document.getElementById('fileInput');
+        if(fileInput) fileInput.value = '';
 
-        if (uploadSectionEl) uploadSectionEl.style.display = 'block';
-        if (contentSectionEl) contentSectionEl.style.display = 'none';
-        if (resultsSectionEl) resultsSectionEl.style.display = 'none';
-        if (fileInputEl) fileInputEl.value = '';
-
-        this.showNotification('Prêt pour une nouvelle analyse.', 'info');
+        this.showNotification(this._('notificationNewAnalysisReady'), 'info');
     }
 
-    showModal(modalId) {
-        const modal = document.getElementById(modalId);
-        if (modal) modal.classList.add('show');
-    }
+    showModal(modalId) { document.getElementById(modalId)?.classList.add('show'); }
+    hideModal(modalId) { document.getElementById(modalId)?.classList.remove('show'); }
 
-    hideModal(modalId) {
-         const modal = document.getElementById(modalId);
-        if (modal) modal.classList.remove('show');
+    showLoading(messageKey) {
+        document.getElementById('loadingText').textContent = this._(messageKey) || this._('loadingTextDefault');
+        document.getElementById('loadingOverlay').style.display = 'flex';
     }
-
-    showLoading(message) {
-        const loadingTextEl = document.getElementById('loadingText');
-        const loadingOverlayEl = document.getElementById('loadingOverlay');
-        if (loadingTextEl) loadingTextEl.textContent = message;
-        if (loadingOverlayEl) loadingOverlayEl.style.display = 'flex';
-    }
-
-    hideLoading() {
-        const loadingOverlayEl = document.getElementById('loadingOverlay');
-        if (loadingOverlayEl) loadingOverlayEl.style.display = 'none';
-    }
+    hideLoading() { document.getElementById('loadingOverlay').style.display = 'none'; }
 
     showNotification(message, type = 'info') {
-        const notificationArea = document.body; // Ou un conteneur dédié si vous en avez un
+        const notificationArea = document.body;
         const notification = document.createElement('div');
-        // Utiliser les classes .success, .error, .info de styles.css si elles existent
-        // ou appliquer des styles inline comme précédemment.
-        // Pour la simplicité, je reprends le style inline mais l'idéal serait des classes CSS.
-        notification.style.cssText = `
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            padding: 1rem 1.5rem;
-            border-radius: 0.5rem;
-            color: white;
-            font-weight: 500;
-            z-index: 3000;
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            animation: slideInFromRight 0.3s ease-out;
-            background: ${type === 'success' ? 'var(--secondary-color)' : type === 'error' ? '#ef4444' : 'var(--primary-color)'};
-            box-shadow: var(--shadow-lg);
-        `;
+        notification.className = `notification type-${type} slide-in`;
         
         const messageSpan = document.createElement('span');
         messageSpan.textContent = message;
@@ -642,19 +1007,20 @@ class StudyBoostApp {
 
         const closeButton = document.createElement('button');
         closeButton.innerHTML = '&times;';
-        closeButton.style.cssText = `
-            background: none; border: none; color: white; font-size: 1.5rem; 
-            cursor: pointer; opacity: 0.8; padding: 0; margin-left: 1rem;
-            line-height: 1;
-        `;
-        closeButton.onclick = () => notification.remove();
+        closeButton.className = 'notification-close';
+        closeButton.onclick = () => {
+            notification.classList.remove('slide-in');
+            notification.classList.add('slide-out');
+            setTimeout(() => notification.remove(), 300);
+        };
         notification.appendChild(closeButton);
         
         notificationArea.appendChild(notification);
         
         setTimeout(() => {
             if (notification.parentElement) {
-                notification.style.animation = 'fadeOutToRight 0.3s ease-in forwards';
+                notification.classList.remove('slide-in');
+                notification.classList.add('slide-out');
                 setTimeout(() => notification.remove(), 300);
             }
         }, 3000);
@@ -665,16 +1031,4 @@ document.addEventListener('DOMContentLoaded', () => {
     new StudyBoostApp();
 });
 
-const styleSheet = document.createElement("style");
-styleSheet.type = "text/css";
-styleSheet.innerText = `
-    @keyframes slideInFromRight {
-        from { transform: translateX(100%); opacity: 0; }
-        to { transform: translateX(0); opacity: 1; }
-    }
-    @keyframes fadeOutToRight {
-        from { transform: translateX(0); opacity: 1; }
-        to { transform: translateX(100%); opacity: 0; }
-    }
-`;
-document.head.appendChild(styleSheet);
+// Keyframes for notifications are now in styles.css
