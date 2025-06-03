@@ -12,7 +12,14 @@ function getLanguageInstructions(lang) {
                 revisionSheetPromptStart: "Create a complete and well-structured revision sheet in Markdown format from the following text.\nThe sheet should include:\n- A relevant main title (## Title).\n- A 'Key Points' section (### Key Points) with a bulleted list of the most important ideas.\n- An 'Important Definitions' section (### Important Definitions) listing key terms and their definitions, if applicable.\n- If the text lends itself to it, a 'Concepts and Relations' section (### Concepts and Relations) describing the relationships between main ideas (can be bullet points or short paragraphs).\nUse Markdown formatting (bold, italics, lists) to improve readability.",
                 userQuestionPromptStart: "Based STRICTLY and ONLY on the content of the following text, answer the posed question. If the answer is not found in the text, indicate 'The information is not available in the provided text.' Do not make any assumptions or external searches.",
                 openQuestionGeneratePrompt: "Based on the following document, generate one open-ended question that requires a written answer. The question should encourage critical thinking or recall of information from the document. Return ONLY the question as a plain string, without any JSON or Markdown formatting.",
-                openQuestionCorrectPromptStart: "Given the following document, the question: '{originalQuestion}', and the user's answer: '{userAnswer}', please evaluate the user's answer. Provide constructive correction and feedback in Markdown. If the answer is correct, acknowledge it. If it's partially correct or incorrect, explain why and provide the correct information based *only* on the document."
+                openQuestionCorrectPromptStart: "Given the following document, the question: '{originalQuestion}', and the user's answer: '{userAnswer}', please evaluate the user's answer. Provide constructive correction and feedback in Markdown. If the answer is correct, acknowledge it. If it's partially correct or incorrect, explain why and provide the correct information based *only* on the document.",
+                difficultyLevels: {
+                    level1: "Very simple questions, mainly for checking reading and superficial understanding of the document (discovery level).",
+                    level2: "Easy questions, focusing on facts clearly stated in the document.",
+                    level3: "Medium difficulty questions, which may require connecting some simple information from the document.",
+                    level4: "Difficult questions, requiring a deeper understanding, interpretation, or synthesis of information from different parts of the document.",
+                    level5: "Very complex and 'ultra complicated' questions, requiring critical analysis, comparison with implicit concepts, or application of the document's information to hypothetical scenarios."
+                }
             };
         case 'de':
              return {
@@ -23,7 +30,14 @@ function getLanguageInstructions(lang) {
                 revisionSheetPromptStart: "Erstellen Sie aus dem folgenden Text ein vollständiges und gut strukturiertes Revisionsblatt im Markdown-Format.\nDas Blatt sollte Folgendes enthalten:\n- Einen relevanten Haupttitel (## Titel).\n- Einen Abschnitt 'Kernpunkte' (### Kernpunkte) mit einer Aufzählung der wichtigsten Ideen.\n- Einen Abschnitt 'Wichtige Definitionen' (### Wichtige Definitionen), der gegebenenfalls Schlüsselbegriffe und deren Definitionen auflistet.\n- Wenn der Text dies zulässt, einen Abschnitt 'Konzepte und Beziehungen' (### Konzepte und Beziehungen), der die Beziehungen zwischen den Hauptideen beschreibt (kann in Form von Aufzählungspunkten oder kurzen Absätzen erfolgen).\nVerwenden Sie Markdown-Formatierung (fett, kursiv, Listen), um die Lesbarkeit zu verbessern.",
                 userQuestionPromptStart: "Beantworten Sie die gestellte Frage AUSSCHLIESSLICH und NUR auf der Grundlage des Inhalts des folgenden Textes. Wenn die Antwort nicht im Text enthalten ist, geben Sie an: 'Die Information ist im bereitgestellten Text nicht verfügbar.' Machen Sie keine Annahmen oder externen Recherchen.",
                 openQuestionGeneratePrompt: "Generieren Sie auf Basis des folgenden Dokuments eine offene Frage, die eine schriftliche Antwort erfordert. Die Frage sollte kritisches Denken oder das Abrufen von Informationen aus dem Dokument fördern. Geben Sie NUR die Frage als einfachen String zurück, ohne JSON- oder Markdown-Formatierung.",
-                openQuestionCorrectPromptStart: "Bewerten Sie angesichts des folgenden Dokuments, der Frage: '{originalQuestion}' und der Antwort des Benutzers: '{userAnswer}' die Antwort des Benutzers. Geben Sie konstruktive Korrekturen und Feedback in Markdown. Wenn die Antwort richtig ist, bestätigen Sie dies. Wenn sie teilweise richtig oder falsch ist, erklären Sie warum und geben Sie die korrekten Informationen NUR auf der Grundlage des Dokuments an."
+                openQuestionCorrectPromptStart: "Bewerten Sie angesichts des folgenden Dokuments, der Frage: '{originalQuestion}' und der Antwort des Benutzers: '{userAnswer}' die Antwort des Benutzers. Geben Sie konstruktive Korrekturen und Feedback in Markdown. Wenn die Antwort richtig ist, bestätigen Sie dies. Wenn sie teilweise richtig oder falsch ist, erklären Sie warum und geben Sie die korrekten Informationen NUR auf der Grundlage des Dokuments an.",
+                difficultyLevels: {
+                    level1: "Sehr einfache Fragen, hauptsächlich zur Überprüfung des Lesens und des oberflächlichen Verständnisses des Dokuments (Entdeckungsniveau).",
+                    level2: "Einfache Fragen, die sich auf klar im Dokument dargelegte Fakten konzentrieren.",
+                    level3: "Fragen mittlerer Schwierigkeit, die möglicherweise das Verknüpfen einiger einfacher Informationen aus dem Dokument erfordern.",
+                    level4: "Schwierige Fragen, die ein tieferes Verständnis, Interpretation oder Synthese von Informationen aus verschiedenen Teilen des Dokuments erfordern.",
+                    level5: "Sehr komplexe und 'ultra komplizierte' Fragen, die kritische Analyse, Vergleich mit impliziten Konzepten oder Anwendung der Informationen des Dokuments auf hypothetische Szenarien erfordern."
+                }
             };
         case 'es':
             return {
@@ -34,7 +48,14 @@ function getLanguageInstructions(lang) {
                 revisionSheetPromptStart: "Cree una hoja de revisión completa y bien estructurada en formato Markdown a partir del siguiente texto.\nLa hoja debe incluir:\n- Un título principal pertinente (## Título).\n- Una sección 'Puntos Clave' (### Puntos Clave) con una lista de viñetas de las ideas más importantes.\n- Una sección 'Definiciones Importantes' (### Definiciones Importantes) que liste los términos clave y sus definiciones, si aplica.\n- Si el texto se presta a ello, una sección 'Conceptos y Relaciones' (### Conceptos y Relaciones) que describa las relaciones entre las ideas principales (puede ser en forma de viñetas o párrafos cortos).\nUtilice formato Markdown (negrita, cursiva, listas) para mejorar la legibilidad.",
                 userQuestionPromptStart: "Basándose ESTRICTA y ÚNICAMENTE en el contenido del siguiente texto, responda a la pregunta planteada. Si la respuesta no se encuentra en el texto, indique 'La información no está disponible en el texto proporcionado.' No haga suposiciones ni búsquedas externas.",
                 openQuestionGeneratePrompt: "Basándose en el siguiente documento, genere una pregunta abierta que requiera una respuesta escrita. La pregunta debe fomentar el pensamiento crítico o la recuperación de información del documento. Devuelva ÚNICAMENTE la pregunta como una cadena de texto simple, sin ningún formato JSON o Markdown.",
-                openQuestionCorrectPromptStart: "Dado el siguiente documento, la pregunta: '{originalQuestion}', y la respuesta del usuario: '{userAnswer}', evalúe la respuesta del usuario. Proporcione correcciones constructivas y comentarios en Markdown. Si la respuesta es correcta, reconózcalo. Si es parcialmente correcta o incorrecta, explique por qué y proporcione la información correcta basándose *únicamente* en el documento."
+                openQuestionCorrectPromptStart: "Dado el siguiente documento, la pregunta: '{originalQuestion}', y la respuesta del usuario: '{userAnswer}', evalúe la respuesta del usuario. Proporcione correcciones constructivas y comentarios en Markdown. Si la respuesta es correcta, reconózcalo. Si es parcialmente correcta o incorrecta, explique por qué y proporcione la información correcta basándose *únicamente* en el documento.",
+                difficultyLevels: {
+                    level1: "Preguntas muy simples, principalmente para verificar la lectura y la comprensión superficial del documento (nivel descubrimiento).",
+                    level2: "Preguntas fáciles, centradas en hechos claramente enunciados en el documento.",
+                    level3: "Preguntas de dificultad media, que pueden requerir conectar alguna información simple del documento.",
+                    level4: "Preguntas difíciles, que requieren una comprensión más profunda, interpretación o síntesis de información de diferentes partes del documento.",
+                    level5: "Preguntas muy complejas y 'ultra complicadas', que exigen un análisis crítico, la comparación con conceptos implícitos o la aplicación de la información del documento a escenarios hipotéticos."
+                }
             };
         // French (default)
         default:
@@ -46,7 +67,14 @@ function getLanguageInstructions(lang) {
                 revisionSheetPromptStart: "Crée une fiche de révision complète et bien structurée en format Markdown à partir du texte suivant.\nLa fiche doit inclure :\n- Un titre principal pertinent (## Titre).\n- Une section \"Points Clés\" (### Points Clés) avec une liste à puces des idées les plus importantes.\n- Une section \"Définitions Importantes\" (### Définitions Importantes) listant les termes clés et leurs définitions, si applicable.\n- Si le texte s'y prête, une section \"Concepts et Relations\" (### Concepts et Relations) décrivant les relations entre les idées principales (peut être sous forme de puces ou de courts paragraphes).\nUtilise la mise en forme Markdown (gras, italique, listes) pour améliorer la lisibilité.",
                 userQuestionPromptStart: "En te basant STRICTEMENT et UNIQUEMENT sur le contenu du texte suivant, réponds à la question posée. Si la réponse ne se trouve pas dans le texte, indique \"L'information n'est pas disponible dans le texte fourni.\" Ne fais aucune supposition ou recherche externe.",
                 openQuestionGeneratePrompt: "En te basant sur le document suivant, génère une question ouverte qui nécessite une réponse rédigée. La question doit encourager la réflexion critique ou le rappel d'informations du document. Retourne UNIQUEMENT la question sous forme de chaîne de caractères simple, sans formatage JSON ou Markdown.",
-                openQuestionCorrectPromptStart: "Étant donné le document suivant, la question : '{originalQuestion}', et la réponse de l'utilisateur : '{userAnswer}', veuillez évaluer la réponse de l'utilisateur. Fournissez une correction constructive et des commentaires en Markdown. Si la réponse est correcte, reconnaissez-le. Si elle est partiellement correcte ou incorrecte, expliquez pourquoi et fournissez les informations correctes en vous basant *uniquement* sur le document."
+                openQuestionCorrectPromptStart: "Étant donné le document suivant, la question : '{originalQuestion}', et la réponse de l'utilisateur : '{userAnswer}', veuillez évaluer la réponse de l'utilisateur. Fournissez une correction constructive et des commentaires en Markdown. Si la réponse est correcte, reconnaissez-le. Si elle est partiellement correcte ou incorrecte, expliquez pourquoi et fournissez les informations correctes en vous basant *uniquement* sur le document.",
+                difficultyLevels: {
+                    level1: "Questions très simples, principalement pour vérifier la lecture et la compréhension superficielle du document (niveau découverte).",
+                    level2: "Questions faciles, portant sur des faits clairement énoncés dans le document.",
+                    level3: "Questions de difficulté moyenne, pouvant nécessiter de relier quelques informations simples du document.",
+                    level4: "Questions difficiles, demandant une compréhension plus approfondie, l'interprétation ou la synthèse d'informations de différentes parties du document.",
+                    level5: "Questions très complexes et \"ultra compliquées\", exigeant une analyse critique, la comparaison avec des concepts implicites, ou l'application des informations du document à des scénarios hypothétiques."
+                }
             };
     }
 }
@@ -54,11 +82,26 @@ function getLanguageInstructions(lang) {
 
 async function generateContent(text, type, options = {}, apiKey, language = 'fr') {
   const genAI = new GoogleGenerativeAI(apiKey);
-  const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" }); 
+  const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" }); // Updated model
 
   let prompt = '';
   const langInstructions = getLanguageInstructions(language);
   
+  let difficultyPromptPart = '';
+  if (options.difficultyLevel && (type === 'qcm' || type === 'open_question_generate')) {
+      const levels = langInstructions.difficultyLevels;
+      let difficultyDescription = '';
+      switch (parseInt(options.difficultyLevel)) {
+          case 1: difficultyDescription = levels.level1; break;
+          case 2: difficultyDescription = levels.level2; break;
+          case 3: difficultyDescription = levels.level3; break;
+          case 4: difficultyDescription = levels.level4; break;
+          case 5: difficultyDescription = levels.level5; break;
+          default: difficultyDescription = levels.level3; // Default to medium
+      }
+      difficultyPromptPart = `\nLe niveau de difficulté demandé pour les questions est : ${difficultyDescription}`;
+  }
+
   switch (type) {
     case 'summary_short':
       prompt = `${langInstructions.shortSummaryPrompt}\n\nTexte:\n${text}`;
@@ -70,8 +113,7 @@ async function generateContent(text, type, options = {}, apiKey, language = 'fr'
       
     case 'qcm':
       const numQuestions = options.numQuestions || 10;
-      // The prompt now directly uses the language-specific qcmFormatInstruction.
-      prompt = `Génère exactement ${numQuestions} questions à choix multiples (QCM) basées sur le texte suivant.
+      prompt = `Génère exactement ${numQuestions} questions à choix multiples (QCM) basées sur le texte suivant.${difficultyPromptPart}
 Chaque QCM doit être un objet JSON avec les clés suivantes :
 - "question": (string) La question elle-même.
 - "options": (array of 4 strings) Une liste de quatre chaînes de caractères représentant les options.
@@ -85,7 +127,6 @@ Texte de référence :\n\n${text}`;
       
     case 'flashcards':
       const numCards = options.numCards || 15;
-      // The prompt now directly uses the language-specific flashcardFormatInstruction.
       prompt = `Crée exactement ${numCards} flashcards basées sur les concepts clés du texte suivant.
 Chaque flashcard doit être un objet JSON avec les clés suivantes :
 - "front": (string) La question ou le terme clé.
@@ -105,7 +146,7 @@ Texte de référence :\n\n${text}`;
       break;
 
     case 'open_question_generate':
-        prompt = `${langInstructions.openQuestionGeneratePrompt}\n\nDocument:\n${text}`;
+        prompt = `${langInstructions.openQuestionGeneratePrompt}${difficultyPromptPart}\n\nDocument:\n${text}`;
         break;
 
     case 'open_question_correct':
