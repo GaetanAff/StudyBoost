@@ -200,4 +200,44 @@ Texte de référence :\n\n${text}`;
   }
 }
 
-module.exports = { generateContent };
+async function testApiKey(apiKey) {
+  if (!apiKey || typeof apiKey !== 'string' || apiKey.trim() === '') {
+    // Ce cas devrait être principalement géré par le frontend ou la route du serveur,
+    // mais une double vérification ici est une bonne pratique.
+    return { success: false, error: 'La clé API ne peut pas être vide.' };
+  }
+  try {
+    const genAI = new GoogleGenerativeAI(apiKey);
+    // Utilisation du même modèle que pour les autres opérations pour assurer la cohérence des tests
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+
+    // L'opération countTokens est légère et permet de vérifier si la clé est authentifiée
+    // et si le modèle est accessible, sans consommer beaucoup de quota.
+    await model.countTokens("test"); // Un texte court et simple suffit
+
+    // Si countTokens ne lève pas d'erreur, la clé est considérée comme fonctionnelle.
+    return { success: true };
+
+  } catch (error) {
+    // Loggue l'erreur côté serveur pour le débogage
+    console.error('Erreur détaillée lors du test de la clé API Gemini (aiService):', error.toString());
+
+    let userFriendlyError = 'Une erreur s\'est produite lors du test de la clé API.';
+    // Essayer de donner des messages plus spécifiques basés sur l'erreur de l'SDK
+    if (error.message && error.message.includes('API key not valid')) {
+        userFriendlyError = 'La clé API fournie n\'est pas valide. Veuillez la vérifier.';
+    } else if (error.message && error.message.includes('Permission denied')) {
+        userFriendlyError = 'Permission refusée. Vérifiez que votre clé API dispose des autorisations nécessaires.';
+    } else if (error.message && error.message.includes('quota')) {
+        userFriendlyError = 'Le quota pour cette clé API a été dépassé ou des problèmes de facturation existent.';
+    } else if (error.message) {
+        // Si l'erreur est d'un autre type mais contient un message, l'utiliser.
+        userFriendlyError = error.message;
+    }
+
+    return { success: false, error: userFriendlyError };
+  }
+}
+
+
+module.exports = { generateContent, testApiKey }; // Ajout de testApiKey aux exports
