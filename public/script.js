@@ -59,6 +59,9 @@ class StudyBoostApp {
                 loadingTextDefault: "Traitement en cours...",
                 loadingTextDocument: "Traitement du document...",
                 loadingTextGenerating: "Génération du contenu avec l'IA...",
+                loadingTextSendingRequest: "Envoi de la requête à l'IA...",
+                loadingTextWaitingForAI: "En attente de la réponse de l'IA...",
+                loadingTextProcessingResponse: "Traitement de la réponse de l'IA...",
                 notificationApiKeyMissing: "Veuillez d'abord configurer votre clé API Gemini",
                 notificationDocumentMissing: "Veuillez d'abord uploader un document.",
                 notificationApiKeySaved: "Clé API sauvegardée.",
@@ -77,6 +80,7 @@ class StudyBoostApp {
                 notificationEnterAnswer: "Veuillez entrer votre réponse.",
                 notificationQCMFormatError: "Les QCM n'ont pas pu être formatés correctement.",
                 notificationFlashcardsFormatError: "Les Flashcards n'ont pas pu être formatées correctement.",
+                checkConsoleForDetails: "Vérifiez la console pour plus de détails.",
                 optionsQCMTitle: "Options QCM",
                 optionsQCMLabel: "Nombre de questions (5-20)",
                 optionsQCMError: "Veuillez entrer un nombre de questions entre 5 et 20.",
@@ -142,6 +146,9 @@ class StudyBoostApp {
                 loadingTextDefault: "Processing...",
                 loadingTextDocument: "Processing document...",
                 loadingTextGenerating: "Generating content with AI...",
+                loadingTextSendingRequest: "Sending request to AI...",
+                loadingTextWaitingForAI: "Waiting for AI response...",
+                loadingTextProcessingResponse: "Processing AI response...",
                 notificationApiKeyMissing: "Please configure your Gemini API key first",
                 notificationDocumentMissing: "Please upload a document first.",
                 notificationApiKeySaved: "API key saved.",
@@ -160,6 +167,7 @@ class StudyBoostApp {
                 notificationEnterAnswer: "Please enter your answer.",
                 notificationQCMFormatError: "MCQs could not be formatted correctly.",
                 notificationFlashcardsFormatError: "Flashcards could not be formatted correctly.",
+                checkConsoleForDetails: "Check console for details.",
                 optionsQCMTitle: "MCQ Options",
                 optionsQCMLabel: "Number of questions (5-20)",
                 optionsQCMError: "Please enter a number of questions between 5 and 20.",
@@ -225,6 +233,9 @@ class StudyBoostApp {
                 loadingTextDefault: "Verarbeitung...",
                 loadingTextDocument: "Dokument wird verarbeitet...",
                 loadingTextGenerating: "Inhalt wird mit KI generiert...",
+                loadingTextSendingRequest: "Anfrage an KI wird gesendet...",
+                loadingTextWaitingForAI: "Warten auf KI-Antwort...",
+                loadingTextProcessingResponse: "KI-Antwort wird verarbeitet...",
                 notificationApiKeyMissing: "Bitte konfigurieren Sie zuerst Ihren Gemini API-Schlüssel",
                 notificationDocumentMissing: "Bitte laden Sie zuerst ein Dokument hoch.",
                 notificationApiKeySaved: "API-Schlüssel gespeichert.",
@@ -243,6 +254,7 @@ class StudyBoostApp {
                 notificationEnterAnswer: "Bitte geben Sie Ihre Antwort ein.",
                 notificationQCMFormatError: "MC-Fragen konnten nicht korrekt formatiert werden.",
                 notificationFlashcardsFormatError: "Lernkarten konnten nicht korrekt formatiert werden.",
+                checkConsoleForDetails: "Überprüfen Sie die Konsole für Details.",
                 optionsQCMTitle: "MC-Fragen Optionen",
                 optionsQCMLabel: "Anzahl der Fragen (5-20)",
                 optionsQCMError: "Bitte geben Sie eine Anzahl von Fragen zwischen 5 und 20 ein.",
@@ -308,6 +320,9 @@ class StudyBoostApp {
                 loadingTextDefault: "Procesando...",
                 loadingTextDocument: "Procesando documento...",
                 loadingTextGenerating: "Generando contenido con IA...",
+                loadingTextSendingRequest: "Enviando solicitud a la IA...",
+                loadingTextWaitingForAI: "Esperando respuesta de la IA...",
+                loadingTextProcessingResponse: "Procesando respuesta de la IA...",
                 notificationApiKeyMissing: "Por favor, configure primero su clave API Gemini",
                 notificationDocumentMissing: "Por favor, suba un documento primero.",
                 notificationApiKeySaved: "Clave API guardada.",
@@ -326,6 +341,7 @@ class StudyBoostApp {
                 notificationEnterAnswer: "Por favor, ingrese su respuesta.",
                 notificationQCMFormatError: "Las PEM no se pudieron formatear correctamente.",
                 notificationFlashcardsFormatError: "Las tarjetas no se pudieron formatear correctamente.",
+                checkConsoleForDetails: "Consulte la consola para más detalles.",
                 optionsQCMTitle: "Opciones PEM",
                 optionsQCMLabel: "Número de preguntas (5-20)",
                 optionsQCMError: "Por favor, ingrese un número de preguntas entre 5 y 20.",
@@ -377,7 +393,6 @@ class StudyBoostApp {
                     el.placeholder = this.translations[lang][key];
                 }
             });
-            // Update dynamically set texts like modal titles if needed, or ensure they also use data-lang
             const languageSwitcher = document.getElementById('languageSwitcher');
             if (languageSwitcher) languageSwitcher.value = lang;
         }
@@ -540,7 +555,7 @@ class StudyBoostApp {
             return;
         }
 
-        this.showLoading(this._('loadingTextDocument'));
+        this.showLoading('loadingTextDocument'); // Use key for translation
 
         const formData = new FormData();
         formData.append('document', file);
@@ -571,7 +586,6 @@ class StudyBoostApp {
 
     showDocumentProcessed(filename, text) {
         const wordCount = text ? text.split(/\s+/).filter(Boolean).length : 0;
-        // A common estimate for pages is ~250-300 words per page.
         const pageCount = Math.max(1, Math.ceil(wordCount / 250)); 
 
         document.getElementById('documentTitle').textContent = `${this._('processedDocumentLabel')}: ${filename}`;
@@ -596,7 +610,6 @@ class StudyBoostApp {
         }
 
         this.currentAction = action;
-        // Hide previous results and open question section
         document.getElementById('resultsContent').innerHTML = '';
         document.getElementById('openQuestionInteractionSection').style.display = 'none';
 
@@ -612,7 +625,7 @@ class StudyBoostApp {
         }
         
         if (action === 'open_question_generate') {
-            await this.generateContent(action); // No specific options needed for generating one question
+            await this.generateContent(action); 
             return;
         }
 
@@ -671,7 +684,7 @@ class StudyBoostApp {
         await this.generateContent(this.currentAction, options);
     }
 
-    async submitUserQuestion() { // Renamed from submitQuestion to avoid conflict
+    async submitUserQuestion() { 
         const questionInput = document.getElementById('questionInput');
         const question = questionInput.value.trim();
         if (!question) {
@@ -693,7 +706,7 @@ class StudyBoostApp {
             return;
         }
         if (!this.generatedOpenQuestion) {
-             this.showNotification("Aucune question ouverte n'a été générée pour soumettre une réponse.", 'error'); // Should be translated
+             this.showNotification(this._('notificationDocumentMissing'), 'error'); // Or a more specific error
             return;
         }
 
@@ -702,9 +715,7 @@ class StudyBoostApp {
             userAnswer: userAnswer
         };
         
-        // Call generateContent for correction
         await this.generateContent('open_question_correct', options);
-        // The result will be handled by showResults, which needs to update the feedback section
     }
 
 
@@ -713,7 +724,8 @@ class StudyBoostApp {
             this.showNotification(this._('notificationDocumentMissing'), 'error');
             return;
         }
-        this.showLoading(this._('loadingTextGenerating'));
+        
+        this.showLoading('loadingTextSendingRequest'); 
 
         try {
             const requestBody = {
@@ -721,14 +733,19 @@ class StudyBoostApp {
                 type: type,
                 options: options,
                 apiKey: this.apiKey,
-                language: this.currentLanguage // Send language for AI prompts
+                language: this.currentLanguage 
             };
             
-            const response = await fetch('/api/generate', {
+            const responsePromise = fetch('/api/generate', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(requestBody)
             });
+
+            this.showLoading('loadingTextWaitingForAI'); 
+            const response = await responsePromise;
+            
+            this.showLoading('loadingTextProcessingResponse');
             const result = await response.json();
 
             if (response.ok && result.success && result.content && typeof result.content.text !== 'undefined') {
@@ -776,9 +793,10 @@ class StudyBoostApp {
         this.currentQCMData = null;
         this.currentFlashcardsData = null;
         
-        // Ensure open question section is hidden unless explicitly shown
         openQuestionInteractionSection.style.display = 'none';
-        resultsContent.style.display = 'block'; // Default to show main results content
+        resultsContent.style.display = 'block';
+
+        let parsableJSON; // For logging in case of error
 
         switch (type) {
             case 'summary_short':
@@ -790,45 +808,68 @@ class StudyBoostApp {
                 break;
             case 'qcm':
                 try {
-                    const cleanedContent = content.trim().startsWith('```json') ? content.substring(content.indexOf('['), content.lastIndexOf(']') + 1) : content;
-                    this.currentQCMData = JSON.parse(cleanedContent); 
+                    let cleanedContent = content.trim();
+                    if (cleanedContent.startsWith('```json')) {
+                        cleanedContent = cleanedContent.substring(7, cleanedContent.length - 3).trim();
+                    } else if (cleanedContent.startsWith('```')) {
+                         cleanedContent = cleanedContent.substring(3, cleanedContent.length - 3).trim();
+                    }
+                    
+                    parsableJSON = cleanedContent;
+                    const arrayMatch = cleanedContent.match(/(\[[\s\S]*\])/);
+                    if (arrayMatch && arrayMatch[1]) {
+                        parsableJSON = arrayMatch[1];
+                    }
+
+                    this.currentQCMData = JSON.parse(parsableJSON); 
                     html = this.formatQCM(this.currentQCMData);
                     resultsContent.innerHTML = html;
                     this.setupQCMInteractions();
                 } catch (e) {
-                    console.error("Error parsing QCM JSON:", e, "Raw content:", content);
-                    html = `<div class="markdown-content"><p>${this._('notificationQCMFormatError')} Raw:</p><pre>${content}</pre></div>`;
+                    console.error("Error parsing QCM JSON:", e, "\nRaw content:", content, "\nAttempted to parse:", parsableJSON || content);
+                    html = `<div class="markdown-content"><p>${this._('notificationQCMFormatError')} ${this._('checkConsoleForDetails')}</p><p>Raw output:</p><pre>${content}</pre></div>`;
                     resultsContent.innerHTML = html;
-                    this.showNotification(this._('notificationQCMFormatError'), "error");
+                    this.showNotification(`${this._('notificationQCMFormatError')} ${this._('checkConsoleForDetails')}`, "error");
                 }
                 break;
             case 'flashcards':
                  try {
-                    const cleanedContent = content.trim().startsWith('```json') ? content.substring(content.indexOf('['), content.lastIndexOf(']') + 1) : content;
-                    this.currentFlashcardsData = JSON.parse(cleanedContent);
+                    let cleanedContent = content.trim();
+                    if (cleanedContent.startsWith('```json')) {
+                        cleanedContent = cleanedContent.substring(7, cleanedContent.length - 3).trim();
+                    } else if (cleanedContent.startsWith('```')) {
+                         cleanedContent = cleanedContent.substring(3, cleanedContent.length - 3).trim();
+                    }
+                    
+                    parsableJSON = cleanedContent;
+                    const arrayMatch = cleanedContent.match(/(\[[\s\S]*\])/);
+                    if (arrayMatch && arrayMatch[1]) {
+                        parsableJSON = arrayMatch[1];
+                    }
+                    this.currentFlashcardsData = JSON.parse(parsableJSON);
                     html = this.formatFlashcards(this.currentFlashcardsData);
                     resultsContent.innerHTML = html;
                     this.setupFlashcards();
                 } catch (e) {
-                    console.error("Error parsing Flashcards JSON:", e, "Raw content:", content);
-                    html = `<div class="markdown-content"><p>${this._('notificationFlashcardsFormatError')} Raw:</p><pre>${content}</pre></div>`;
+                    console.error("Error parsing Flashcards JSON:", e, "\nRaw content:", content, "\nAttempted to parse:", parsableJSON || content);
+                    html = `<div class="markdown-content"><p>${this._('notificationFlashcardsFormatError')} ${this._('checkConsoleForDetails')}</p><p>Raw output:</p><pre>${content}</pre></div>`;
                     resultsContent.innerHTML = html;
-                    this.showNotification(this._('notificationFlashcardsFormatError'), "error");
+                    this.showNotification(`${this._('notificationFlashcardsFormatError')} ${this._('checkConsoleForDetails')}`, "error");
                 }
                 break;
             case 'open_question_generate':
-                this.generatedOpenQuestion = content; // Store the question
+                this.generatedOpenQuestion = content; 
                 generatedOpenQuestionTextEl.textContent = content;
-                document.getElementById('userOpenAnswer').value = ''; // Clear previous answer
-                openAnswerFeedbackEl.style.display = 'none'; // Hide old feedback
+                document.getElementById('userOpenAnswer').value = ''; 
+                openAnswerFeedbackEl.style.display = 'none'; 
                 openQuestionInteractionSection.style.display = 'block';
-                resultsContent.style.display = 'none'; // Hide the generic results content area
+                resultsContent.style.display = 'none'; 
                 break;
             case 'open_question_correct':
                 openAnswerFeedbackContentEl.innerHTML = `<div class="markdown-content">${marked.parse(content)}</div>`;
                 openAnswerFeedbackEl.style.display = 'block';
-                openQuestionInteractionSection.style.display = 'block'; // Keep it visible
-                resultsContent.style.display = 'none'; // Hide the generic results content area
+                openQuestionInteractionSection.style.display = 'block'; 
+                resultsContent.style.display = 'none'; 
                 break;
         }
         
@@ -855,9 +896,8 @@ class StudyBoostApp {
                     </label>`;
             });
             html += `</div>
-                    <button class="check-answer-btn" data-question-index="${index}">${this._('submitOpenAnswerBtnLabel').replace('Correction', 'Vérifier')}</button>
-                    <div class="qcm-explanation">
-                        <strong>${this._('aiFeedbackTitle').replace('Correction', 'Explication')}:</strong> ${q.explanation || "Aucune explication fournie."}
+                    <button class="check-answer-btn" data-question-index="${index}">${this._('submitOpenAnswerBtnLabel').replace(this._('submitOpenAnswerBtnLabel').split(' ')[2], this._('generateBtnLabel'))}</button> <div class="qcm-explanation">
+                        <strong>${this._('aiFeedbackTitle').replace(this._('aiFeedbackTitle').split(" ")[0],this._('resultsQCM').split(" ")[0])}:</strong> ${q.explanation || "Aucune explication fournie."}
                     </div>
                 </div>`;
         });
@@ -924,9 +964,8 @@ class StudyBoostApp {
     exportResults() {
         const resultsContentElement = document.getElementById('resultsContent');
         const titleElement = document.getElementById('resultsTitle');
-        const openQuestionInteractionElement = document.getElementById('openQuestionInteractionSection');
 
-        if (!resultsContentElement || !titleElement) {
+        if (!resultsContentElement || !titleElement ) {
             this.showNotification(this._('notificationNoResultsToExport'), 'error');
             return;
         }
@@ -950,7 +989,16 @@ class StudyBoostApp {
             if (userAnswerEl && userAnswerEl.value) textContentToExport += `${this._('yourAnswerLabel')} ${userAnswerEl.value}\n\n`;
             if (feedbackEl && feedbackEl.style.display !== 'none') textContentToExport += `${this._('aiFeedbackTitle')}\n${feedbackEl.innerText}\n\n`;
         } else {
-            textContentToExport = resultsContentElement.innerText;
+            // For Markdown content, try to get the raw markdown if possible, or innerText as fallback
+            const mdContent = resultsContentElement.querySelector('.markdown-content');
+            if (mdContent) { // Assuming marked.js was used and results are in .markdown-content
+                 // This is tricky as marked.parse converts to HTML. We don't store raw MD on client.
+                 // For now, innerText is a simpler fallback for export.
+                 // For a true MD export, the server would need to send MD and client displays it.
+                textContentToExport = mdContent.innerText;
+            } else {
+                textContentToExport = resultsContentElement.innerText;
+            }
         }
 
         if (window.jspdf && window.jspdf.jsPDF) {
@@ -997,7 +1045,7 @@ class StudyBoostApp {
     hideLoading() { document.getElementById('loadingOverlay').style.display = 'none'; }
 
     showNotification(message, type = 'info') {
-        const notificationArea = document.body;
+        const notificationArea = document.body; // Or a dedicated notification container
         const notification = document.createElement('div');
         notification.className = `notification type-${type} slide-in`;
         
@@ -1011,24 +1059,23 @@ class StudyBoostApp {
         closeButton.onclick = () => {
             notification.classList.remove('slide-in');
             notification.classList.add('slide-out');
-            setTimeout(() => notification.remove(), 300);
+            setTimeout(() => notification.remove(), 300); // Corresponds to animation duration
         };
         notification.appendChild(closeButton);
         
         notificationArea.appendChild(notification);
         
         setTimeout(() => {
+            // Check if the notification is still in the DOM before trying to remove
             if (notification.parentElement) {
                 notification.classList.remove('slide-in');
                 notification.classList.add('slide-out');
-                setTimeout(() => notification.remove(), 300);
+                setTimeout(() => notification.remove(), 300); // Animation duration
             }
-        }, 3000);
+        }, 7000); // Display for 7 seconds
     }
 }
 
 document.addEventListener('DOMContentLoaded', () => {
     new StudyBoostApp();
 });
-
-// Keyframes for notifications are now in styles.css
