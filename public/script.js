@@ -100,6 +100,13 @@ class StudyBoostApp {
                 resultsQuestion: "Réponse à votre Question",
                 resultsOpenQuestion: "Question Ouverte Générée",
                 resultsOpenQuestionFeedback: "Correction de votre Réponse",
+                optionsDifficultyLabel: "Niveau de difficulté",
+                difficultyLevel1: "Découverte",
+                difficultyLevel2: "Facile",
+                difficultyLevel3: "Moyen",
+                difficultyLevel4: "Difficile",
+                difficultyLevel5: "Expert",
+                checkAnswerBtnLabel: "Vérifier la réponse",
             },
             en: {
                 appTitle: "StudyBoost - AI Study Assistant",
@@ -187,6 +194,13 @@ class StudyBoostApp {
                 resultsQuestion: "Answer to your Question",
                 resultsOpenQuestion: "Generated Open Question",
                 resultsOpenQuestionFeedback: "Feedback on your Answer",
+                optionsDifficultyLabel: "Difficulty Level",
+                difficultyLevel1: "Discovery",
+                difficultyLevel2: "Easy",
+                difficultyLevel3: "Medium",
+                difficultyLevel4: "Hard",
+                difficultyLevel5: "Expert",
+                checkAnswerBtnLabel: "Check Answer",
             },
             de: {
                 appTitle: "StudyBoost - KI-Lernassistent",
@@ -274,6 +288,13 @@ class StudyBoostApp {
                 resultsQuestion: "Antwort auf Ihre Frage",
                 resultsOpenQuestion: "Generierte Offene Frage",
                 resultsOpenQuestionFeedback: "Feedback zu Ihrer Antwort",
+                optionsDifficultyLabel: "Schwierigkeitsgrad",
+                difficultyLevel1: "Entdeckung",
+                difficultyLevel2: "Einfach",
+                difficultyLevel3: "Mittel",
+                difficultyLevel4: "Schwer",
+                difficultyLevel5: "Experte",
+                checkAnswerBtnLabel: "Antwort überprüfen",
             },
             es: {
                 appTitle: "StudyBoost - Asistente de Estudio IA",
@@ -361,6 +382,13 @@ class StudyBoostApp {
                 resultsQuestion: "Respuesta a tu Pregunta",
                 resultsOpenQuestion: "Pregunta Abierta Generada",
                 resultsOpenQuestionFeedback: "Comentarios sobre tu Respuesta",
+                optionsDifficultyLabel: "Nivel de dificultad",
+                difficultyLevel1: "Descubrimiento",
+                difficultyLevel2: "Fácil",
+                difficultyLevel3: "Medio",
+                difficultyLevel4: "Difícil",
+                difficultyLevel5: "Experto",
+                checkAnswerBtnLabel: "Verificar respuesta",
             }
         };
 
@@ -395,6 +423,17 @@ class StudyBoostApp {
             });
             const languageSwitcher = document.getElementById('languageSwitcher');
             if (languageSwitcher) languageSwitcher.value = lang;
+
+            // Re-translate difficulty labels if modal is open or options are visible
+            const difficultyLabelsContainer = document.querySelector('.difficulty-labels');
+            if (difficultyLabelsContainer) {
+                difficultyLabelsContainer.querySelectorAll('span[data-lang]').forEach(span => {
+                    const key = span.dataset.lang;
+                     if (this.translations[lang][key]) {
+                        span.textContent = this.translations[lang][key];
+                    }
+                });
+            }
         }
     }
 
@@ -555,7 +594,7 @@ class StudyBoostApp {
             return;
         }
 
-        this.showLoading('loadingTextDocument'); // Use key for translation
+        this.showLoading('loadingTextDocument'); 
 
         const formData = new FormData();
         formData.append('document', file);
@@ -619,16 +658,11 @@ class StudyBoostApp {
             return;
         }
 
-        if (action === 'qcm' || action === 'flashcards') {
+        if (action === 'qcm' || action === 'flashcards' || action === 'open_question_generate') {
             this.showOptionsModal(action);
             return;
         }
         
-        if (action === 'open_question_generate') {
-            await this.generateContent(action); 
-            return;
-        }
-
         await this.generateContent(action);
     }
 
@@ -654,7 +688,26 @@ class StudyBoostApp {
                     <label for="numCardsInput">${this._('optionsFlashcardsLabel')}</label>
                     <input type="number" id="numCardsInput" value="15" min="5" max="25" class="form-control">
                 </div>`;
+        } else if (action === 'open_question_generate') {
+             title.textContent = this._('actionOpenQuestion'); // Or a more specific title like "Options for Open Questions"
+             // No specific options for open_question_generate other than difficulty for now
         }
+
+        if (action === 'qcm' || action === 'open_question_generate') {
+            optionsHtml += `
+                <div class="form-group">
+                    <label for="difficultySlider">${this._('optionsDifficultyLabel')}</label>
+                    <input type="range" id="difficultySlider" min="1" max="5" value="3" class="form-control">
+                    <div class="difficulty-labels">
+                        <span data-lang="difficultyLevel1">${this._('difficultyLevel1')}</span>
+                        <span data-lang="difficultyLevel2">${this._('difficultyLevel2')}</span>
+                        <span data-lang="difficultyLevel3">${this._('difficultyLevel3')}</span>
+                        <span data-lang="difficultyLevel4">${this._('difficultyLevel4')}</span>
+                        <span data-lang="difficultyLevel5">${this._('difficultyLevel5')}</span>
+                    </div>
+                </div>`;
+        }
+
         body.innerHTML = optionsHtml;
         this.showModal('optionsModal');
     }
@@ -678,6 +731,14 @@ class StudyBoostApp {
                 isValid = false;
             }
         }
+
+        if (this.currentAction === 'qcm' || this.currentAction === 'open_question_generate') {
+            const difficultySlider = document.getElementById('difficultySlider');
+            if (difficultySlider) {
+                options.difficultyLevel = parseInt(difficultySlider.value);
+            }
+        }
+
         if (!isValid) return;
 
         this.hideModal('optionsModal');
@@ -731,7 +792,7 @@ class StudyBoostApp {
             const requestBody = {
                 text: this.currentDocument.text,
                 type: type,
-                options: options,
+                options: options, // This will include numQuestions, numCards, difficultyLevel etc.
                 apiKey: this.apiKey,
                 language: this.currentLanguage 
             };
@@ -796,7 +857,7 @@ class StudyBoostApp {
         openQuestionInteractionSection.style.display = 'none';
         resultsContent.style.display = 'block';
 
-        let parsableJSON; // For logging in case of error
+        let parsableJSON; 
 
         switch (type) {
             case 'summary_short':
@@ -896,7 +957,8 @@ class StudyBoostApp {
                     </label>`;
             });
             html += `</div>
-                    <button class="check-answer-btn" data-question-index="${index}">${this._('submitOpenAnswerBtnLabel').replace(this._('submitOpenAnswerBtnLabel').split(' ')[2], this._('generateBtnLabel'))}</button> <div class="qcm-explanation">
+                    <button class="check-answer-btn" data-question-index="${index}">${this._('checkAnswerBtnLabel')}</button> 
+                    <div class="qcm-explanation">
                         <strong>${this._('aiFeedbackTitle').replace(this._('aiFeedbackTitle').split(" ")[0],this._('resultsQCM').split(" ")[0])}:</strong> ${q.explanation || "Aucune explication fournie."}
                     </div>
                 </div>`;
@@ -985,16 +1047,12 @@ class StudyBoostApp {
             const genQEl = document.getElementById('generatedOpenQuestionText');
             const userAnswerEl = document.getElementById('userOpenAnswer');
             const feedbackEl = document.getElementById('openAnswerFeedbackContent');
-            if (genQEl) textContentToExport += `${this._('openQuestionGeneratedTitle')} ${genQEl.textContent}\n\n`;
-            if (userAnswerEl && userAnswerEl.value) textContentToExport += `${this._('yourAnswerLabel')} ${userAnswerEl.value}\n\n`;
-            if (feedbackEl && feedbackEl.style.display !== 'none') textContentToExport += `${this._('aiFeedbackTitle')}\n${feedbackEl.innerText}\n\n`;
+            if (genQEl && genQEl.offsetParent !== null) textContentToExport += `${this._('openQuestionGeneratedTitle')} ${genQEl.textContent}\n\n`;
+            if (userAnswerEl && userAnswerEl.value && userAnswerEl.offsetParent !== null) textContentToExport += `${this._('yourAnswerLabel')} ${userAnswerEl.value}\n\n`;
+            if (feedbackEl && feedbackEl.style.display !== 'none' && feedbackEl.offsetParent !== null) textContentToExport += `${this._('aiFeedbackTitle')}\n${feedbackEl.innerText}\n\n`;
         } else {
-            // For Markdown content, try to get the raw markdown if possible, or innerText as fallback
             const mdContent = resultsContentElement.querySelector('.markdown-content');
-            if (mdContent) { // Assuming marked.js was used and results are in .markdown-content
-                 // This is tricky as marked.parse converts to HTML. We don't store raw MD on client.
-                 // For now, innerText is a simpler fallback for export.
-                 // For a true MD export, the server would need to send MD and client displays it.
+            if (mdContent) { 
                 textContentToExport = mdContent.innerText;
             } else {
                 textContentToExport = resultsContentElement.innerText;
@@ -1045,7 +1103,7 @@ class StudyBoostApp {
     hideLoading() { document.getElementById('loadingOverlay').style.display = 'none'; }
 
     showNotification(message, type = 'info') {
-        const notificationArea = document.body; // Or a dedicated notification container
+        const notificationArea = document.body; 
         const notification = document.createElement('div');
         notification.className = `notification type-${type} slide-in`;
         
@@ -1059,20 +1117,19 @@ class StudyBoostApp {
         closeButton.onclick = () => {
             notification.classList.remove('slide-in');
             notification.classList.add('slide-out');
-            setTimeout(() => notification.remove(), 300); // Corresponds to animation duration
+            setTimeout(() => notification.remove(), 300); 
         };
         notification.appendChild(closeButton);
         
         notificationArea.appendChild(notification);
         
         setTimeout(() => {
-            // Check if the notification is still in the DOM before trying to remove
             if (notification.parentElement) {
                 notification.classList.remove('slide-in');
                 notification.classList.add('slide-out');
-                setTimeout(() => notification.remove(), 300); // Animation duration
+                setTimeout(() => notification.remove(), 300); 
             }
-        }, 7000); // Display for 7 seconds
+        }, 7000); 
     }
 }
 
