@@ -6,7 +6,7 @@ const fs =require('fs');
 require('dotenv').config();
 
 const { processDocument } = require('./utils/documentProcessor');
-const { generateContent } = require('./utils/aiService');
+const { generateContent, testApiKey: testApiKeyService } = require('./utils/aiService'); // Ajout de testApiKeyService
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -98,6 +98,34 @@ app.post('/api/generate', async (req, res) => {
     console.error(`[${requestTimestamp}] Erreur API Gemini ou service:`, error.message, error.stack);
     res.status(500).json({ error: error.message || 'Erreur lors de la génération de contenu par l\'IA.' });
   }
+});
+
+app.post('/api/test-key', async (req, res) => {
+    const requestTimestamp = new Date().toISOString();
+    console.log(`[${requestTimestamp}] Requête reçue pour /api/test-key`);
+    try {
+        const { apiKey } = req.body;
+        if (!apiKey) {
+            console.log(`[${requestTimestamp}] Clé API manquante pour le test.`);
+            return res.status(400).json({ success: false, error: 'Clé API manquante.' });
+        }
+
+        console.log(`[${requestTimestamp}] Appel de testApiKeyService.`);
+        const testResult = await testApiKeyService(apiKey); // Appel de la fonction du service
+
+        if (testResult.success) {
+            console.log(`[${requestTimestamp}] Test de la clé API réussi.`);
+            res.json({ success: true, message: 'Clé API valide et fonctionnelle.' });
+        } else {
+            console.log(`[${requestTimestamp}] Test de la clé API échoué: ${testResult.error}`);
+            // Renvoyer 400 pour une clé invalide, 500 pour d'autres erreurs serveur lors du test.
+            // Ici, nous utilisons 400 si le test service lui-même indique un échec lié à la clé.
+            res.status(400).json({ success: false, error: testResult.error || 'Clé API invalide ou problème lors du test.' });
+        }
+    } catch (error) {
+        console.error(`[${requestTimestamp}] Erreur serveur lors du test de la clé API:`, error.message);
+        res.status(500).json({ success: false, error: error.message || 'Erreur serveur interne lors du test de la clé API.' });
+    }
 });
 
 app.listen(PORT, () => {
