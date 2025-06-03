@@ -81,15 +81,15 @@ app.post('/api/generate', async (req, res) => {
   console.log(`[${requestTimestamp}] Requête reçue pour /api/generate`);
 
   try {
-    const { text, type, options = {}, apiKey, language = 'fr' } = req.body; // Added language
+    const { text, type, options = {}, apiKey, language = 'fr' } = req.body; // options will include difficultyLevel
 
     if (!text || !type || !apiKey) {
       console.log(`[${requestTimestamp}] Paramètres manquants.`);
       return res.status(400).json({ error: 'Paramètres manquants: texte, type ou clé API.' });
     }
 
-    console.log(`[${requestTimestamp}] Appel de generateContent avec type: ${type}, lang: ${language}`);
-    const generationResult = await generateContent(text, type, options, apiKey, language); // Pass language
+    console.log(`[${requestTimestamp}] Appel de generateContent avec type: ${type}, lang: ${language}, options: ${JSON.stringify(options)}`);
+    const generationResult = await generateContent(text, type, options, apiKey, language); // Pass options (including difficultyLevel)
     
     console.log(`[${requestTimestamp}] Succès de la génération.`);
     res.json({ success: true, content: generationResult });
