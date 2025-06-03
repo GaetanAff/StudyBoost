@@ -42,6 +42,8 @@
             </div>
         </header>
 
+        <nav id="breadcrumb" class="breadcrumb"></nav>
+
         <main class="main-content">
             <section class="upload-section" id="uploadSection">
                 <div class="upload-card">
@@ -111,6 +113,7 @@
                         <p data-lang="actionAskQuestionDesc">Questions libres sur le contenu</p>
                     </button>
                 </div>
+                <div id="contentResultsContainer" class="generated-list"></div>
             </section>
 
             <section class="results-section" id="resultsSection" style="display: none;">
@@ -140,7 +143,17 @@
                     </div>
                 </div>
             </section>
+
+            <section class="history-section" id="historySection" style="display: none;">
+            </section>
         </main>
+
+        <nav id="bottomNav" class="bottom-nav">
+            <button class="nav-btn" data-section="upload"><i class="fas fa-upload"></i><span data-lang="navUpload">Importer</span></button>
+            <button class="nav-btn" data-section="content"><i class="fas fa-book"></i><span data-lang="navContent">Contenu</span></button>
+            <button class="nav-btn" data-section="results"><i class="fas fa-list"></i><span data-lang="navResults">Résultats</span></button>
+            <button class="nav-btn" data-section="history"><i class="fas fa-history"></i><span data-lang="navHistory">Historique</span></button>
+        </nav>
 
         <div class="modal" id="apiKeyModal">
             <div class="modal-content">

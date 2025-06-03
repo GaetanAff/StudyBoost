@@ -8,6 +8,7 @@ class StudyBoostApp {
         this.currentQCMData = null;
         this.currentFlashcardsData = null;
         this.generatedOpenQuestion = null; // To store the AI-generated open question
+        this.allGeneratedResults = [];
 
         this.dailyInputTokenLimit = 1048576; 
 
@@ -114,6 +115,13 @@ class StudyBoostApp {
                 showPasswordIcon: "👁️", // Add this
                 hidePasswordIcon: "🙈", // Add this
                 apiKeyStatusTitle: "Statut de la clé API",
+                historyBtnLabel: "Historique",
+                breadcrumbHome: "Accueil",
+                breadcrumbHistory: "Historique",
+                navUpload: "Importer",
+                navContent: "Contenu",
+                navResults: "Résultats",
+                navHistory: "Historique",
             },
             en: {
                 appTitle: "StudyBoost - AI Study Assistant",
@@ -215,6 +223,13 @@ class StudyBoostApp {
                 showPasswordIcon: "👁️",
                 hidePasswordIcon: "🙈",
                 apiKeyStatusTitle: "API Key Status",
+                historyBtnLabel: "History",
+                breadcrumbHome: "Home",
+                breadcrumbHistory: "History",
+                navUpload: "Upload",
+                navContent: "Content",
+                navResults: "Results",
+                navHistory: "History",
             },
             de: {
                 appTitle: "StudyBoost - KI-Lernassistent",
@@ -316,6 +331,13 @@ class StudyBoostApp {
                 showPasswordIcon: "👁️",
                 hidePasswordIcon: "🙈",
                 apiKeyStatusTitle: "API-Schlüsselstatus",
+                historyBtnLabel: "Verlauf",
+                breadcrumbHome: "Startseite",
+                breadcrumbHistory: "Verlauf",
+                navUpload: "Import",
+                navContent: "Inhalt",
+                navResults: "Ergebnisse",
+                navHistory: "Verlauf",
             },
             es: {
                 appTitle: "StudyBoost - Asistente de Estudio IA",
@@ -417,6 +439,13 @@ class StudyBoostApp {
                 showPasswordIcon: "👁️",
                 hidePasswordIcon: "🙈",
                 apiKeyStatusTitle: "⏳ Estado de la Clave API",
+                historyBtnLabel: "Historial",
+                breadcrumbHome: "Inicio",
+                breadcrumbHistory: "Historial",
+                navUpload: "Importar",
+                navContent: "Contenido",
+                navResults: "Resultados",
+                navHistory: "Historial",
             }
         };
 
@@ -427,8 +456,10 @@ class StudyBoostApp {
         this.setupEventListeners();
         this.checkApiKey();
         this.updateTokenDisplay();
-        this.setLanguage(this.currentLanguage); 
+        this.setLanguage(this.currentLanguage);
         this.setInitialDarkMode();
+        this.updateBreadcrumb();
+        this.setActiveNav('upload');
     }
     
     setLanguage(lang) {
@@ -536,6 +567,127 @@ class StudyBoostApp {
         this.updateTokenDisplay();
     }
 
+    appendGeneratedResult(title, html, rawText) {
+        const container = document.getElementById('contentResultsContainer');
+        if (!container) return;
+        const item = document.createElement('div');
+        item.className = 'generated-item';
+        item.innerHTML = `<h4>${title}</h4>` + html;
+        container.appendChild(item);
+        this.allGeneratedResults.push({ title, html, raw: rawText });
+    }
+
+    hideAllSections() {
+        document.getElementById('uploadSection').style.display = 'none';
+        document.getElementById('contentSection').style.display = 'none';
+        document.getElementById('resultsSection').style.display = 'none';
+        document.getElementById('historySection').style.display = 'none';
+    }
+
+    setActiveNav(section) {
+        document.querySelectorAll('#bottomNav .nav-btn').forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.section === section);
+        });
+    }
+
+    navigateSection(section) {
+        if (section === 'history') {
+            this.showHistory();
+            return;
+        }
+
+        this.hideAllSections();
+        switch (section) {
+            case 'upload':
+                document.getElementById('uploadSection').style.display = 'block';
+                this.updateBreadcrumb();
+                break;
+            case 'content':
+                if (this.currentDocument) {
+                    document.getElementById('contentSection').style.display = 'block';
+                } else {
+                    document.getElementById('uploadSection').style.display = 'block';
+                }
+                this.updateBreadcrumb();
+                break;
+            case 'results':
+                if (this.currentAction) {
+                    document.getElementById('resultsSection').style.display = 'block';
+                }
+                this.updateBreadcrumb();
+                break;
+        }
+        this.setActiveNav(section);
+    }
+
+    updateBreadcrumb(section) {
+        const el = document.getElementById('breadcrumb');
+        if (!el) return;
+        let path = this._('breadcrumbHome');
+        if (section === 'history') {
+            path += ' > ' + this._('breadcrumbHistory');
+        }
+        el.textContent = path;
+    }
+
+    async showHistory() {
+        this.hideAllSections();
+        document.getElementById('historySection').style.display = 'block';
+        this.updateBreadcrumb('history');
+        this.setActiveNav('history');
+        await this.loadHistory();
+    }
+
+    async loadHistory() {
+        try {
+            const res = await fetch('/api/history');
+            const history = await res.json();
+            this.renderHistory(history);
+        } catch (e) {
+            console.error('Erreur chargement historique:', e);
+        }
+    }
+
+    renderHistory(history) {
+        const container = document.getElementById('historySection');
+        container.innerHTML = '';
+        if (!history || history.length === 0) {
+            container.textContent = 'Aucun historique.';
+            return;
+        }
+        const ul = document.createElement('ul');
+        history.forEach(entry => {
+            const li = document.createElement('li');
+            li.textContent = `${new Date(entry.date).toLocaleString()} - ${entry.type}`;
+            li.addEventListener('click', () => this.viewHistoryEntry(entry));
+            ul.appendChild(li);
+        });
+        container.appendChild(ul);
+    }
+
+    viewHistoryEntry(entry) {
+        const container = document.getElementById('historySection');
+        container.innerHTML = '';
+        const backBtn = document.createElement('button');
+        backBtn.textContent = '⬅';
+        backBtn.addEventListener('click', () => this.loadHistory());
+        container.appendChild(backBtn);
+        const textarea = document.createElement('textarea');
+        textarea.value = entry.versions[entry.versions.length - 1].content;
+        container.appendChild(textarea);
+        const saveBtn = document.createElement('button');
+        saveBtn.textContent = this._('saveBtnLabel');
+        saveBtn.addEventListener('click', async () => {
+            await fetch(`/api/history/${entry.id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ content: textarea.value })
+            });
+            this.loadHistory();
+        });
+        container.appendChild(saveBtn);
+    }
+
     setupEventListeners() {
         const fileInput = document.getElementById('fileInput');
         const uploadArea = document.getElementById('uploadArea');
@@ -548,6 +700,10 @@ class StudyBoostApp {
         if (fileInput) {
             fileInput.addEventListener('change', (e) => this.handleFileUpload(e.target.files[0]));
         }
+
+        document.querySelectorAll('#bottomNav .nav-btn').forEach(btn => {
+            btn.addEventListener('click', () => this.navigateSection(btn.dataset.section));
+        });
 
         // Listeners pour le glisser-déposer (drag and drop)
         if (uploadArea) {
@@ -795,6 +951,7 @@ class StudyBoostApp {
         document.getElementById('contentSection').style.display = 'block';
         document.getElementById('resultsSection').style.display = 'none';
         document.getElementById('openQuestionInteractionSection').style.display = 'none';
+        this.setActiveNav('content');
     }
 
     async handleAction(action) {
@@ -1026,6 +1183,7 @@ class StudyBoostApp {
             case 'question':
                 html = `<div class="markdown-content">${marked.parse(content)}</div>`;
                 resultsContent.innerHTML = html;
+                this.appendGeneratedResult(resultsTitle.textContent, html, content);
                 break;
             case 'qcm':
                 try {
@@ -1042,10 +1200,11 @@ class StudyBoostApp {
                         parsableJSON = arrayMatch[1];
                     }
 
-                    this.currentQCMData = JSON.parse(parsableJSON); 
+                    this.currentQCMData = JSON.parse(parsableJSON);
                     html = this.formatQCM(this.currentQCMData);
                     resultsContent.innerHTML = html;
                     this.setupQCMInteractions();
+                    this.appendGeneratedResult(resultsTitle.textContent, html, JSON.stringify(this.currentQCMData, null, 2));
                 } catch (e) {
                     console.error("Error parsing QCM JSON:", e, "\nRaw content:", content, "\nAttempted to parse:", parsableJSON || content);
                     html = `<div class="markdown-content"><p>${this._('notificationQCMFormatError')} ${this._('checkConsoleForDetails')}</p><p>Raw output:</p><pre>${content}</pre></div>`;
@@ -1071,6 +1230,7 @@ class StudyBoostApp {
                     html = this.formatFlashcards(this.currentFlashcardsData);
                     resultsContent.innerHTML = html;
                     this.setupFlashcards();
+                    this.appendGeneratedResult(resultsTitle.textContent, html, JSON.stringify(this.currentFlashcardsData, null, 2));
                 } catch (e) {
                     console.error("Error parsing Flashcards JSON:", e, "\nRaw content:", content, "\nAttempted to parse:", parsableJSON || content);
                     html = `<div class="markdown-content"><p>${this._('notificationFlashcardsFormatError')} ${this._('checkConsoleForDetails')}</p><p>Raw output:</p><pre>${content}</pre></div>`;
@@ -1089,13 +1249,20 @@ class StudyBoostApp {
             case 'open_question_correct':
                 openAnswerFeedbackContentEl.innerHTML = `<div class="markdown-content">${marked.parse(content)}</div>`;
                 openAnswerFeedbackEl.style.display = 'block';
-                openQuestionInteractionSection.style.display = 'block'; 
-                resultsContent.style.display = 'none'; 
+                openQuestionInteractionSection.style.display = 'block';
+                resultsContent.style.display = 'none';
+                const userAnswer = document.getElementById('userOpenAnswer').value;
+                const questionHtml = `<p>${this.generatedOpenQuestion}</p>`;
+                const answerHtml = `<p>${userAnswer}</p>`;
+                const feedbackHtml = `<div class="markdown-content">${marked.parse(content)}</div>`;
+                const combinedHtml = `<div>${questionHtml}</div><div>${answerHtml}</div>${feedbackHtml}`;
+                this.appendGeneratedResult(resultsTitle.textContent, combinedHtml, `${this.generatedOpenQuestion}\n${userAnswer}\n${content}`);
                 break;
         }
         
         resultsSection.style.display = 'block';
         resultsSection.scrollIntoView({ behavior: 'smooth' });
+        this.setActiveNav('results');
     }
 
 
@@ -1184,55 +1351,35 @@ class StudyBoostApp {
     }
     
     exportResults() {
-        const resultsContentElement = document.getElementById('resultsContent');
-        const titleElement = document.getElementById('resultsTitle');
-
-        if (!resultsContentElement || !titleElement ) {
+        if (this.allGeneratedResults.length === 0) {
             this.showNotification(this._('notificationNoResultsToExport'), 'error');
             return;
         }
-        
-        const title = titleElement.textContent;
-        let textContentToExport = "";
 
-        if (this.currentAction === 'qcm' && this.currentQCMData) {
-            this.currentQCMData.forEach((q, i) => {
-                textContentToExport += `Question ${i+1}: ${q.question}\n`;
-                q.options.forEach((opt, j) => textContentToExport += `${String.fromCharCode(65+j)}. ${opt}\n`);
-                textContentToExport += `Réponse: ${q.correct_answer}\nExplication: ${q.explanation}\n\n`;
-            });
-        } else if (this.currentAction === 'flashcards' && this.currentFlashcardsData) {
-             this.currentFlashcardsData.forEach((card, i) => textContentToExport += `Flashcard ${i+1}:\nRecto: ${card.front}\nVerso: ${card.back}\n\n`);
-        } else if (this.currentAction === 'open_question_generate' || this.currentAction === 'open_question_correct') {
-            const genQEl = document.getElementById('generatedOpenQuestionText');
-            const userAnswerEl = document.getElementById('userOpenAnswer');
-            const feedbackEl = document.getElementById('openAnswerFeedbackContent');
-            if (genQEl && genQEl.offsetParent !== null) textContentToExport += `${this._('openQuestionGeneratedTitle')} ${genQEl.textContent}\n\n`;
-            if (userAnswerEl && userAnswerEl.value && userAnswerEl.offsetParent !== null) textContentToExport += `${this._('yourAnswerLabel')} ${userAnswerEl.value}\n\n`;
-            if (feedbackEl && feedbackEl.style.display !== 'none' && feedbackEl.offsetParent !== null) textContentToExport += `${this._('aiFeedbackTitle')}\n${feedbackEl.innerText}\n\n`;
-        } else {
-            const mdContent = resultsContentElement.querySelector('.markdown-content');
-            if (mdContent) { 
-                textContentToExport = mdContent.innerText;
+        let textContentToExport = '';
+        this.allGeneratedResults.forEach(item => {
+            textContentToExport += `${item.title}\n`;
+            if (item.raw) {
+                textContentToExport += `${item.raw}\n\n`;
             } else {
-                textContentToExport = resultsContentElement.innerText;
+                const temp = document.createElement('div');
+                temp.innerHTML = item.html;
+                textContentToExport += `${temp.innerText}\n\n`;
             }
-        }
+        });
 
         if (window.jspdf && window.jspdf.jsPDF) {
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
-            doc.setFontSize(18);
-            doc.text(title, 14, 22);
             doc.setFontSize(11);
             const lines = doc.splitTextToSize(textContentToExport, 180);
-            doc.text(lines, 14, 32);
-            doc.save(`${title.toLowerCase().replace(/\s+/g, '-')}.pdf`);
+            doc.text(lines, 14, 14);
+            doc.save('studyboost-results.pdf');
             this.showNotification(this._('notificationExportedPDF'), 'success');
         } else {
             navigator.clipboard.writeText(textContentToExport).then(() => {
                 this.showNotification(this._('notificationCopiedToClipboard'), 'info');
-            }).catch(err => this.showNotification(this._('notificationErrorCopy'), 'error'));
+            }).catch(() => this.showNotification(this._('notificationErrorCopy'), 'error'));
         }
     }
 
@@ -1242,6 +1389,10 @@ class StudyBoostApp {
         this.currentQCMData = null;
         this.currentFlashcardsData = null;
         this.generatedOpenQuestion = null;
+
+        this.allGeneratedResults = [];
+        const container = document.getElementById('contentResultsContainer');
+        if (container) container.innerHTML = '';
         
         document.getElementById('uploadSection').style.display = 'block';
         document.getElementById('contentSection').style.display = 'none';
@@ -1251,6 +1402,8 @@ class StudyBoostApp {
         if(fileInput) fileInput.value = '';
 
         this.showNotification(this._('notificationNewAnalysisReady'), 'info');
+        this.updateBreadcrumb();
+        this.setActiveNav('upload');
     }
 
     showModal(modalId) { document.getElementById(modalId)?.classList.add('show'); }

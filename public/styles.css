@@ -347,7 +347,7 @@ body.dark-mode .status-error {
 .btn-secondary:hover { background: var(--background); }
 
 /* Main Content */
-.main-content { flex: 1; max-width: 1200px; margin: 0 auto; padding: 2rem; width: 100%; }
+.main-content { flex: 1; max-width: 1200px; margin: 0 auto; padding: 2rem; width: 100%; padding-bottom: 4rem; }
 
 /* Upload Section */
 .upload-section { text-align: center; padding: 3rem 0; }
@@ -603,4 +603,81 @@ body {
     --text-secondary-dark-rgb: 148, 163, 184;
     --surface-rgb: 255, 255, 255; /* Default light */
     --surface-dark-rgb: 51, 65, 85; /* Dark mode */
+}
+
+.breadcrumb {
+    margin: 1rem;
+    font-size: 0.9rem;
+    color: var(--text-secondary-light);
+}
+body.dark-mode .breadcrumb {
+    color: var(--text-secondary-dark);
+}
+
+.history-section ul {
+    list-style: none;
+    padding: 0;
+}
+.history-section li {
+    padding: 8px;
+    border-bottom: 1px solid var(--border-light);
+    cursor: pointer;
+}
+body.dark-mode .history-section li {
+    border-bottom: 1px solid var(--border-dark);
+}
+.history-section textarea {
+    width: 100%;
+    margin-top: 1rem;
+}
+
+.generated-list {
+    margin-top: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+.generated-item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 0.75rem;
+    padding: 1rem;
+    box-shadow: var(--shadow);
+}
+body.dark-mode .generated-item {
+    border: 1px solid var(--border-dark);
+}
+
+.bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: space-around;
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    padding: 0.5rem 0;
+    z-index: 1000;
+}
+body.dark-mode .bottom-nav {
+    background: var(--surface-dark);
+    border-top: 1px solid var(--border-dark);
+}
+.bottom-nav .nav-btn {
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    flex: 1;
+    font-size: 0.9rem;
+}
+body.dark-mode .bottom-nav .nav-btn {
+    color: var(--text-secondary-dark);
+}
+.bottom-nav .nav-btn span {
+    display: block;
+    font-size: 0.75rem;
+}
+.bottom-nav .nav-btn.active {
+    color: var(--primary-color);
 }
