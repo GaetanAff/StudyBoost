@@ -1,12 +1,12 @@
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 
-// Helper function to get language-specific instructions (basic example)
+// Helper function to get language-specific instructions
 function getLanguageInstructions(lang) {
     switch (lang) {
         case 'en':
             return {
-                qcmFormatInstruction: "The output must be ONLY a valid JSON list (an array of MCQ objects), without any text or Markdown formatting before or after the JSON list. Start directly with '[' and end with ']'.",
-                flashcardFormatInstruction: "The output must be ONLY a valid JSON list (an array of flashcard objects), without any text or Markdown formatting before or after the JSON list. Start directly with '[' and end with ']'.",
+                qcmFormatInstruction: "The output must be ONLY a valid JSON list (an array of MCQ objects), without any text or Markdown formatting before or after the JSON list. Start directly with '[' and end with ']'. Each object must contain 'question', 'options' (array of 4 strings), 'correct_answer' (A, B, C, or D), and 'explanation'.",
+                flashcardFormatInstruction: "The output must be ONLY a valid JSON list (an array of flashcard objects), without any text or Markdown formatting before or after the JSON list. Start directly with '[' and end with ']'. Each object must contain 'front' and 'back'.",
                 shortSummaryPrompt: "Create a short and concise summary (around 150-200 words) of the following text, using Markdown format. Structure the summary with headings (##) and bullet points (-) for optimal readability.",
                 longSummaryPrompt: "Create a detailed and well-structured summary of the following text, using Markdown format. Use headings (##), subheadings (###), bullet points (-), and highlight important terms in **bold**. The summary should cover the essential aspects of the text exhaustively.",
                 revisionSheetPromptStart: "Create a complete and well-structured revision sheet in Markdown format from the following text.\nThe sheet should include:\n- A relevant main title (## Title).\n- A 'Key Points' section (### Key Points) with a bulleted list of the most important ideas.\n- An 'Important Definitions' section (### Important Definitions) listing key terms and their definitions, if applicable.\n- If the text lends itself to it, a 'Concepts and Relations' section (### Concepts and Relations) describing the relationships between main ideas (can be bullet points or short paragraphs).\nUse Markdown formatting (bold, italics, lists) to improve readability.",
@@ -16,8 +16,8 @@ function getLanguageInstructions(lang) {
             };
         case 'de':
              return {
-                qcmFormatInstruction: "Die Ausgabe muss NUR eine gültige JSON-Liste sein (ein Array von MCQ-Objekten), ohne Text oder Markdown-Formatierung vor oder nach der JSON-Liste. Beginnen Sie direkt mit '[' und enden Sie mit ']'.",
-                flashcardFormatInstruction: "Die Ausgabe muss NUR eine gültige JSON-Liste sein (ein Array von Lernkartenobjekten), ohne Text oder Markdown-Formatierung vor oder nach der JSON-Liste. Beginnen Sie direkt mit '[' und enden Sie mit ']'.",
+                qcmFormatInstruction: "Die Ausgabe muss NUR eine gültige JSON-Liste sein (ein Array von MCQ-Objekten), ohne Text oder Markdown-Formatierung vor oder nach der JSON-Liste. Beginnen Sie direkt mit '[' und enden Sie mit ']'. Jedes Objekt muss 'question', 'options' (Array mit 4 Strings), 'correct_answer' (A, B, C oder D) und 'explanation' enthalten.",
+                flashcardFormatInstruction: "Die Ausgabe muss NUR eine gültige JSON-Liste sein (ein Array von Lernkartenobjekten), ohne Text oder Markdown-Formatierung vor oder nach der JSON-Liste. Beginnen Sie direkt mit '[' und enden Sie mit ']'. Jedes Objekt muss 'front' und 'back' enthalten.",
                 shortSummaryPrompt: "Erstellen Sie eine kurze und prägnante Zusammenfassung (ca. 150-200 Wörter) des folgenden Textes im Markdown-Format. Strukturieren Sie die Zusammenfassung mit Überschriften (##) und Aufzählungspunkten (-) für optimale Lesbarkeit.",
                 longSummaryPrompt: "Erstellen Sie eine detaillierte und gut strukturierte Zusammenfassung des folgenden Textes im Markdown-Format. Verwenden Sie Überschriften (##), Unterüberschriften (###), Aufzählungspunkte (-) und heben Sie wichtige Begriffe **fett** hervor. Die Zusammenfassung sollte die wesentlichen Aspekte des Textes umfassend abdecken.",
                 revisionSheetPromptStart: "Erstellen Sie aus dem folgenden Text ein vollständiges und gut strukturiertes Revisionsblatt im Markdown-Format.\nDas Blatt sollte Folgendes enthalten:\n- Einen relevanten Haupttitel (## Titel).\n- Einen Abschnitt 'Kernpunkte' (### Kernpunkte) mit einer Aufzählung der wichtigsten Ideen.\n- Einen Abschnitt 'Wichtige Definitionen' (### Wichtige Definitionen), der gegebenenfalls Schlüsselbegriffe und deren Definitionen auflistet.\n- Wenn der Text dies zulässt, einen Abschnitt 'Konzepte und Beziehungen' (### Konzepte und Beziehungen), der die Beziehungen zwischen den Hauptideen beschreibt (kann in Form von Aufzählungspunkten oder kurzen Absätzen erfolgen).\nVerwenden Sie Markdown-Formatierung (fett, kursiv, Listen), um die Lesbarkeit zu verbessern.",
@@ -27,8 +27,8 @@ function getLanguageInstructions(lang) {
             };
         case 'es':
             return {
-                qcmFormatInstruction: "La salida debe ser ÚNICAMENTE una lista JSON válida (un array de objetos MCQ), sin ningún texto o formato Markdown antes o después de la lista JSON. Comience directamente con '[' y termine con ']'.",
-                flashcardFormatInstruction: "La salida debe ser ÚNICAMENTE una lista JSON válida (un array de objetos de tarjeta de memoria), sin ningún texto o formato Markdown antes o después de la lista JSON. Comience directamente con '[' y termine con ']'.",
+                qcmFormatInstruction: "La salida debe ser ÚNICAMENTE una lista JSON válida (un array de objetos MCQ), sin ningún texto o formato Markdown antes o después de la lista JSON. Comience directamente con '[' y termine con ']'. Cada objeto debe contener 'question', 'options' (array de 4 cadenas), 'correct_answer' (A, B, C, o D), y 'explanation'.",
+                flashcardFormatInstruction: "La salida debe ser ÚNICAMENTE una lista JSON válida (un array de objetos de tarjeta de memoria), sin ningún texto o formato Markdown antes o después de la lista JSON. Comience directamente con '[' y termine con ']'. Cada objeto debe contener 'front' y 'back'.",
                 shortSummaryPrompt: "Cree un resumen breve y conciso (alrededor de 150-200 palabras) del siguiente texto, utilizando el formato Markdown. Estructure el resumen con encabezados (##) y viñetas (-) para una legibilidad óptima.",
                 longSummaryPrompt: "Cree un resumen detallado y bien estructurado del siguiente texto, utilizando el formato Markdown. Utilice encabezados (##), subencabezados (###), viñetas (-) y resalte los términos importantes en **negrita**. El resumen debe cubrir los aspectos esenciales del texto de manera exhaustiva.",
                 revisionSheetPromptStart: "Cree una hoja de revisión completa y bien estructurada en formato Markdown a partir del siguiente texto.\nLa hoja debe incluir:\n- Un título principal pertinente (## Título).\n- Una sección 'Puntos Clave' (### Puntos Clave) con una lista de viñetas de las ideas más importantes.\n- Una sección 'Definiciones Importantes' (### Definiciones Importantes) que liste los términos clave y sus definiciones, si aplica.\n- Si el texto se presta a ello, una sección 'Conceptos y Relaciones' (### Conceptos y Relaciones) que describa las relaciones entre las ideas principales (puede ser en forma de viñetas o párrafos cortos).\nUtilice formato Markdown (negrita, cursiva, listas) para mejorar la legibilidad.",
@@ -39,8 +39,8 @@ function getLanguageInstructions(lang) {
         // French (default)
         default:
             return {
-                qcmFormatInstruction: "La sortie doit être UNIQUEMENT une liste JSON valide (un tableau d'objets QCM), sans aucun texte ou formatage Markdown avant ou après la liste JSON. Commence directement par '[' et termine par ']'.",
-                flashcardFormatInstruction: "La sortie doit être UNIQUEMENT une liste JSON valide (un tableau d'objets flashcard), sans aucun texte ou formatage Markdown avant ou après la liste JSON. Commence directement par '[' et termine par ']'.",
+                qcmFormatInstruction: "La sortie doit être UNIQUEMENT une liste JSON valide (un tableau d'objets QCM), sans aucun texte ou formatage Markdown avant ou après la liste JSON. Commence directement par '[' et termine par ']'. Chaque objet doit contenir 'question', 'options' (tableau de 4 chaînes), 'correct_answer' (A, B, C, ou D), et 'explanation'.",
+                flashcardFormatInstruction: "La sortie doit être UNIQUEMENT une liste JSON valide (un tableau d'objets flashcard), sans aucun texte ou formatage Markdown avant ou après la liste JSON. Commence directement par '[' et termine par ']'. Chaque objet doit contenir 'front' et 'back'.",
                 shortSummaryPrompt: "Crée un résumé court et concis (environ 150-200 mots) du texte suivant, en utilisant le format Markdown. Structure le résumé avec des titres (##) et des puces (-) pour une lisibilité optimale.",
                 longSummaryPrompt: "Crée un résumé détaillé et bien structuré du texte suivant, en utilisant le format Markdown. Utilise des titres (##), des sous-titres (###), des puces (-) et mets en évidence les termes importants en **gras**. Le résumé doit couvrir les aspects essentiels du texte de manière exhaustive.",
                 revisionSheetPromptStart: "Crée une fiche de révision complète et bien structurée en format Markdown à partir du texte suivant.\nLa fiche doit inclure :\n- Un titre principal pertinent (## Titre).\n- Une section \"Points Clés\" (### Points Clés) avec une liste à puces des idées les plus importantes.\n- Une section \"Définitions Importantes\" (### Définitions Importantes) listant les termes clés et leurs définitions, si applicable.\n- Si le texte s'y prête, une section \"Concepts et Relations\" (### Concepts et Relations) décrivant les relations entre les idées principales (peut être sous forme de puces ou de courts paragraphes).\nUtilise la mise en forme Markdown (gras, italique, listes) pour améliorer la lisibilité.",
@@ -54,8 +54,6 @@ function getLanguageInstructions(lang) {
 
 async function generateContent(text, type, options = {}, apiKey, language = 'fr') {
   const genAI = new GoogleGenerativeAI(apiKey);
-  // Using gemini-1.5-flash-latest as a generally available and capable model.
-  // Adjust if "gemini-2.0-flash-lite" is a specific internal/beta model you have access to.
   const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" }); 
 
   let prompt = '';
@@ -72,6 +70,7 @@ async function generateContent(text, type, options = {}, apiKey, language = 'fr'
       
     case 'qcm':
       const numQuestions = options.numQuestions || 10;
+      // The prompt now directly uses the language-specific qcmFormatInstruction.
       prompt = `Génère exactement ${numQuestions} questions à choix multiples (QCM) basées sur le texte suivant.
 Chaque QCM doit être un objet JSON avec les clés suivantes :
 - "question": (string) La question elle-même.
@@ -86,6 +85,7 @@ Texte de référence :\n\n${text}`;
       
     case 'flashcards':
       const numCards = options.numCards || 15;
+      // The prompt now directly uses the language-specific flashcardFormatInstruction.
       prompt = `Crée exactement ${numCards} flashcards basées sur les concepts clés du texte suivant.
 Chaque flashcard doit être un objet JSON avec les clés suivantes :
 - "front": (string) La question ou le terme clé.
@@ -133,10 +133,8 @@ Texte de référence :\n\n${text}`;
     }
     
     const generatedText = response.text();
-    // For QCM/Flashcards, an empty JSON "[]" is technically valid if 0 items are requested or if IA can't generate.
-    // For open_question_generate, an empty string means no question could be generated.
     if (!generatedText && type !== 'qcm' && type !== 'flashcards' && type !== 'open_question_generate') { 
-        console.warn('API Gemini a retourné un texte vide pour le type:', type);
+        console.warn('API Gemini a retourné un texte vide pour le type:', type, "Prompt utilisé:", prompt);
     }
 
     const usageMetadata = response.usageMetadata || { promptTokenCount: 0, candidatesTokenCount: 0, totalTokenCount: 0 };
@@ -150,11 +148,11 @@ Texte de référence :\n\n${text}`;
     };
 
   } catch (error) {
-    console.error('Erreur lors de l\'appel à API Gemini:', error.message, error.stack); // Log stack for more details
+    console.error('Erreur lors de l\'appel à API Gemini:', error.message, "\nPrompt utilisé:", prompt, "\nStack:", error.stack); 
     let detailedError = error.message;
     if (error.response && error.response.data && error.response.data.error && error.response.data.error.message) {
         detailedError = error.response.data.error.message;
-    } else if (error.cause) { // Check for error.cause which might contain more info
+    } else if (error.cause) { 
         detailedError += ` (Cause: ${JSON.stringify(error.cause)})`;
     }
     throw new Error(`Erreur API Gemini: ${detailedError}`);
