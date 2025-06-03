@@ -6,6 +6,9 @@ Une application web moderne et interactive qui transforme vos documents de cours
 
 Cette version majeure introduit des fonctionnalités très attendues pour une expérience utilisateur encore plus riche :
 
+* **Curseur de Difficulté pour les Questions :**
+    * Ajustez le niveau de difficulté (de "Découverte" à "Expert") pour les QCM et les questions ouvertes générées par l'IA.
+    * Obtenez des questions adaptées à votre niveau de compréhension, allant de la simple vérification de lecture à des analyses complexes.
 * **Questions Ouvertes avec Correction par l'IA :**
     * Générez des questions ouvertes basées sur le contenu de vos documents.
     * Rédigez vos propres réponses.
@@ -38,9 +41,9 @@ Cette version majeure introduit des fonctionnalités très attendues pour une ex
 
 * **Upload de documents variés** : PDF, Word, PowerPoint, et même des Images (avec OCR pour l'extraction de texte).
 * **Résumés intelligents** : Obtenez des résumés courts et concis ou détaillés et structurés, au format Markdown.
-* **QCM personnalisables** : Génération automatique de questions à choix multiples avec options, réponses correctes et explications.
+* **QCM personnalisables** : Génération automatique de questions à choix multiples avec options, réponses correctes, explications et **niveau de difficulté ajustable**.
 * **Flashcards interactives** : Créez des cartes de révision (recto/verso) pour un apprentissage actif des concepts clés.
-* **Questions Ouvertes** : Générez des questions demandant une réponse rédigée et obtenez une correction de l'IA.
+* **Questions Ouvertes** : Générez des questions demandant une réponse rédigée (avec **niveau de difficulté ajustable**) et obtenez une correction de l'IA.
 * **Fiches de révision complètes** : Des fiches structurées, prêtes à l'emploi et exportables.
 * **Questions libres sur le document** : Posez des questions spécifiques sur le contenu de votre document et obtenez des réponses basées sur celui-ci.
 * **Export PDF** : Sauvegardez facilement tous les contenus générés (résumés, QCM, fiches) au format PDF.
@@ -51,72 +54,74 @@ Cette version majeure introduit des fonctionnalités très attendues pour une ex
 
 ## 📋 Prérequis
 
-- Node.js (version 16 ou supérieure)
-- NPM ou Yarn
-- Clé API Google Gemini (gratuite sur Google AI Studio)
+-   Node.js (version 16 ou supérieure)
+-   NPM ou Yarn
+-   Clé API Google Gemini (gratuite sur Google AI Studio)
 
 ## 🛠️ Installation
 
-1. **Cloner le projet**
-```bash
-git clone https://github.com/GaetanAff/StudyBoost.git
-cd studyboost
-```
+1.  **Cloner le projet**
+    ```bash
+    git clone [https://github.com/GaetanAff/StudyBoost.git](https://github.com/GaetanAff/StudyBoost.git)
+    cd studyboost
+    ```
+   
+2.  **Installer les dépendances**
+    ```bash
+    npm install
+    ```
+    (Le `package.json` liste déjà `express multer cors dotenv pdf-parse mammoth tesseract.js @google/generative-ai marked jspdf html2canvas nodemon webpack webpack-cli`, donc `npm install` suffit)
 
-2. **Installer les dépendances**
-```bash
-npm install express multer cors dotenv pdf-parse mammoth tesseract.js @google/generative-ai marked jspdf html2canvas nodemon webpack webpack-cli
-npm install
-```
+3.  **Démarrer l'application**
+    ```bash
+    # Mode développement
+    npm run dev
 
-3. **Démarrer l'application**
-```bash
-# Mode développement
-npm run dev
-
-# Mode production
-npm start
-```
-
-4. **Ouvrir l'application**
-```
-http://localhost:3000
-```
+    # Mode production
+    npm start
+    ```
+   
+4.  **Ouvrir l'application**
+    ```
+    http://localhost:3000
+    ```
+   
 
 ## 🔧 Configuration
 
-1. **Obtenir une clé API Gemini** :
-   - Visitez [Google AI Studio](https://makersuite.google.com/app/apikey)
-   - Créez un compte Google si nécessaire
-   - Générez une nouvelle clé API
-   - Copiez la clé
+1.  **Obtenir une clé API Gemini** :
+    * Visitez [Google AI Studio](https://makersuite.google.com/app/apikey)
+    * Créez un compte Google si nécessaire
+    * Générez une nouvelle clé API
+    * Copiez la clé
 
-2. **Configurer dans l'application** :
-   - Cliquez sur le bouton "Clé API" en haut à droite
-   - Collez votre clé API Gemini
-   - Cliquez sur "Sauvegarder"
+2.  **Configurer dans l'application** :
+    * Cliquez sur le bouton "Clé API" en haut à droite
+    * Collez votre clé API Gemini
+    * Cliquez sur "Sauvegarder"
 
 ## 📚 Utilisation
 
-1. **Uploader un document**
-   - Cliquez sur la zone d'upload ou glissez-déposez vos fichiers
-   - Formats supportés : PDF, DOC, DOCX, PPT, PPTX, JPG, PNG
+1.  **Uploader un document**
+    * Cliquez sur la zone d'upload ou glissez-déposez vos fichiers
+    * Formats supportés : PDF, DOC, DOCX, PPT, PPTX, JPG, PNG
 
-2. **Choisir une action**
-   - Résumé court/détaillé
-   - Génération de QCM
-   - Création de flashcards
-   - Fiche de révision
-   - Questions libres
+2.  **Choisir une action**
+    * Résumé court/détaillé
+    * Génération de QCM
+    * Création de flashcards
+    * Fiche de révision
+    * Questions libres
 
-3. **Personnaliser les options**
-   - Nombre de questions pour les QCM
-   - Nombre de flashcards
-   - Type de résumé souhaité
+3.  **Personnaliser les options**
+    * Nombre de questions pour les QCM
+    * Nombre de flashcards
+    * Type de résumé souhaité
+    * **Niveau de difficulté** pour les QCM et questions ouvertes.
 
-4. **Exporter les résultats**
-   - Format PDF
-   - Copie dans le presse-papiers
+4.  **Exporter les résultats**
+    * Format PDF
+    * Copie dans le presse-papiers
 
 ## 🏗️ Structure du projet
 
