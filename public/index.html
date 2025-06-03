@@ -146,17 +146,37 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h3 data-lang="apiKeyModalTitle">Configuration API Gemini</h3>
-                    <button class="modal-close">&times;</button>
+                    <button class="modal-close" type="button" aria-label="Close">&times;</button>
                 </div>
                 <div class="modal-body">
                     <div class="form-group">
-                        <label data-lang="apiKeyInputLabel">Clé API Google Gemini</label>
-                        <input type="password" id="apiKeyInput" placeholder-data-lang="apiKeyInputPlaceholder">
-                        <small><span data-lang="apiKeyModalDesc1">Obtenez votre clé sur</span> <a href="https://makersuite.google.com/app/apikey" target="_blank">Google AI Studio</a></small>
+                        <label for="apiKeyInput" data-lang="apiKeyInputLabel">🔐 Clé API Google Gemini</label>
+                        <div class="input-container">
+                            <input
+                                type="password"
+                                id="apiKeyInput"
+                                class="form-control" placeholder-data-lang="apiKeyInputPlaceholder" >
+                            <button class="input-toggle" type="button" aria-label="Toggle API Key Visibility">
+                                <span data-lang="showPasswordIcon">👁️</span> </button>
+                        </div>
+                    </div>
+
+                    <div id="apiKeyStatusIndicator" class="status-indicator" role="alert">
+                        </div>
+
+                    <div class="api-info">
+                        <p> <span data-lang="apiKeyModalDesc1">💡 Obtenez gratuitement votre clé sur</span>
+                            <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer">Google AI Studio</a>
+                        </p>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button id="saveApiKey" class="btn-primary" data-lang="saveBtnLabel">Sauvegarder</button>
+                    <button id="testApiKeyBtn" class="btn-secondary" data-lang="testApiKeyBtnLabel" type="button">
+                        🧪 Tester la Clé
+                    </button>
+                    <button id="saveApiKey" class="btn-primary" data-lang="saveBtnLabel" type="button">
+                        💾 Sauvegarder
+                    </button>
                 </div>
             </div>
         </div>

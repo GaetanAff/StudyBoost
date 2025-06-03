@@ -107,6 +107,13 @@ class StudyBoostApp {
                 difficultyLevel4: "Difficile",
                 difficultyLevel5: "Expert",
                 checkAnswerBtnLabel: "Vérifier la réponse",
+                testApiKeyBtnLabel: "🧪 Tester la Clé", // Nouvelle traduction
+                apiKeyTestSuccess: "✅ Clé API valide et fonctionnelle.", // Nouvelle traduction
+                apiKeyTestFailure: "❌ Clé API invalide ou problème de connexion: ", // Nouvelle traduction
+                loadingTextTestingKey: "⏳ Test de la clé API en cours...", // Nouvelle traduction pour le chargement
+                showPasswordIcon: "👁️", // Add this
+                hidePasswordIcon: "🙈", // Add this
+                apiKeyStatusTitle: "Statut de la clé API",
             },
             en: {
                 appTitle: "StudyBoost - AI Study Assistant",
@@ -201,6 +208,13 @@ class StudyBoostApp {
                 difficultyLevel4: "Hard",
                 difficultyLevel5: "Expert",
                 checkAnswerBtnLabel: "Check Answer",
+                testApiKeyBtnLabel: "🧪 Test Key", // New translation
+                apiKeyTestSuccess: "✅ API key is valid and working.", // New translation
+                apiKeyTestFailure: "❌ API key is invalid or connection issue: ", // New translation
+                loadingTextTestingKey: "⏳ Testing API key...", // New translation for loading
+                showPasswordIcon: "👁️",
+                hidePasswordIcon: "🙈",
+                apiKeyStatusTitle: "API Key Status",
             },
             de: {
                 appTitle: "StudyBoost - KI-Lernassistent",
@@ -295,6 +309,13 @@ class StudyBoostApp {
                 difficultyLevel4: "Schwer",
                 difficultyLevel5: "Experte",
                 checkAnswerBtnLabel: "Antwort überprüfen",
+                testApiKeyBtnLabel: "🧪 Schlüssel testen", // Neue Übersetzung
+                apiKeyTestSuccess: "✅ API-Schlüssel ist gültig und funktioniert.", // Neue Übersetzung
+                apiKeyTestFailure: "❌ API-Schlüssel ist ungültig oder Verbindungsproblem: ", // Neue Übersetzung
+                loadingTextTestingKey: "⏳ API-Schlüssel wird getestet...", // Neue Übersetzung für das Laden
+                showPasswordIcon: "👁️",
+                hidePasswordIcon: "🙈",
+                apiKeyStatusTitle: "API-Schlüsselstatus",
             },
             es: {
                 appTitle: "StudyBoost - Asistente de Estudio IA",
@@ -389,6 +410,13 @@ class StudyBoostApp {
                 difficultyLevel4: "Difícil",
                 difficultyLevel5: "Experto",
                 checkAnswerBtnLabel: "Verificar respuesta",
+                testApiKeyBtnLabel: "🧪 Probar Clave", // Nueva traducción
+                apiKeyTestSuccess: "✅ La clave API es válida y funciona.", // Nueva traducción
+                apiKeyTestFailure: "❌ La clave API no es válida o hay un problema de conexión: ", // Nueva traducción
+                loadingTextTestingKey: "Probando clave API...", // Nueva traducción para la carga
+                showPasswordIcon: "👁️",
+                hidePasswordIcon: "🙈",
+                apiKeyStatusTitle: "⏳ Estado de la Clave API",
             }
         };
 
@@ -512,48 +540,180 @@ class StudyBoostApp {
         const fileInput = document.getElementById('fileInput');
         const uploadArea = document.getElementById('uploadArea');
 
-        if (uploadArea) uploadArea.addEventListener('click', () => fileInput.click());
-        if (fileInput) fileInput.addEventListener('change', (e) => this.handleFileUpload(e.target.files[0]));
+        // Listener pour le clic sur la zone d'upload (pour ouvrir la sélection de fichier)
+        if (uploadArea && fileInput) { // S'assurer que fileInput existe aussi
+            uploadArea.addEventListener('click', () => fileInput.click());
+        }
+        // Listener pour le changement de fichier dans l'input
+        if (fileInput) {
+            fileInput.addEventListener('change', (e) => this.handleFileUpload(e.target.files[0]));
+        }
 
+        // Listeners pour le glisser-déposer (drag and drop)
         if (uploadArea) {
             ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-                uploadArea.addEventListener(eventName, (e) => e.preventDefault(), false);
+                uploadArea.addEventListener(eventName, (e) => {
+                    e.preventDefault();
+                    e.stopPropagation(); // Bonne pratique d'ajouter stopPropagation aussi
+                }, false);
             });
             uploadArea.addEventListener('dragenter', () => uploadArea.classList.add('dragover'));
             uploadArea.addEventListener('dragleave', () => uploadArea.classList.remove('dragover'));
             uploadArea.addEventListener('drop', (e) => {
                 uploadArea.classList.remove('dragover');
-                this.handleFileUpload(e.dataTransfer.files[0]);
+                if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+                    this.handleFileUpload(e.dataTransfer.files[0]);
+                    e.dataTransfer.clearData(); // Bonne pratique
+                }
             });
         }
 
+        // Listeners pour les boutons principaux de l'en-tête et des modaux
         document.getElementById('apiKeyBtn')?.addEventListener('click', () => this.showModal('apiKeyModal'));
         document.getElementById('saveApiKey')?.addEventListener('click', () => this.saveApiKeyAndResetTokens());
         document.getElementById('darkModeToggle')?.addEventListener('click', () => this.toggleDarkMode());
         document.getElementById('languageSwitcher')?.addEventListener('change', (e) => this.setLanguage(e.target.value));
+        document.getElementById('testApiKeyBtn')?.addEventListener('click', () => this.testApiKey());
 
+        // *** AJOUT CRUCIAL : Listener pour le bouton de bascule de visibilité de la clé API ***
+        const apiKeyModalElement = document.getElementById('apiKeyModal');
+        if (apiKeyModalElement) {
+            const toggleButton = apiKeyModalElement.querySelector('.input-toggle');
+            if (toggleButton) {
+                toggleButton.addEventListener('click', () => {
+                    // 'apiKeyInput' est l'ID de votre champ de saisie de la clé API
+                    // toggleButton est l'élément bouton sur lequel on a cliqué
+                    this.togglePasswordVisibility('apiKeyInput', toggleButton);
+                });
+            }
+        }
+
+        // Listener pour les cartes d'action
         document.querySelectorAll('.action-card').forEach(card => {
-            card.addEventListener('click', (e) => this.handleAction(e.currentTarget.dataset.action));
+            card.addEventListener('click', (e) => {
+                if (e.currentTarget && e.currentTarget.dataset && e.currentTarget.dataset.action) {
+                    this.handleAction(e.currentTarget.dataset.action);
+                }
+            });
         });
 
+        // Listener pour les boutons de fermeture des modaux
         document.querySelectorAll('.modal-close').forEach(btn => {
-            btn.addEventListener('click', (e) => this.hideModal(e.target.closest('.modal').id));
+            btn.addEventListener('click', (e) => {
+                const modal = e.target.closest('.modal');
+                if (modal && modal.id) {
+                    this.hideModal(modal.id);
+                }
+            });
         });
 
+        // Listeners pour les soumissions de formulaires et autres actions spécifiques
         document.getElementById('submitQuestion')?.addEventListener('click', () => this.submitUserQuestion());
         document.getElementById('confirmOptions')?.addEventListener('click', () => this.confirmOptions());
         document.getElementById('newAnalysisBtn')?.addEventListener('click', () => this.resetApp());
         document.getElementById('exportBtn')?.addEventListener('click', () => this.exportResults());
         document.getElementById('submitOpenAnswerBtn')?.addEventListener('click', () => this.submitOpenAnswer());
 
-
+        // Listener pour fermer un modal en cliquant à l'extérieur de son contenu
         document.querySelectorAll('.modal').forEach(modal => {
             modal.addEventListener('click', (e) => {
-                if (e.target === modal) this.hideModal(modal.id);
+                if (e.target === modal) { // Si le clic est sur le fond du modal lui-même
+                    if (modal.id) {
+                        this.hideModal(modal.id);
+                    }
+                }
             });
         });
     }
+
+    togglePasswordVisibility(inputId, toggleButtonElement) {
+        const input = document.getElementById(inputId);
+        // L'icône est dans un <span> à l'intérieur du bouton
+        const iconSpan = toggleButtonElement.querySelector('span');
+
+        if (!input || !iconSpan) {
+            console.error("Éléments manquants pour togglePasswordVisibility:", input, iconSpan);
+            return;
+        }
+
+        if (input.type === 'password') {
+            input.type = 'text';
+            iconSpan.textContent = this._('hidePasswordIcon'); // Utilise la traduction
+            iconSpan.dataset.lang = 'hidePasswordIcon'; // Mettre à jour pour la langue
+        } else {
+            input.type = 'password';
+            iconSpan.textContent = this._('showPasswordIcon'); // Utilise la traduction
+            iconSpan.dataset.lang = 'showPasswordIcon'; // Mettre à jour pour la langue
+        }
+    }
     
+    showModal(modalId) {
+        const modalElement = document.getElementById(modalId);
+        if (modalElement) {
+            modalElement.classList.add('show');
+        } else {
+            console.error(`Modal with id "${modalId}" not found.`); // Message d'erreur si le modal n'existe pas
+            return;
+        }
+
+        if (modalId === 'apiKeyModal') {
+            // Si vous avez une méthode hideApiKeyStatus, appelez-la ici
+            if (typeof this.hideApiKeyStatus === 'function') {
+                 this.hideApiKeyStatus(); // Efface le statut précédent lors de l'affichage du modal
+            }
+
+            const apiKeyInput = document.getElementById('apiKeyInput');
+            if (apiKeyInput) {
+                apiKeyInput.type = 'password'; // Réinitialise en type password
+            }
+
+            const toggleButton = document.querySelector('#apiKeyModal .input-toggle');
+            if (toggleButton) {
+                const iconSpan = toggleButton.querySelector('span');
+                if (iconSpan) {
+                    iconSpan.textContent = this._('showPasswordIcon'); // Réinitialise l'icône
+                    iconSpan.dataset.lang = 'showPasswordIcon';
+                }
+            }
+        }
+        // Vous pourriez avoir d'autres logiques spécifiques pour d'autres modaux ici
+        // else if (modalId === 'autreModal') { ... }
+    }
+
+    async testApiKey() {
+        const apiKeyInput = document.getElementById('apiKeyInput');
+        const apiKeyToTest = apiKeyInput.value.trim();
+
+        if (!apiKeyToTest) {
+            this.showNotification(this._('notificationEnterValidApiKey'), 'error');
+            return;
+        }
+
+        this.showLoading(this._('loadingTextTestingKey')); // Utilisation de la nouvelle traduction pour le chargement
+
+        try {
+            const response = await fetch('/api/test-key', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ apiKey: apiKeyToTest })
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+                this.showNotification(this._('apiKeyTestSuccess'), 'success');
+            } else {
+                const errorMessage = result.error || 'Erreur inconnue';
+                this.showNotification(this._('apiKeyTestFailure') + errorMessage, 'error');
+            }
+        } catch (error) {
+            console.error('Erreur lors du test de la clé API (frontend):', error);
+            this.showNotification(this._('apiKeyTestFailure') + error.message, 'error');
+        } finally {
+            this.hideLoading();
+        }
+    }
+
     saveApiKeyAndResetTokens() {
         const apiKeyInput = document.getElementById('apiKeyInput');
         const newApiKey = apiKeyInput.value.trim();

@@ -124,6 +124,170 @@ body {
     transition: background-image 0.3s ease;
 }
 
+/* Styles pour le modal API amélioré */
+.modal {
+    backdrop-filter: blur(10px); /* This will be overridden by your existing .modal if it doesn't have !important, or add it */
+    animation: fadeIn 0.3s ease; /* New animation */
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-30px) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.modal-content { /* Will add to or override existing .modal-content */
+    animation: slideIn 0.4s ease;
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25); /* Likely overrides your --shadow-lg for this specific context */
+    border-radius: 20px; /* More rounded */
+}
+
+.modal-header { /* Will add to or override existing .modal-header */
+    background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+    position: relative;
+    overflow: hidden;
+    color: white; /* Added for better text visibility on gradient */
+}
+.modal-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="white" opacity="0.1"/><circle cx="75" cy="75" r="1" fill="white" opacity="0.1"/><circle cx="50" cy="10" r="0.5" fill="white" opacity="0.15"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+    pointer-events: none;
+}
+
+.modal-header h3 { /* Ensure h3 text is visible and styled */
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: white !important; /* Make sure title is white */
+}
+
+.modal-close { /* Will add to or override existing .modal-close */
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    backdrop-filter: blur(10px);
+    transition: all 0.3s ease;
+    color: white !important; /* Ensure close button is white */
+}
+.modal-close:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: rotate(90deg);
+}
+
+/* New classes for input styling */
+.input-container {
+    position: relative;
+    margin-bottom: 12px;
+}
+.input-container input { /* Styles for input within the new container */
+    padding-right: 50px !important; /* Ensure space for the toggle */
+    font-family: 'Monaco', 'Menlo', monospace;
+    background: #f9fafb; /* Light background for the input field */
+    transition: all 0.3s ease;
+}
+/* Apply dark mode adjustments if needed */
+body.dark-mode .input-container input {
+    background: var(--surface-dark); /* Or a slightly lighter shade like #475569 */
+    color: var(--text-primary-dark);
+    border-color: var(--border-dark);
+}
+
+.input-container input:focus {
+    border-color: #4f46e5 !important; /* Use important if needed to override general input focus */
+    background: white !important;
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1) !important;
+    transform: translateY(-1px);
+}
+body.dark-mode .input-container input:focus {
+    background: var(--surface) !important; /* A bit lighter when focused in dark mode */
+    border-color: var(--primary-color-dark) !important;
+    box-shadow: 0 0 0 3px rgba(var(--primary-color-dark-rgb), 0.2) !important;
+}
+
+
+.input-toggle {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 18px;
+    color: #6b7280;
+    transition: color 0.3s ease;
+}
+body.dark-mode .input-toggle {
+    color: var(--text-secondary-dark);
+}
+
+.input-toggle:hover {
+    color: #4f46e5;
+}
+body.dark-mode .input-toggle:hover {
+    color: var(--primary-color-dark);
+}
+
+.api-info {
+    background: linear-gradient(135deg, #eff6ff 0%, #f0f9ff 100%);
+    border: 1px solid #bfdbfe;
+    border-radius: 12px;
+    padding: 16px;
+    font-size: 14px;
+    color: #1e40af;
+    margin-top: 1rem; /* Add some space */
+}
+body.dark-mode .api-info {
+    background: linear-gradient(135deg, #334155 0%, #3e526e 100%);
+    border-color: #475569;
+    color: #94a3b8;
+}
+
+.status-indicator {
+    display: none; /* Hidden by default */
+    margin-top: 12px;
+    padding: 12px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+}
+.status-success {
+    background: #dcfce7;
+    color: #166534;
+    border: 1px solid #bbf7d0;
+}
+body.dark-mode .status-success {
+    background: #102c1a; /* Darker green background */
+    color: #6ee7b7;    /* Lighter green text */
+    border-color: #2e6343; /* Darker green border */
+}
+
+.status-error {
+    background: #fee2e2;
+    color: #991b1b;
+    border: 1px solid #fecaca;
+}
+body.dark-mode .status-error {
+    background: #451010; /* Darker red background */
+    color: #fca5a5;    /* Lighter red text */
+    border-color: #7f1d1d; /* Darker red border */
+}
 
 .language-switcher-container {
     display: flex;
