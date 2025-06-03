@@ -50,6 +50,7 @@ Cette version majeure introduit des fonctionnalités très attendues pour une ex
 * **Mode Sombre** : Changez de thème pour un meilleur confort visuel.
 * **Support Multi-langues** : Interface disponible en Français, Anglais, Allemand, Espagnol.
 * **Suivi des Tokens** : Gardez un œil sur votre utilisation de l'API Gemini avec un affichage numérique et un diagramme circulaire pour les tokens d'entrée.
+* **Historique et progression** : Consultez vos actions passées et suivez vos scores directement dans l'application.
 
 
 ## 📋 Prérequis

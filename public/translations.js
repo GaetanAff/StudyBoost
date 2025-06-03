@@ -100,6 +100,12 @@ window.STUDYBOOST_TRANSLATIONS = {
                 showPasswordIcon: "👁️", // Add this
                 hidePasswordIcon: "🙈", // Add this
                 apiKeyStatusTitle: "Statut de la clé API",
+                progressBtnLabel: "Progression",
+                progressModalTitle: "Historique & Progression",
+                clearHistoryBtnLabel: "Effacer l'historique",
+                noHistoryMessage: "Aucune donnée de progression",
+                dateLabel: "Date",
+                detailsLabel: "Détails",
             },
             en: {
                 appTitle: "StudyBoost - AI Study Assistant",
@@ -201,6 +207,12 @@ window.STUDYBOOST_TRANSLATIONS = {
                 showPasswordIcon: "👁️",
                 hidePasswordIcon: "🙈",
                 apiKeyStatusTitle: "API Key Status",
+                progressBtnLabel: "Progress",
+                progressModalTitle: "History & Progress",
+                clearHistoryBtnLabel: "Clear History",
+                noHistoryMessage: "No progress data",
+                dateLabel: "Date",
+                detailsLabel: "Details",
             },
             de: {
                 appTitle: "StudyBoost - KI-Lernassistent",
@@ -302,6 +314,12 @@ window.STUDYBOOST_TRANSLATIONS = {
                 showPasswordIcon: "👁️",
                 hidePasswordIcon: "🙈",
                 apiKeyStatusTitle: "API-Schlüsselstatus",
+                progressBtnLabel: "Fortschritt",
+                progressModalTitle: "Verlauf & Fortschritt",
+                clearHistoryBtnLabel: "Verlauf löschen",
+                noHistoryMessage: "Keine Fortschrittdaten",
+                dateLabel: "Datum",
+                detailsLabel: "Details",
             },
             es: {
                 appTitle: "StudyBoost - Asistente de Estudio IA",
@@ -403,5 +421,11 @@ window.STUDYBOOST_TRANSLATIONS = {
                 showPasswordIcon: "👁️",
                 hidePasswordIcon: "🙈",
                 apiKeyStatusTitle: "⏳ Estado de la Clave API",
+                progressBtnLabel: "Progreso",
+                progressModalTitle: "Historial y Progreso",
+                clearHistoryBtnLabel: "Borrar historial",
+                noHistoryMessage: "No hay datos de progreso",
+                dateLabel: "Fecha",
+                detailsLabel: "Detalles",
             }
         };

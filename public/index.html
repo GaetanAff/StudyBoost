@@ -38,6 +38,9 @@
                     <button id="apiKeyBtn" class="btn-secondary">
                         <i class="fas fa-key"></i> <span data-lang="apiKeyBtnLabel">Clé API</span>
                     </button>
+                    <button id="progressBtn" class="btn-secondary">
+                        <i class="fas fa-chart-line"></i> <span data-lang="progressBtnLabel">Progression</span>
+                    </button>
                 </div>
             </div>
         </header>
@@ -209,6 +212,21 @@
                     </div>
                 <div class="modal-footer">
                     <button id="confirmOptions" class="btn-primary" data-lang="generateBtnLabel">Générer</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal" id="progressModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 data-lang="progressModalTitle">Historique</h3>
+                    <button class="modal-close" type="button">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div id="historyContainer"></div>
+                </div>
+                <div class="modal-footer">
+                    <button id="clearHistoryBtn" class="btn-secondary" data-lang="clearHistoryBtnLabel">Effacer l'historique</button>
                 </div>
             </div>
         </div>

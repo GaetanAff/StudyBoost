@@ -9,7 +9,9 @@ class StudyBoostApp {
         this.currentFlashcardsData = null;
         this.generatedOpenQuestion = null; // To store the AI-generated open question
 
-        this.dailyInputTokenLimit = 1048576; 
+        this.history = [];
+        
+        this.dailyInputTokenLimit = 1048576;
 
         this.currentLanguage = localStorage.getItem('studyboost_language') || 'fr';
         this.translations = window.STUDYBOOST_TRANSLATIONS || {};
@@ -21,8 +23,10 @@ class StudyBoostApp {
         this.setupEventListeners();
         this.checkApiKey();
         this.updateTokenDisplay();
-        this.setLanguage(this.currentLanguage); 
+        this.setLanguage(this.currentLanguage);
         this.setInitialDarkMode();
+        this.loadHistory();
+        this.renderHistory();
     }
     
     setLanguage(lang) {
@@ -130,6 +134,53 @@ class StudyBoostApp {
         this.updateTokenDisplay();
     }
 
+    loadHistory() {
+        try {
+            this.history = JSON.parse(localStorage.getItem('studyboost_history')) || [];
+        } catch (e) {
+            this.history = [];
+        }
+    }
+
+    saveHistory() {
+        localStorage.setItem('studyboost_history', JSON.stringify(this.history));
+    }
+
+    addHistoryEntry(action, details = {}) {
+        const entry = {
+            timestamp: new Date().toISOString(),
+            document: this.currentDocument?.filename || '',
+            action,
+            details
+        };
+        this.history.push(entry);
+        this.saveHistory();
+        this.renderHistory();
+    }
+
+    clearHistory() {
+        this.history = [];
+        this.saveHistory();
+        this.renderHistory();
+    }
+
+    renderHistory() {
+        const container = document.getElementById('historyContainer');
+        if (!container) return;
+        if (this.history.length === 0) {
+            container.innerHTML = `<p>${this._('noHistoryMessage')}</p>`;
+            return;
+        }
+        let html = '<table class="history-table"><thead><tr><th>' + this._('dateLabel') + '</th><th>' + this._('processedDocumentLabel') + '</th><th>' + this._('resultsTitleLabel') + '</th><th>' + this._('detailsLabel') + '</th></tr></thead><tbody>';
+        this.history.forEach(entry => {
+            const date = new Date(entry.timestamp).toLocaleString();
+            const details = entry.details && entry.details.score ? entry.details.score : (entry.details.numQuestions ? entry.details.numQuestions + ' Q' : '');
+            html += `<tr><td>${date}</td><td>${entry.document}</td><td>${entry.action}</td><td>${details}</td></tr>`;
+        });
+        html += '</tbody></table>';
+        container.innerHTML = html;
+    }
+
     replaceEmojiCodes(text) {
         const map = {
             ":)": "🙂",
@@ -186,6 +237,8 @@ class StudyBoostApp {
         document.getElementById('darkModeToggle')?.addEventListener('click', () => this.toggleDarkMode());
         document.getElementById('languageSwitcher')?.addEventListener('change', (e) => this.setLanguage(e.target.value));
         document.getElementById('testApiKeyBtn')?.addEventListener('click', () => this.testApiKey());
+        document.getElementById('progressBtn')?.addEventListener('click', () => { this.renderHistory(); this.showModal('progressModal'); });
+        document.getElementById('clearHistoryBtn')?.addEventListener('click', () => this.clearHistory());
 
         // *** AJOUT CRUCIAL : Listener pour le bouton de bascule de visibilité de la clé API ***
         const apiKeyModalElement = document.getElementById('apiKeyModal');
@@ -582,10 +635,11 @@ class StudyBoostApp {
             const result = await response.json();
 
             if (response.ok && result.success && result.content && typeof result.content.text !== 'undefined') {
-                this.showResults(type, result.content.text); 
+                this.showResults(type, result.content.text);
+                this.addHistoryEntry(type, options);
                 if (result.content.usage) {
                     const promptTokens = result.content.usage.promptTokenCount || 0;
-                    const candidatesTokens = result.content.usage.candidatesTokenCount || 0; 
+                    const candidatesTokens = result.content.usage.candidatesTokenCount || 0;
                     this.updateStoredTokens(promptTokens, candidatesTokens);
                 }
             } else {
@@ -649,16 +703,17 @@ class StudyBoostApp {
                          cleanedContent = cleanedContent.substring(3, cleanedContent.length - 3).trim();
                     }
                     
-                    parsableJSON = cleanedContent;
-                    const arrayMatch = cleanedContent.match(/(\[[\s\S]*\])/);
-                    if (arrayMatch && arrayMatch[1]) {
-                        parsableJSON = arrayMatch[1];
-                    }
+                parsableJSON = cleanedContent;
+                const arrayMatch = cleanedContent.match(/(\[[\s\S]*\])/);
+                if (arrayMatch && arrayMatch[1]) {
+                    parsableJSON = arrayMatch[1];
+                }
 
-                    this.currentQCMData = JSON.parse(parsableJSON); 
-                    html = this.formatQCM(this.currentQCMData);
-                    resultsContent.innerHTML = html;
-                    this.setupQCMInteractions();
+                this.currentQCMData = JSON.parse(parsableJSON);
+                this.qcmScore = { total: 0, correct: 0 };
+                html = this.formatQCM(this.currentQCMData);
+                resultsContent.innerHTML = html;
+                this.setupQCMInteractions();
                 } catch (e) {
                     console.error("Error parsing QCM JSON:", e, "\nRaw content:", content, "\nAttempted to parse:", parsableJSON || content);
                     html = `<div class="markdown-content"><p>${this._('notificationQCMFormatError')} ${this._('checkConsoleForDetails')}</p><p>Raw output:</p><pre>${content}</pre></div>`;
@@ -770,7 +825,24 @@ class StudyBoostApp {
                     input.disabled = true; 
                 });
                 qcmItem.querySelector('.qcm-explanation')?.classList.add('visible');
-                button.disabled = true; 
+                button.disabled = true;
+
+                if (!qcmItem.dataset.answered) {
+                    this.qcmScore.total++;
+                    if (userAnswerLetter === correctAnswerLetter) {
+                        this.qcmScore.correct++;
+                    }
+                    qcmItem.dataset.answered = 'true';
+                    if (this.qcmScore.total === this.currentQCMData.length) {
+                        this.showNotification(`Score: ${this.qcmScore.correct}/${this.qcmScore.total}`, 'info');
+                        const last = this.history[this.history.length - 1];
+                        if (last && last.action === 'qcm') {
+                            last.details.score = `${this.qcmScore.correct}/${this.qcmScore.total}`;
+                            this.saveHistory();
+                            this.renderHistory();
+                        }
+                    }
+                }
             }
         });
     }
