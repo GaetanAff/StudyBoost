@@ -7,6 +7,7 @@ require('dotenv').config();
 
 const { processDocument } = require('./utils/documentProcessor');
 const { generateContent, testApiKey: testApiKeyService } = require('./utils/aiService'); // Ajout de testApiKeyService
+const historyService = require('./utils/historyService');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -88,11 +89,13 @@ app.post('/api/generate', async (req, res) => {
       return res.status(400).json({ error: 'Paramètres manquants: texte, type ou clé API.' });
     }
 
-    console.log(`[${requestTimestamp}] Appel de generateContent avec type: ${type}, lang: ${language}, options: ${JSON.stringify(options)}`);
-    const generationResult = await generateContent(text, type, options, apiKey, language); // Pass options (including difficultyLevel)
-    
-    console.log(`[${requestTimestamp}] Succès de la génération.`);
-    res.json({ success: true, content: generationResult });
+  console.log(`[${requestTimestamp}] Appel de generateContent avec type: ${type}, lang: ${language}, options: ${JSON.stringify(options)}`);
+  const generationResult = await generateContent(text, type, options, apiKey, language); // Pass options (including difficultyLevel)
+
+  historyService.addEntry({ type, content: generationResult.text || '', user: 'anonymous' });
+
+  console.log(`[${requestTimestamp}] Succès de la génération.`);
+  res.json({ success: true, content: generationResult });
 
   } catch (error) {
     console.error(`[${requestTimestamp}] Erreur API Gemini ou service:`, error.message, error.stack);
@@ -124,8 +127,22 @@ app.post('/api/test-key', async (req, res) => {
         }
     } catch (error) {
         console.error(`[${requestTimestamp}] Erreur serveur lors du test de la clé API:`, error.message);
-        res.status(500).json({ success: false, error: error.message || 'Erreur serveur interne lors du test de la clé API.' });
-    }
+  res.status(500).json({ success: false, error: error.message || 'Erreur serveur interne lors du test de la clé API.' });
+  }
+});
+
+app.get('/api/history', (req, res) => {
+  res.json(historyService.getHistory());
+});
+
+app.put('/api/history/:id', (req, res) => {
+  const id = parseInt(req.params.id, 10);
+  const { content } = req.body;
+  const entry = historyService.updateEntry(id, content);
+  if (!entry) {
+    return res.status(404).json({ error: 'Not found' });
+  }
+  res.json({ success: true, entry });
 });
 
 app.listen(PORT, () => {
