@@ -38,9 +38,14 @@
                     <button id="apiKeyBtn" class="btn-secondary">
                         <i class="fas fa-key"></i> <span data-lang="apiKeyBtnLabel">Clé API</span>
                     </button>
+                    <button id="historyBtn" class="btn-secondary">
+                        <i class="fas fa-history"></i> <span data-lang="historyBtnLabel">Historique</span>
+                    </button>
                 </div>
             </div>
         </header>
+
+        <nav id="breadcrumb" class="breadcrumb"></nav>
 
         <main class="main-content">
             <section class="upload-section" id="uploadSection">
@@ -139,6 +144,9 @@
                         <div id="openAnswerFeedbackContent"></div>
                     </div>
                 </div>
+            </section>
+
+            <section class="history-section" id="historySection" style="display: none;">
             </section>
         </main>
 

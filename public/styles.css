@@ -604,3 +604,29 @@ body {
     --surface-rgb: 255, 255, 255; /* Default light */
     --surface-dark-rgb: 51, 65, 85; /* Dark mode */
 }
+
+.breadcrumb {
+    margin: 1rem;
+    font-size: 0.9rem;
+    color: var(--text-secondary-light);
+}
+body.dark-mode .breadcrumb {
+    color: var(--text-secondary-dark);
+}
+
+.history-section ul {
+    list-style: none;
+    padding: 0;
+}
+.history-section li {
+    padding: 8px;
+    border-bottom: 1px solid var(--border-light);
+    cursor: pointer;
+}
+body.dark-mode .history-section li {
+    border-bottom: 1px solid var(--border-dark);
+}
+.history-section textarea {
+    width: 100%;
+    margin-top: 1rem;
+}

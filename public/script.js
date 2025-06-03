@@ -114,6 +114,9 @@ class StudyBoostApp {
                 showPasswordIcon: "👁️", // Add this
                 hidePasswordIcon: "🙈", // Add this
                 apiKeyStatusTitle: "Statut de la clé API",
+                historyBtnLabel: "Historique",
+                breadcrumbHome: "Accueil",
+                breadcrumbHistory: "Historique",
             },
             en: {
                 appTitle: "StudyBoost - AI Study Assistant",
@@ -215,6 +218,9 @@ class StudyBoostApp {
                 showPasswordIcon: "👁️",
                 hidePasswordIcon: "🙈",
                 apiKeyStatusTitle: "API Key Status",
+                historyBtnLabel: "History",
+                breadcrumbHome: "Home",
+                breadcrumbHistory: "History",
             },
             de: {
                 appTitle: "StudyBoost - KI-Lernassistent",
@@ -316,6 +322,9 @@ class StudyBoostApp {
                 showPasswordIcon: "👁️",
                 hidePasswordIcon: "🙈",
                 apiKeyStatusTitle: "API-Schlüsselstatus",
+                historyBtnLabel: "Verlauf",
+                breadcrumbHome: "Startseite",
+                breadcrumbHistory: "Verlauf",
             },
             es: {
                 appTitle: "StudyBoost - Asistente de Estudio IA",
@@ -417,6 +426,9 @@ class StudyBoostApp {
                 showPasswordIcon: "👁️",
                 hidePasswordIcon: "🙈",
                 apiKeyStatusTitle: "⏳ Estado de la Clave API",
+                historyBtnLabel: "Historial",
+                breadcrumbHome: "Inicio",
+                breadcrumbHistory: "Historial",
             }
         };
 
@@ -427,8 +439,9 @@ class StudyBoostApp {
         this.setupEventListeners();
         this.checkApiKey();
         this.updateTokenDisplay();
-        this.setLanguage(this.currentLanguage); 
+        this.setLanguage(this.currentLanguage);
         this.setInitialDarkMode();
+        this.updateBreadcrumb();
     }
     
     setLanguage(lang) {
@@ -536,6 +549,80 @@ class StudyBoostApp {
         this.updateTokenDisplay();
     }
 
+    hideAllSections() {
+        document.getElementById('uploadSection').style.display = 'none';
+        document.getElementById('contentSection').style.display = 'none';
+        document.getElementById('resultsSection').style.display = 'none';
+        document.getElementById('historySection').style.display = 'none';
+    }
+
+    updateBreadcrumb(section) {
+        const el = document.getElementById('breadcrumb');
+        if (!el) return;
+        let path = this._('breadcrumbHome');
+        if (section === 'history') {
+            path += ' > ' + this._('breadcrumbHistory');
+        }
+        el.textContent = path;
+    }
+
+    async showHistory() {
+        this.hideAllSections();
+        document.getElementById('historySection').style.display = 'block';
+        this.updateBreadcrumb('history');
+        await this.loadHistory();
+    }
+
+    async loadHistory() {
+        try {
+            const res = await fetch('/api/history');
+            const history = await res.json();
+            this.renderHistory(history);
+        } catch (e) {
+            console.error('Erreur chargement historique:', e);
+        }
+    }
+
+    renderHistory(history) {
+        const container = document.getElementById('historySection');
+        container.innerHTML = '';
+        if (!history || history.length === 0) {
+            container.textContent = 'Aucun historique.';
+            return;
+        }
+        const ul = document.createElement('ul');
+        history.forEach(entry => {
+            const li = document.createElement('li');
+            li.textContent = `${new Date(entry.date).toLocaleString()} - ${entry.type}`;
+            li.addEventListener('click', () => this.viewHistoryEntry(entry));
+            ul.appendChild(li);
+        });
+        container.appendChild(ul);
+    }
+
+    viewHistoryEntry(entry) {
+        const container = document.getElementById('historySection');
+        container.innerHTML = '';
+        const backBtn = document.createElement('button');
+        backBtn.textContent = '⬅';
+        backBtn.addEventListener('click', () => this.loadHistory());
+        container.appendChild(backBtn);
+        const textarea = document.createElement('textarea');
+        textarea.value = entry.versions[entry.versions.length - 1].content;
+        container.appendChild(textarea);
+        const saveBtn = document.createElement('button');
+        saveBtn.textContent = this._('saveBtnLabel');
+        saveBtn.addEventListener('click', async () => {
+            await fetch(`/api/history/${entry.id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ content: textarea.value })
+            });
+            this.loadHistory();
+        });
+        container.appendChild(saveBtn);
+    }
+
     setupEventListeners() {
         const fileInput = document.getElementById('fileInput');
         const uploadArea = document.getElementById('uploadArea');
@@ -574,6 +661,7 @@ class StudyBoostApp {
         document.getElementById('darkModeToggle')?.addEventListener('click', () => this.toggleDarkMode());
         document.getElementById('languageSwitcher')?.addEventListener('change', (e) => this.setLanguage(e.target.value));
         document.getElementById('testApiKeyBtn')?.addEventListener('click', () => this.testApiKey());
+        document.getElementById('historyBtn')?.addEventListener('click', () => this.showHistory());
 
         // *** AJOUT CRUCIAL : Listener pour le bouton de bascule de visibilité de la clé API ***
         const apiKeyModalElement = document.getElementById('apiKeyModal');
@@ -1251,6 +1339,7 @@ class StudyBoostApp {
         if(fileInput) fileInput.value = '';
 
         this.showNotification(this._('notificationNewAnalysisReady'), 'info');
+        this.updateBreadcrumb();
     }
 
     showModal(modalId) { document.getElementById(modalId)?.classList.add('show'); }
