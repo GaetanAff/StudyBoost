@@ -62,7 +62,7 @@ Cette version majeure introduit des fonctionnalités très attendues pour une ex
 
 1.  **Cloner le projet**
     ```bash
-    git clone [https://github.com/GaetanAff/StudyBoost.git](https://github.com/GaetanAff/StudyBoost.git)
+    git clone https://github.com/GaetanAff/StudyBoost.git
     cd studyboost
     ```
    
