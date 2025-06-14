@@ -6,7 +6,7 @@ const fs =require('fs');
 require('dotenv').config();
 
 const { processDocument } = require('./utils/documentProcessor');
-const { generateContent, testApiKey: testApiKeyService } = require('./utils/aiService'); // Ajout de testApiKeyService
+const { generateContent, ollamaGenerateContent, testApiKey: testApiKeyService } = require('./utils/aiService'); // Ajout de testApiKeyService
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -90,6 +90,31 @@ app.post('/api/generate', async (req, res) => {
 
     console.log(`[${requestTimestamp}] Appel de generateContent avec type: ${type}, lang: ${language}, options: ${JSON.stringify(options)}`);
     const generationResult = await generateContent(text, type, options, apiKey, language); // Pass options (including difficultyLevel)
+    
+    console.log(`[${requestTimestamp}] Succès de la génération.`);
+    res.json({ success: true, content: generationResult });
+
+  } catch (error) {
+    console.error(`[${requestTimestamp}] Erreur API Gemini ou service:`, error.message, error.stack);
+    res.status(500).json({ error: error.message || 'Erreur lors de la génération de contenu par l\'IA.' });
+  }
+});
+
+
+app.post('/api/generate-Ollama', async (req, res) => {
+  const requestTimestamp = new Date().toISOString();
+  console.log(`[${requestTimestamp}] Requête reçue pour /api/generate-Ollama`);
+
+  try {
+    const { text, type, options = {}, apiKey, language = 'fr' } = req.body; // options will include difficultyLevel
+
+    if (!text || !type ) {
+      console.log(`[${requestTimestamp}] Paramètres manquants.`);
+      return res.status(400).json({ error: 'Paramètres manquants: texte, type ou clé API.' });
+    }
+
+    console.log(`[${requestTimestamp}] Appel de generateContent avec type: ${type}, lang: ${language}, options: ${JSON.stringify(options)}`);
+    const generationResult = await ollamaGenerateContent(text, type, options, language); // Pass options (including difficultyLevel)
     
     console.log(`[${requestTimestamp}] Succès de la génération.`);
     res.json({ success: true, content: generationResult });
