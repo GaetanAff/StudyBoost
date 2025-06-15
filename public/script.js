@@ -411,33 +411,43 @@ class StudyBoostApp {
         }
 
         saveApiKeyAndResetTokens() {
-                this.usingOllama = false;
                 const container = document.getElementById('ollamaModelSelectContainer');
                 const apiGroup = document.getElementById('apiKeyInput')?.closest('.form-group');
+
+                // If Ollama is active, simply confirm the selection
+                if (this.usingOllama) {
+                        if (container) container.style.display = 'block';
+                        if (apiGroup) apiGroup.style.display = 'none';
+                        this.showNotification(this._('notificationUsingOllama'), 'success');
+                        this.hideModal('apiKeyModal');
+                        return;
+                }
+
+                // Gemini API key configuration
                 if (container) container.style.display = 'none';
                 if (apiGroup) apiGroup.style.display = 'block';
-		const apiKeyInput = document.getElementById('apiKeyInput');
-		const newApiKey = apiKeyInput.value.trim();
-		
-		if (!newApiKey) {
-			this.showNotification(this._('notificationEnterValidApiKey'), 'error');
-			return;
-		}
-		
-		if (this.apiKey !== newApiKey) {
-			this.apiKey = newApiKey;
-			localStorage.setItem('gemini_api_key', this.apiKey);
-			this.inputTokensUsed = 0;
-			this.outputTokensUsed = 0;
-			localStorage.setItem('inputTokensUsed', '0');
-			localStorage.setItem('outputTokensUsed', '0');
-			this.updateTokenDisplay();
-			this.showNotification(this._('notificationApiKeySavedReset'), 'success');
-		} else {
-			this.showNotification(this._('notificationApiKeyUnchanged'), 'success');
-		}
-		this.hideModal('apiKeyModal');
-	}
+                const apiKeyInput = document.getElementById('apiKeyInput');
+                const newApiKey = apiKeyInput.value.trim();
+
+                if (!newApiKey) {
+                        this.showNotification(this._('notificationEnterValidApiKey'), 'error');
+                        return;
+                }
+
+                if (this.apiKey !== newApiKey) {
+                        this.apiKey = newApiKey;
+                        localStorage.setItem('gemini_api_key', this.apiKey);
+                        this.inputTokensUsed = 0;
+                        this.outputTokensUsed = 0;
+                        localStorage.setItem('inputTokensUsed', '0');
+                        localStorage.setItem('outputTokensUsed', '0');
+                        this.updateTokenDisplay();
+                        this.showNotification(this._('notificationApiKeySavedReset'), 'success');
+                } else {
+                        this.showNotification(this._('notificationApiKeyUnchanged'), 'success');
+                }
+                this.hideModal('apiKeyModal');
+        }
 	
         checkApiKey() {
                 const apiKeyInput = document.getElementById('apiKeyInput');
