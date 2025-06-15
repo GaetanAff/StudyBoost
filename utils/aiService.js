@@ -256,7 +256,7 @@ async function testApiKey(apiKey) {
 
 
 
-async function ollamaGenerateContent(text, type, options = {}, modelName = 'mistral', language = 'fr') {
+async function ollamaGenerateContent(text, type, options = {}, modelName = 'mistral', language = 'fr', onToken) {
         const api = ollamaCalls
 	
 	// defines prompt
@@ -346,7 +346,7 @@ Texte de référence :\n\n${text}`;
 
 
         try {
-                const result = await api.generateContentWithOllama(prompt, modelName);
+                const result = await api.generateContentWithOllama(prompt, modelName, onToken);
 
 		const generatedText = result.text;
 		console.log("réponse de ollama DEBUG : \n", generatedText);

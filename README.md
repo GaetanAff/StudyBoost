@@ -16,6 +16,8 @@
 * **Traductions complètes** : libellés de gestion des sessions traduits dans toutes les langues supportées.
 * **Interface utilisateur mise à jour** : liste stylisée des sessions avec actions intuitives.
 * **Navigation dans l'historique** : flèches pour parcourir les résultats précédents d'une session.
+* **Compatibilité ODT** : prise en charge des documents OpenDocument (.odt).
+* **Génération Ollama en streaming** : affichage progressif des réponses lors de la génération locale.
 
 ---
 
@@ -53,7 +55,7 @@
 
 ## ⭐ Fonctionnalités Clés
 
-* **Support de documents multiples** : PDF, Word, PowerPoint, Images (avec OCR).
+* **Support de documents multiples** : PDF, Word, ODT, PowerPoint, Images (avec OCR).
 * **Choix du moteur IA** : Google Gemini (cloud) ou Ollama (local).
 * **Résumé intelligent** (court ou détaillé, au format Markdown).
 * **QCM personnalisables** : niveau de difficulté, réponses, explications.

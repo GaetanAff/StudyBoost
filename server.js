@@ -33,14 +33,14 @@ const storage = multer.diskStorage({
 const upload = multer({ 
   storage: storage,
   fileFilter: (req, file, cb) => {
-    const allowedTypes = /pdf|doc|docx|ppt|pptx|jpg|jpeg|png/;
+    const allowedTypes = /pdf|doc|docx|odt|ppt|pptx|jpg|jpeg|png/;
     const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
     const mimetype = allowedTypes.test(file.mimetype);
     
     if (mimetype && extname) {
       return cb(null, true);
     } else {
-      cb(new Error('Type de fichier non supporté. Formats autorisés : PDF, DOC, DOCX, PPT, PPTX, JPG, JPEG, PNG.'));
+      cb(new Error('Type de fichier non supporté. Formats autorisés : PDF, DOC, DOCX, ODT, PPT, PPTX, JPG, JPEG, PNG.'));
     }
   },
   limits: { fileSize: 10 * 1024 * 1024 } // 10MB max
@@ -139,6 +139,34 @@ app.post('/api/generate-Ollama', async (req, res) => {
   } catch (error) {
     console.error(`[${requestTimestamp}] Erreur API Gemini ou service:`, error.message, error.stack);
     res.status(500).json({ error: error.message || 'Erreur lors de la génération de contenu par l\'IA.' });
+  }
+});
+
+app.post('/api/generate-Ollama-stream', async (req, res) => {
+  const requestTimestamp = new Date().toISOString();
+  console.log(`[${requestTimestamp}] Requête reçue pour /api/generate-Ollama-stream`);
+
+  const { text, type, options = {}, model = 'mistral', language = 'fr' } = req.body;
+  if (!text || !type) {
+    console.log(`[${requestTimestamp}] Paramètres manquants.`);
+    res.status(400).end(JSON.stringify({ error: 'Paramètres manquants: texte ou type.' }) + '\n');
+    return;
+  }
+
+  res.writeHead(200, {
+    'Content-Type': 'application/x-ndjson',
+    'Cache-Control': 'no-cache',
+    Connection: 'keep-alive'
+  });
+
+  try {
+    await ollamaGenerateContent(text, type, options, model, language, token => {
+      res.write(JSON.stringify({ token }) + '\n');
+    });
+    res.end(JSON.stringify({ done: true }) + '\n');
+  } catch (error) {
+    console.error(`[${requestTimestamp}] Erreur streaming Ollama:`, error.message);
+    res.end(JSON.stringify({ error: error.message, done: true }) + '\n');
   }
 });
 

@@ -3,6 +3,7 @@ const mammoth = require('mammoth');
 const fs = require('fs');
 const path = require('path');
 const Tesseract = require('tesseract.js');
+const textract = require('textract');
 
 async function processDocument(filePath) {
   const ext = path.extname(filePath).toLowerCase();
@@ -14,6 +15,8 @@ async function processDocument(filePath) {
       case '.doc':
       case '.docx':
         return await processWord(filePath);
+      case '.odt':
+        return await processOdt(filePath);
       case '.jpg':
       case '.jpeg':
       case '.png':
@@ -36,6 +39,15 @@ async function processPDF(filePath) {
 async function processWord(filePath) {
   const result = await mammoth.extractRawText({ path: filePath });
   return result.value;
+}
+
+async function processOdt(filePath) {
+  return new Promise((resolve, reject) => {
+    textract.fromFileWithPath(filePath, { preserveLineBreaks: true }, (err, text) => {
+      if (err) return reject(err);
+      resolve(text);
+    });
+  });
 }
 
 async function processImage(filePath) {

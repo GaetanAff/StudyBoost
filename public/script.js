@@ -737,28 +737,39 @@ class StudyBoostApp {
 				} else {
 					throw new Error(result.error || `HTTP error ${response.status}`);
 				}
-			} else {
-				const responsePromise = fetch('/api/generate-Ollama', {
-					method: 'POST',
-					headers: { 'Content-Type': 'application/json' },
-					body: JSON.stringify(requestBodyOllama)
-				});
-				this.showLoading('loadingTextWaitingForAI'); 
-				const response = await responsePromise;
-				this.showLoading('loadingTextProcessingResponse');
-				const result = await response.json();
+                        } else {
+                                const response = await fetch('/api/generate-Ollama-stream', {
+                                        method: 'POST',
+                                        headers: { 'Content-Type': 'application/json' },
+                                        body: JSON.stringify(requestBodyOllama)
+                                });
+                                this.showLoading('loadingTextWaitingForAI');
+                                const reader = response.body.getReader();
+                                const decoder = new TextDecoder();
+                                let buffer = '';
+                                let resultText = '';
+                                const resultsContent = document.getElementById('resultsContent');
+                                resultsContent.textContent = '';
 
-				if (response.ok && result.success && result.content && typeof result.content.text !== 'undefined') {
-					this.showResults(type, result.content.text); 
-					if (result.content.usage) {
-						const promptTokens = result.content.usage.promptTokenCount || 0;
-						const candidatesTokens = result.content.usage.candidatesTokenCount || 0; 
-						this.updateStoredTokens(promptTokens, candidatesTokens);
-					}
-				} else {
-					throw new Error(result.error || `HTTP error ${response.status}`);
-				}
-			}
+                                while (true) {
+                                        const { value, done } = await reader.read();
+                                        if (done) break;
+                                        buffer += decoder.decode(value, { stream: true });
+                                        let lines = buffer.split('\n');
+                                        buffer = lines.pop();
+                                        for (const line of lines) {
+                                                if (!line.trim()) continue;
+                                                const data = JSON.parse(line);
+                                                if (data.error) throw new Error(data.error);
+                                                if (data.token) {
+                                                        resultText += data.token;
+                                                        resultsContent.textContent = resultText;
+                                                }
+                                        }
+                                }
+                                this.hideLoading();
+                                this.showResults(type, resultText);
+                        }
 			//const responsePromise = fetch('/api/generate', {
 			//	method: 'POST',
 			//	headers: { 'Content-Type': 'application/json' },
