@@ -1,12 +1,12 @@
 # 📚 StudyBoost – Application d’Aide à la Révision avec IA
 
-### Version 4 (Pré-version)
+### Version 4
 
 **StudyBoost** est une application web moderne qui transforme vos documents de cours en outils pédagogiques interactifs, grâce à l’intelligence artificielle. Compatible avec l’API **Google Gemini** et désormais avec les **modèles IA locaux via Ollama**, StudyBoost rend l’apprentissage plus **efficace**, **personnalisé** et **flexible**.
 
 ---
 
-## ✨ Nouveautés de la V4 (Pré-version)
+## ✨ Nouveautés de la V4
 
 ### 🔄 Support des Modèles Locaux avec Ollama
 
