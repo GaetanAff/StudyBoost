@@ -16,6 +16,7 @@
     --shadow-light: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
     --shadow-lg-light: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
     --gradient-light: linear-gradient(135deg, #6366f1, #8b5cf6);
+    --gradient-light2: linear-gradient(135deg, #10c440, #72ad1f);
 
     --primary-color-dark: #818cf8;
     --primary-dark-dark: #6366f1;
@@ -41,6 +42,7 @@
     --shadow: var(--shadow-light);
     --shadow-lg: var(--shadow-lg-light);
     --gradient: var(--gradient-light);
+    --gradient2: var(--gradient-light2);
 }
 
 body.dark-mode {
@@ -184,10 +186,13 @@ body {
     backdrop-filter: blur(10px);
     transition: all 0.3s ease;
     color: white !important; /* Ensure close button is white */
+    width: 40px;
+    height: 40px;
 }
 .modal-close:hover {
     background: rgba(255, 255, 255, 0.3);
     transform: rotate(90deg);
+    font-size:  2em;
 }
 
 /* New classes for input styling */
@@ -327,7 +332,7 @@ body.dark-mode .status-error {
 
 
 /* Buttons */
-.btn-primary, .btn-secondary {
+.btn-primary, .btn-secondary,.btn-thirdary {
     padding: 0.75rem 1.5rem;
     border: none;
     border-radius: 0.5rem;
@@ -345,6 +350,9 @@ body.dark-mode .status-error {
 
 .btn-secondary { background: var(--surface); color: var(--text-primary); border: 1px solid var(--border); }
 .btn-secondary:hover { background: var(--background); }
+
+.btn-thirdary { background: var(--gradient2); color: white; }
+.btn-thirdary:hover { transform: translateY(-1px); box-shadow: var(--shadow-lg); }
 
 /* Main Content */
 .main-content { flex: 1; max-width: 1200px; margin: 0 auto; padding: 2rem; width: 100%; }
@@ -488,6 +496,7 @@ body.dark-mode .qcm-explanation { background: rgba(var(--text-secondary-dark-rgb
 .modal-close { background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--text-secondary); }
 .modal-body { padding: 1.5rem; }
 .modal-footer { padding: 1.5rem; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 1rem; }
+.modal-footer-center { padding: 1.5rem; border-top: 1px solid var(--border); display: flex; justify-content: center; gap: 1rem; }
 
 /* Form Elements */
 .form-group { margin-bottom: 1.5rem; }
