@@ -256,9 +256,8 @@ async function testApiKey(apiKey) {
 
 
 
-async function ollamaGenerateContent(text, type, options = {}, language = 'fr') {
-	// const genAI = new GoogleGenerativeAI(apiKey);
-	const model = ollamaCalls
+async function ollamaGenerateContent(text, type, options = {}, modelName = 'mistral', language = 'fr') {
+        const api = ollamaCalls
 	
 	// defines prompt
 	
@@ -346,8 +345,8 @@ Texte de référence :\n\n${text}`;
 	// prompt defined, start to interact with the AI
 
 
-	try {
-		const result = await model.generateContentWithOllama(prompt);
+        try {
+                const result = await api.generateContentWithOllama(prompt, modelName);
 
 		const generatedText = result.text;
 		console.log("réponse de ollama DEBUG : \n", generatedText);

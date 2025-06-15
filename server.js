@@ -7,6 +7,7 @@ require('dotenv').config();
 
 const { processDocument } = require('./utils/documentProcessor');
 const { generateContent, ollamaGenerateContent, testApiKey: testApiKeyService } = require('./utils/aiService'); // Ajout de testApiKeyService
+const fetch = require('node-fetch');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -76,6 +77,22 @@ app.post('/api/upload', upload.single('document'), async (req, res) => {
   }
 });
 
+app.get('/api/ollama-models', async (req, res) => {
+  try {
+    const response = await fetch('http://localhost:11434/api/tags');
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`HTTP ${response.status}: ${errorText}`);
+    }
+    const data = await response.json();
+    const models = Array.isArray(data.models) ? data.models.map(m => m.name) : [];
+    res.json({ success: true, models });
+  } catch (error) {
+    console.error('Erreur lors de la récupération des modèles Ollama:', error.message);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
 app.post('/api/generate', async (req, res) => {
   const requestTimestamp = new Date().toISOString();
   console.log(`[${requestTimestamp}] Requête reçue pour /api/generate`);
@@ -106,15 +123,15 @@ app.post('/api/generate-Ollama', async (req, res) => {
   console.log(`[${requestTimestamp}] Requête reçue pour /api/generate-Ollama`);
 
   try {
-    const { text, type, options = {}, apiKey, language = 'fr' } = req.body; // options will include difficultyLevel
+    const { text, type, options = {}, model = 'mistral', language = 'fr' } = req.body; // options will include difficultyLevel
 
     if (!text || !type ) {
       console.log(`[${requestTimestamp}] Paramètres manquants.`);
       return res.status(400).json({ error: 'Paramètres manquants: texte, type ou clé API.' });
     }
 
-    console.log(`[${requestTimestamp}] Appel de generateContent avec type: ${type}, lang: ${language}, options: ${JSON.stringify(options)}`);
-    const generationResult = await ollamaGenerateContent(text, type, options, language); // Pass options (including difficultyLevel)
+    console.log(`[${requestTimestamp}] Appel de generateContent avec type: ${type}, model: ${model}, lang: ${language}, options: ${JSON.stringify(options)}`);
+    const generationResult = await ollamaGenerateContent(text, type, options, model, language); // Pass options (including difficultyLevel)
     
     console.log(`[${requestTimestamp}] Succès de la génération.`);
     res.json({ success: true, content: generationResult });

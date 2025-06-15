@@ -13,7 +13,9 @@ class StudyBoostApp {
 		
 		this.currentLanguage = localStorage.getItem('studyboost_language') || 'fr';
 		this.translations = window.STUDYBOOST_TRANSLATIONS || {};
-		this.usingOllama= false;
+                this.usingOllama= false;
+                this.availableOllamaModels = [];
+                this.selectedOllamaModel = localStorage.getItem('ollama_model') || '';
 		
 		this.init();
 	}
@@ -187,7 +189,12 @@ class StudyBoostApp {
 		document.getElementById('darkModeToggle')?.addEventListener('click', () => this.toggleDarkMode());
 		document.getElementById('useOllama')?.addEventListener('click', () => this.useOllama());
 		document.getElementById('languageSwitcher')?.addEventListener('change', (e) => this.setLanguage(e.target.value));
-		document.getElementById('testApiKeyBtn')?.addEventListener('click', () => this.testApiKey());
+                document.getElementById('testApiKeyBtn')?.addEventListener('click', () => this.testApiKey());
+                document.getElementById('ollamaModelSelect')?.addEventListener('change', (e) => {
+                        this.selectedOllamaModel = e.target.value;
+                        localStorage.setItem('ollama_model', this.selectedOllamaModel);
+                        this.testOllamaModel();
+                });
 		
 		// *** AJOUT CRUCIAL : Listener pour le bouton de bascule de visibilité de la clé API ***
 		const apiKeyModalElement = document.getElementById('apiKeyModal');
@@ -326,17 +333,79 @@ class StudyBoostApp {
 		} finally {
 			this.hideLoading();
 		}
-	}
-	
-	useOllama() {
-		this.usingOllama = true;
-		this.showNotification(this._('notificationUsingOllama'), 'success');
-		this.hideModal('apiKeyModal');
-		return;
-	}
+        }
 
-	saveApiKeyAndResetTokens() {
-		this.usingOllama = false;
+        async fetchOllamaModels() {
+                try {
+                        const response = await fetch('/api/ollama-models');
+                        const result = await response.json();
+                        if (response.ok && result.success && Array.isArray(result.models)) {
+                                this.availableOllamaModels = result.models;
+                                const select = document.getElementById('ollamaModelSelect');
+                                if (select) {
+                                        select.innerHTML = '';
+                                        result.models.forEach(m => {
+                                                const opt = document.createElement('option');
+                                                opt.value = m;
+                                                opt.textContent = m;
+                                                select.appendChild(opt);
+                                        });
+                                        if (!this.selectedOllamaModel) {
+                                                this.selectedOllamaModel = result.models[0] || '';
+                                        }
+                                        select.value = this.selectedOllamaModel;
+                                }
+                        } else {
+                                throw new Error(result.error || 'unable to load');
+                        }
+                } catch (err) {
+                        console.error('Erreur récupération modèles Ollama:', err);
+                        this.showNotification('Erreur récupération modèles Ollama: ' + err.message, 'error');
+                }
+        }
+
+        async testOllamaModel() {
+                if (!this.selectedOllamaModel) return;
+                try {
+                        const resp = await fetch('/api/generate-Ollama', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({
+                                        text: 'ping',
+                                        type: 'summary_short',
+                                        options: {},
+                                        model: this.selectedOllamaModel,
+                                        language: this.currentLanguage
+                                })
+                        });
+                        const data = await resp.json();
+                        if (resp.ok && data.success) {
+                                this.showNotification('Modèle Ollama prêt', 'success');
+                        } else {
+                                throw new Error(data.error || 'Erreur');
+                        }
+                } catch(err) {
+                        console.error('Test model error', err);
+                        this.showNotification('Erreur modèle Ollama: ' + err.message, 'error');
+                }
+        }
+
+        useOllama() {
+                this.usingOllama = true;
+                this.fetchOllamaModels();
+                const container = document.getElementById('ollamaModelSelectContainer');
+                const apiGroup = document.getElementById('apiKeyInput')?.closest('.form-group');
+                if (container) container.style.display = 'block';
+                if (apiGroup) apiGroup.style.display = 'none';
+                this.showNotification(this._('notificationUsingOllama'), 'success');
+        }
+
+        saveApiKeyAndResetTokens() {
+                this.usingOllama = false;
+                const container = document.getElementById('ollamaModelSelectContainer');
+                const apiGroup = document.getElementById('apiKeyInput')?.closest('.form-group');
+                if (container) container.style.display = 'none';
+                if (apiGroup) apiGroup.style.display = 'block';
 		const apiKeyInput = document.getElementById('apiKeyInput');
 		const newApiKey = apiKeyInput.value.trim();
 		
@@ -360,12 +429,16 @@ class StudyBoostApp {
 		this.hideModal('apiKeyModal');
 	}
 	
-	checkApiKey() {
-		const apiKeyInput = document.getElementById('apiKeyInput');
-		if (this.apiKey && apiKeyInput) {
-			apiKeyInput.value = this.apiKey;
-		}
-	}
+        checkApiKey() {
+                const apiKeyInput = document.getElementById('apiKeyInput');
+                if (this.apiKey && apiKeyInput) {
+                        apiKeyInput.value = this.apiKey;
+                }
+                const modelSelect = document.getElementById('ollamaModelSelect');
+                if (modelSelect && this.selectedOllamaModel) {
+                        modelSelect.value = this.selectedOllamaModel;
+                }
+        }
 	
 	async handleFileUpload(file) {
 		if (!file) return;
@@ -578,12 +651,13 @@ class StudyBoostApp {
 				apiKey: this.apiKey,
 				language: this.currentLanguage 
 			};
-			const requestBodyOllama = {
-				text: this.currentDocument.text,
-				type: type,
-				options: options, // This will include numQuestions, numCards, difficultyLevel etc.
-				language: this.currentLanguage 
-			};
+                        const requestBodyOllama = {
+                                text: this.currentDocument.text,
+                                type: type,
+                                options: options, // This will include numQuestions, numCards, difficultyLevel etc.
+                                model: this.selectedOllamaModel || 'mistral',
+                                language: this.currentLanguage
+                        };
 
 			if (!this.usingOllama) {
 				const responsePromise = fetch('/api/generate', {
