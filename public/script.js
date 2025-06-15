@@ -206,11 +206,16 @@ class StudyBoostApp {
                 document.getElementById('useOllama')?.addEventListener('click', () => this.useOllama());
                 document.getElementById('useGemini')?.addEventListener('click', () => this.useGemini());
                 document.getElementById('languageSwitcher')?.addEventListener('change', (e) => this.setLanguage(e.target.value));
-                document.getElementById('testApiKeyBtn')?.addEventListener('click', () => this.testApiKey());
+                document.getElementById('testApiKeyBtn')?.addEventListener('click', () => {
+                        if (this.usingOllama) {
+                                this.testOllamaModel();
+                        } else {
+                                this.testApiKey();
+                        }
+                });
                 document.getElementById('ollamaModelSelect')?.addEventListener('change', (e) => {
                         this.selectedOllamaModel = e.target.value;
                         localStorage.setItem('ollama_model', this.selectedOllamaModel);
-                        this.testOllamaModel();
                 });
                 document.getElementById('sessionBtn')?.addEventListener('click', () => { this.renderSessionList(); this.showModal('sessionModal'); });
                 document.getElementById('createSessionBtn')?.addEventListener('click', () => {

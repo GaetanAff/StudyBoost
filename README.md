@@ -121,7 +121,7 @@ Accédez à l'application via : [http://localhost:3000](http://localhost:3000)
    * Cliquez sur **"Clé API"**.
    * Sélectionnez **"Ollama"**.
    * Choisissez un modèle dans la liste déroulante (chargée automatiquement).
-   * Cliquez sur **"Tester"** pour vérifier la connexion.
+   * Cliquez sur **"Tester"** pour vérifier la connexion ou charger le modèle sélectionné.
    * **Sauvegardez.**
 
 ### ☁️ Google Gemini

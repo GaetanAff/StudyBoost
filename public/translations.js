@@ -98,7 +98,7 @@ window.STUDYBOOST_TRANSLATIONS = {
                 difficultyLevel4: "Difficile",
                 difficultyLevel5: "Expert",
                 checkAnswerBtnLabel: "Vérifier la réponse",
-                testApiKeyBtnLabel: "🧪 Tester la Clé", // Nouvelle traduction
+                testApiKeyBtnLabel: "🧪 Tester", // Nouvelle traduction
                 apiKeyTestSuccess: "✅ Clé API valide et fonctionnelle.", // Nouvelle traduction
                 apiKeyTestFailure: "❌ Clé API invalide ou problème de connexion: ", // Nouvelle traduction
                 loadingTextTestingKey: "⏳ Test de la clé API en cours...", // Nouvelle traduction pour le chargement
@@ -215,7 +215,7 @@ window.STUDYBOOST_TRANSLATIONS = {
                 difficultyLevel4: "Hard",
                 difficultyLevel5: "Expert",
                 checkAnswerBtnLabel: "Check Answer",
-                testApiKeyBtnLabel: "🧪 Test Key", // New translation
+                testApiKeyBtnLabel: "🧪 Test", // New translation
                 apiKeyTestSuccess: "✅ API key is valid and working.", // New translation
                 apiKeyTestFailure: "❌ API key is invalid or connection issue: ", // New translation
                 loadingTextTestingKey: "⏳ Testing API key...", // New translation for loading
@@ -332,7 +332,7 @@ window.STUDYBOOST_TRANSLATIONS = {
                 difficultyLevel4: "Schwer",
                 difficultyLevel5: "Experte",
                 checkAnswerBtnLabel: "Antwort überprüfen",
-                testApiKeyBtnLabel: "🧪 Schlüssel testen", // Neue Übersetzung
+                testApiKeyBtnLabel: "🧪 Testen", // Neue Übersetzung
                 apiKeyTestSuccess: "✅ API-Schlüssel ist gültig und funktioniert.", // Neue Übersetzung
                 apiKeyTestFailure: "❌ API-Schlüssel ist ungültig oder Verbindungsproblem: ", // Neue Übersetzung
                 loadingTextTestingKey: "⏳ API-Schlüssel wird getestet...", // Neue Übersetzung für das Laden
@@ -449,7 +449,7 @@ window.STUDYBOOST_TRANSLATIONS = {
                 difficultyLevel4: "Difícil",
                 difficultyLevel5: "Experto",
                 checkAnswerBtnLabel: "Verificar respuesta",
-                testApiKeyBtnLabel: "🧪 Probar Clave", // Nueva traducción
+                testApiKeyBtnLabel: "🧪 Probar", // Nueva traducción
                 apiKeyTestSuccess: "✅ La clave API es válida y funciona.", // Nueva traducción
                 apiKeyTestFailure: "❌ La clave API no es válida o hay un problema de conexión: ", // Nueva traducción
                 loadingTextTestingKey: "Probando clave API...", // Nueva traducción para la carga
