@@ -114,6 +114,8 @@ window.STUDYBOOST_TRANSLATIONS = {
                 deleteSessionBtnLabel: "Supprimer",
                 noSessionsMessage: "Aucune session enregistrée",
                 defaultSessionName: "Session par défaut",
+                prevResultBtnLabel: "Résultat précédent",
+                nextResultBtnLabel: "Résultat suivant",
             },
             en: {
                 appTitle: "StudyBoost - AI Study Assistant",
@@ -229,6 +231,8 @@ window.STUDYBOOST_TRANSLATIONS = {
                 deleteSessionBtnLabel: "Delete",
                 noSessionsMessage: "No sessions saved",
                 defaultSessionName: "Default Session",
+                prevResultBtnLabel: "Previous Result",
+                nextResultBtnLabel: "Next Result",
             },
             de: {
                 appTitle: "StudyBoost - KI-Lernassistent",
@@ -344,6 +348,8 @@ window.STUDYBOOST_TRANSLATIONS = {
                 deleteSessionBtnLabel: "Löschen",
                 noSessionsMessage: "Keine Sitzungen gespeichert",
                 defaultSessionName: "Standardsitzung",
+                prevResultBtnLabel: "Vorheriges Ergebnis",
+                nextResultBtnLabel: "Nächstes Ergebnis",
             },
             es: {
                 appTitle: "StudyBoost - Asistente de Estudio IA",
@@ -459,5 +465,7 @@ window.STUDYBOOST_TRANSLATIONS = {
                 deleteSessionBtnLabel: "Eliminar",
                 noSessionsMessage: "Ninguna sesión guardada",
                 defaultSessionName: "Sesión por defecto",
+                prevResultBtnLabel: "Resultado anterior",
+                nextResultBtnLabel: "Resultado siguiente",
             }
         };

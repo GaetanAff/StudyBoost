@@ -336,6 +336,10 @@ body.dark-mode .status-error {
     border-radius: 50%;
     transition: background-color 0.2s, color 0.2s;
 }
+.btn-icon:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
 .btn-icon:hover {
     background-color: var(--border);
     color: var(--text-primary);

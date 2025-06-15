@@ -19,6 +19,7 @@ class StudyBoostApp {
 
                 this.sessions = JSON.parse(localStorage.getItem('studyboost_sessions') || '{}');
                 this.currentSessionId = localStorage.getItem('studyboost_current_session') || null;
+                this.currentActionIndex = -1; // index of currently displayed action in session history
 
                 this.init();
         }
@@ -49,12 +50,18 @@ class StudyBoostApp {
 					el.textContent = this.translations[lang][key];
 				}
 			});
-			document.querySelectorAll('[placeholder-data-lang]').forEach(el => {
-				const key = el.getAttribute('placeholder-data-lang');
-				if (this.translations[lang][key]) {
-					el.placeholder = this.translations[lang][key];
-				}
-			});
+                       document.querySelectorAll('[placeholder-data-lang]').forEach(el => {
+                               const key = el.getAttribute('placeholder-data-lang');
+                               if (this.translations[lang][key]) {
+                                       el.placeholder = this.translations[lang][key];
+                               }
+                       });
+                       document.querySelectorAll('[title-data-lang]').forEach(el => {
+                                const key = el.getAttribute('title-data-lang');
+                                if (this.translations[lang][key]) {
+                                        el.setAttribute('title', this.translations[lang][key]);
+                                }
+                        });
 			const languageSwitcher = document.getElementById('languageSwitcher');
 			if (languageSwitcher) languageSwitcher.value = lang;
 			
@@ -250,8 +257,10 @@ class StudyBoostApp {
 		document.getElementById('submitQuestion')?.addEventListener('click', () => this.submitUserQuestion());
 		document.getElementById('confirmOptions')?.addEventListener('click', () => this.confirmOptions());
 		document.getElementById('newAnalysisBtn')?.addEventListener('click', () => this.resetApp());
-		document.getElementById('exportBtn')?.addEventListener('click', () => this.exportResults());
-		document.getElementById('submitOpenAnswerBtn')?.addEventListener('click', () => this.submitOpenAnswer());
+                document.getElementById('exportBtn')?.addEventListener('click', () => this.exportResults());
+                document.getElementById('submitOpenAnswerBtn')?.addEventListener('click', () => this.submitOpenAnswer());
+                document.getElementById('prevResultBtn')?.addEventListener('click', () => this.showPreviousResult());
+                document.getElementById('nextResultBtn')?.addEventListener('click', () => this.showNextResult());
 		
 		// Listener pour fermer un modal en cliquant à l'extérieur de son contenu
 		document.querySelectorAll('.modal').forEach(modal => {
@@ -871,10 +880,13 @@ class StudyBoostApp {
                 resultsSection.scrollIntoView({ behavior: 'smooth' });
 
                 if (!fromHistory && this.currentSessionId && this.sessions[this.currentSessionId]) {
-                        this.sessions[this.currentSessionId].currentDocument = this.currentDocument;
-                        this.sessions[this.currentSessionId].actions.push({ type, content, options: this.lastOptions, timestamp: Date.now() });
+                        const sess = this.sessions[this.currentSessionId];
+                        sess.currentDocument = this.currentDocument;
+                        sess.actions.push({ type, content, options: this.lastOptions, timestamp: Date.now() });
+                        this.currentActionIndex = sess.actions.length - 1;
                         this.saveSessions();
                 }
+                this.updateHistoryButtons();
         }
 	
 	
@@ -1015,22 +1027,24 @@ class StudyBoostApp {
 		}
 	}
 	
-	resetApp() {
-		this.currentDocument = null;
-		this.currentAction = null;
-		this.currentQCMData = null;
-		this.currentFlashcardsData = null;
-		this.generatedOpenQuestion = null;
+        resetApp() {
+                this.currentDocument = null;
+                this.currentAction = null;
+                this.currentQCMData = null;
+                this.currentFlashcardsData = null;
+                this.generatedOpenQuestion = null;
+                this.currentActionIndex = -1;
 		
 		document.getElementById('uploadSection').style.display = 'block';
 		document.getElementById('contentSection').style.display = 'none';
 		document.getElementById('resultsSection').style.display = 'none';
 		document.getElementById('openQuestionInteractionSection').style.display = 'none';
 		const fileInput = document.getElementById('fileInput');
-		if(fileInput) fileInput.value = '';
-		
-		this.showNotification(this._('notificationNewAnalysisReady'), 'info');
-	}
+                if(fileInput) fileInput.value = '';
+
+                this.showNotification(this._('notificationNewAnalysisReady'), 'info');
+                this.updateHistoryButtons();
+        }
 	
         showModal(modalId) {
                 const modalElement = document.getElementById(modalId);
@@ -1069,7 +1083,8 @@ class StudyBoostApp {
                 if (!sess) return;
                 this.currentSessionId = id;
                 this.currentDocument = sess.currentDocument;
-                const lastAction = sess.actions[sess.actions.length - 1];
+                this.currentActionIndex = sess.actions.length - 1;
+                const lastAction = sess.actions[this.currentActionIndex];
                 if (this.currentDocument) {
                         this.showDocumentProcessed(this.currentDocument.filename, this.currentDocument.text);
                 } else {
@@ -1079,6 +1094,7 @@ class StudyBoostApp {
                         this.currentAction = lastAction.type;
                         this.showResults(lastAction.type, lastAction.content, true);
                 }
+                this.updateHistoryButtons();
                 this.saveSessions();
         }
 
@@ -1115,10 +1131,10 @@ class StudyBoostApp {
 	}
 	hideLoading() { document.getElementById('loadingOverlay').style.display = 'none'; }
 	
-	showNotification(message, type = 'info') {
-		const notificationArea = document.body; 
-		const notification = document.createElement('div');
-		notification.className = `notification type-${type} slide-in`;
+        showNotification(message, type = 'info') {
+                const notificationArea = document.body;
+                const notification = document.createElement('div');
+                notification.className = `notification type-${type} slide-in`;
 		
 		const messageSpan = document.createElement('span');
 		messageSpan.textContent = message;
@@ -1136,14 +1152,41 @@ class StudyBoostApp {
 		
 		notificationArea.appendChild(notification);
 		
-		setTimeout(() => {
-			if (notification.parentElement) {
-				notification.classList.remove('slide-in');
-				notification.classList.add('slide-out');
-				setTimeout(() => notification.remove(), 300); 
-			}
-		}, 7000); 
-	}
+                setTimeout(() => {
+                        if (notification.parentElement) {
+                                notification.classList.remove('slide-in');
+                                notification.classList.add('slide-out');
+                                setTimeout(() => notification.remove(), 300);
+                        }
+                }, 7000);
+        }
+
+        updateHistoryButtons() {
+                const sess = this.sessions[this.currentSessionId];
+                const prevBtn = document.getElementById('prevResultBtn');
+                const nextBtn = document.getElementById('nextResultBtn');
+                if (!sess || !prevBtn || !nextBtn) return;
+                prevBtn.disabled = this.currentActionIndex <= 0;
+                nextBtn.disabled = this.currentActionIndex >= sess.actions.length - 1;
+        }
+
+        showPreviousResult() {
+                const sess = this.sessions[this.currentSessionId];
+                if (!sess || this.currentActionIndex <= 0) return;
+                this.currentActionIndex--;
+                const action = sess.actions[this.currentActionIndex];
+                this.currentAction = action.type;
+                this.showResults(action.type, action.content, true);
+        }
+
+        showNextResult() {
+                const sess = this.sessions[this.currentSessionId];
+                if (!sess || this.currentActionIndex >= sess.actions.length - 1) return;
+                this.currentActionIndex++;
+                const action = sess.actions[this.currentActionIndex];
+                this.currentAction = action.type;
+                this.showResults(action.type, action.content, true);
+        }
 }
 
 document.addEventListener('DOMContentLoaded', () => {

@@ -15,6 +15,7 @@
 * **Persistance locale** : toutes les sessions sont stockées dans localStorage.
 * **Traductions complètes** : libellés de gestion des sessions traduits dans toutes les langues supportées.
 * **Interface utilisateur mise à jour** : liste stylisée des sessions avec actions intuitives.
+* **Navigation dans l'historique** : flèches pour parcourir les résultats précédents d'une session.
 
 ---
 
