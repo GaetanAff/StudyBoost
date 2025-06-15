@@ -187,7 +187,8 @@ class StudyBoostApp {
 		document.getElementById('apiKeyBtn')?.addEventListener('click', () => this.showModal('apiKeyModal'));
 		document.getElementById('saveApiKey')?.addEventListener('click', () => this.saveApiKeyAndResetTokens());
 		document.getElementById('darkModeToggle')?.addEventListener('click', () => this.toggleDarkMode());
-		document.getElementById('useOllama')?.addEventListener('click', () => this.useOllama());
+                document.getElementById('useOllama')?.addEventListener('click', () => this.useOllama());
+                document.getElementById('useGemini')?.addEventListener('click', () => this.useGemini());
 		document.getElementById('languageSwitcher')?.addEventListener('change', (e) => this.setLanguage(e.target.value));
                 document.getElementById('testApiKeyBtn')?.addEventListener('click', () => this.testApiKey());
                 document.getElementById('ollamaModelSelect')?.addEventListener('change', (e) => {
@@ -398,6 +399,15 @@ class StudyBoostApp {
                 if (container) container.style.display = 'block';
                 if (apiGroup) apiGroup.style.display = 'none';
                 this.showNotification(this._('notificationUsingOllama'), 'success');
+        }
+
+        useGemini() {
+                this.usingOllama = false;
+                const container = document.getElementById('ollamaModelSelectContainer');
+                const apiGroup = document.getElementById('apiKeyInput')?.closest('.form-group');
+                if (container) container.style.display = 'none';
+                if (apiGroup) apiGroup.style.display = 'block';
+                this.showNotification(this._('notificationUsingGemini'), 'success');
         }
 
         saveApiKeyAndResetTokens() {
@@ -983,8 +993,27 @@ class StudyBoostApp {
 		this.showNotification(this._('notificationNewAnalysisReady'), 'info');
 	}
 	
-	showModal(modalId) { document.getElementById(modalId)?.classList.add('show'); }
-	hideModal(modalId) { document.getElementById(modalId)?.classList.remove('show'); }
+        showModal(modalId) {
+                const modalElement = document.getElementById(modalId);
+                if (!modalElement) return;
+                modalElement.classList.add('show');
+
+                if (modalId === 'apiKeyModal') {
+                        const container = document.getElementById('ollamaModelSelectContainer');
+                        const apiGroup = document.getElementById('apiKeyInput')?.closest('.form-group');
+                        if (this.usingOllama) {
+                                if (container) container.style.display = 'block';
+                                if (apiGroup) apiGroup.style.display = 'none';
+                        } else {
+                                if (container) container.style.display = 'none';
+                                if (apiGroup) apiGroup.style.display = 'block';
+                        }
+                }
+        }
+        hideModal(modalId) {
+                const modalElement = document.getElementById(modalId);
+                if (modalElement) modalElement.classList.remove('show');
+        }
 	
 	showLoading(messageKey) {
 		document.getElementById('loadingText').textContent = this._(messageKey) || this._('loadingTextDefault');
