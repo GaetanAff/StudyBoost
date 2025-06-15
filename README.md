@@ -1,14 +1,26 @@
-# 📚 StudyBoost – Application d’Aide à la Révision avec IA
+# 📚 StudyBoost – Application d'Aide à la Révision avec IA
 
-### Version 4
+### Version 5
 
-**StudyBoost** est une application web moderne qui transforme vos documents de cours en outils pédagogiques interactifs, grâce à l’intelligence artificielle. Compatible avec l’API **Google Gemini** et désormais avec les **modèles IA locaux via Ollama**, StudyBoost rend l’apprentissage plus **efficace**, **personnalisé** et **flexible**.
+**StudyBoost** est une application web moderne qui transforme vos documents de cours en outils pédagogiques interactifs, grâce à l'intelligence artificielle. Compatible avec l'API **Google Gemini** et désormais avec les **modèles IA locaux via Ollama**, StudyBoost rend l'apprentissage plus **efficace**, **personnalisé** et **flexible**.
 
 ---
 
-## ✨ Nouveautés de la V4
+## ✨ Nouveautés de la V5
 
-### 🔄 Support des Modèles Locaux avec Ollama
+### 💾 Système de Sessions Amélioré
+
+* **Interface de gestion des sessions** : nouveau bouton "Sessions" avec modale dédiée.
+* **Création et chargement de sessions** : sauvegardez et retrouvez facilement vos analyses précédentes.
+* **Persistance locale** : toutes les sessions sont stockées dans localStorage.
+* **Traductions complètes** : libellés de gestion des sessions traduits dans toutes les langues supportées.
+* **Interface utilisateur mise à jour** : liste stylisée des sessions avec actions intuitives.
+
+---
+
+## 🔄 Nouveautés de la V4
+
+### Support des Modèles Locaux avec Ollama
 
 * Intégration de **modèles IA locaux** via **Ollama** : plus de contrôle et de confidentialité.
 * Endpoint ajouté pour **détecter et lister** les modèles installés.
@@ -18,12 +30,12 @@
 
 * Menu déroulant discret (dans la modale API) pour choisir le modèle Ollama à utiliser.
 * Le modèle sélectionné est **mémorisé localement**.
-* Les appels à l’IA sont adaptés dynamiquement selon le modèle choisi.
+* Les appels à l'IA sont adaptés dynamiquement selon le modèle choisi.
 
 ### ⚙️ Améliorations Techniques
 
 * Nouveau fichier `utils/ollamaCalls.js` pour gérer l'API Ollama.
-* **Correction d’un bug critique Webpack** (erreur sur `./src` lors du build).
+* **Correction d'un bug critique Webpack** (erreur sur `./src` lors du build).
 * **Nouveau système de sessions** pour retrouver facilement vos analyses précédentes.
 
 ---
@@ -31,10 +43,10 @@
 ## 🚀 Nouveautés de la V3
 
 * **Curseur de difficulté** pour adapter les QCM et questions ouvertes (de *Découverte* à *Expert*).
-* **Questions ouvertes corrigées par l’IA** : rédigez, soumettez, recevez une évaluation.
+* **Questions ouvertes corrigées par l'IA** : rédigez, soumettez, recevez une évaluation.
 * **Mode sombre intégral** avec sauvegarde locale.
 * **Interface multilingue** : Français, Anglais, Allemand, Espagnol.
-* **Compteur de tokens avec graphique circulaire** (pour l’API Gemini).
+* **Compteur de tokens avec graphique circulaire** (pour l'API Gemini).
 
 ---
 
@@ -46,13 +58,13 @@
 * **QCM personnalisables** : niveau de difficulté, réponses, explications.
 * **Flashcards interactives** : pour une révision active.
 * **Questions ouvertes** avec correction IA.
-* **Fiches de révision** exportables, prêtes à l’emploi.
+* **Fiches de révision** exportables, prêtes à l'emploi.
 * **Questions libres** sur le contenu de vos documents.
 * **Export PDF** de tous les contenus générés.
 * **Mode sombre** : confort visuel amélioré.
 * **Interface multilingue**.
 * **Suivi de la consommation API (Gemini)** : tokens IN/OUT.
-* **Sessions sauvegardées** : reprenez vos travaux quand vous le souhaitez.
+* **Gestion avancée des sessions** : créez, sauvegardez et chargez vos sessions de travail.
 
 ---
 
@@ -83,7 +95,7 @@ npm run dev
 npm start
 ```
 
-Accédez à l’application via : [http://localhost:3000](http://localhost:3000)
+Accédez à l'application via : [http://localhost:3000](http://localhost:3000)
 
 ---
 
@@ -158,7 +170,7 @@ npm start
 
 * Les **clés API** sont stockées uniquement **dans votre navigateur**.
 * Les **fichiers uploadés** sont supprimés automatiquement après traitement.
-* L’utilisation d’**Ollama** garantit un **traitement 100% local**.
+* L'utilisation d'**Ollama** garantit un **traitement 100% local**.
 
 ---
 
@@ -182,4 +194,3 @@ Pour toute question ou bug : [ouvrir une issue sur GitHub](https://github.com/Ga
 
 Développé avec ❤️ pour rendre la révision plus intelligente et agréable.
 **Made by [GaetanAff](https://github.com/GaetanAff)**
-
