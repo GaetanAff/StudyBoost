@@ -1,190 +1,183 @@
-# StudyBoost - Application d'aide à la révision avec IA - V3
+# 📚 StudyBoost – Application d’Aide à la Révision avec IA
 
-Une application web moderne et interactive qui transforme vos documents de cours en outils pédagogiques dynamiques grâce à l'IA Google Gemini. StudyBoost vise à rendre l'apprentissage plus efficace et personnalisé.
+### Version 4 (Pré-version)
 
-## 🔥 Nouveautés de la V3 : Interactivité et Personnalisation Accrues !
+**StudyBoost** est une application web moderne qui transforme vos documents de cours en outils pédagogiques interactifs, grâce à l’intelligence artificielle. Compatible avec l’API **Google Gemini** et désormais avec les **modèles IA locaux via Ollama**, StudyBoost rend l’apprentissage plus **efficace**, **personnalisé** et **flexible**.
 
-Cette version majeure introduit des fonctionnalités très attendues pour une expérience utilisateur encore plus riche :
+---
 
-* **Curseur de Difficulté pour les Questions :**
-    * Ajustez le niveau de difficulté (de "Découverte" à "Expert") pour les QCM et les questions ouvertes générées par l'IA.
-    * Obtenez des questions adaptées à votre niveau de compréhension, allant de la simple vérification de lecture à des analyses complexes.
-* **Questions Ouvertes avec Correction par l'IA :**
-    * Générez des questions ouvertes basées sur le contenu de vos documents.
-    * Rédigez vos propres réponses.
-    * Soumettez vos réponses pour une évaluation et une correction constructive fournies par l'IA, vous aidant à approfondir votre compréhension.
-* **Mode Sombre Intégral :**
-    * Activez un thème sombre élégant et reposant pour vos sessions d'étude tardives.
-    * La préférence est sauvegardée dans votre navigateur pour une expérience cohérente.
-* **Support Multi-langues (Français, Anglais, Allemand, Espagnol) :**
-    * Utilisez StudyBoost dans la langue de votre choix.
-    * L'interface utilisateur s'adapte dynamiquement, et les instructions pour l'IA peuvent également tenir compte de la langue sélectionnée pour une meilleure pertinence.
-    * Votre choix de langue est mémorisé.
-* **Compteur de Tokens Amélioré avec Diagramme Circulaire :**
-    * Visualisez rapidement votre consommation de tokens d'entrée grâce à un diagramme circulaire (camembert) affichant le pourcentage utilisé par rapport à votre limite journalière de l'API Gemini.
-    * Le suivi des tokens d'entrée et de sortie reste disponible numériquement.
+## ✨ Nouveautés de la V4 (Pré-version)
 
-##  Studyboost (V2) :
+### 🔄 Support des Modèles Locaux avec Ollama
 
-* **Interface QCM Interactive :**
-    * Les utilisateurs peuvent sélectionner une réponse à un QCM et la vérifier instantanément.
-    * La bonne réponse et une explication détaillée sont affichées après la vérification.
-    * Les options sont désactivées après une tentative pour encourager la réflexion.
-* **Options de Génération Flexibles :**
-    * Définissez le nombre exact de QCM et de Flashcards que vous souhaitez générer.
-* **Suivi de l'Utilisation des Tokens Gemini :**
-    * L'application compte les tokens d'entrée et de sortie pour chaque appel à l'API.
-    * Le compteur est stocké localement et se réinitialise si la clé API est modifiée.
-* **Amélioration des Prompts et Gestion d'Erreurs (V2).**
+* Intégration de **modèles IA locaux** via **Ollama** : plus de contrôle et de confidentialité.
+* Endpoint ajouté pour **détecter et lister** les modèles installés.
+* Interface mise à jour pour charger dynamiquement cette liste.
 
-## 🚀 Fonctionnalités Complètes
+### 🧠 Sélection Dynamique du Modèle
 
-* **Upload de documents variés** : PDF, Word, PowerPoint, et même des Images (avec OCR pour l'extraction de texte).
-* **Résumés intelligents** : Obtenez des résumés courts et concis ou détaillés et structurés, au format Markdown.
-* **QCM personnalisables** : Génération automatique de questions à choix multiples avec options, réponses correctes, explications et **niveau de difficulté ajustable**.
-* **Flashcards interactives** : Créez des cartes de révision (recto/verso) pour un apprentissage actif des concepts clés.
-* **Questions Ouvertes** : Générez des questions demandant une réponse rédigée (avec **niveau de difficulté ajustable**) et obtenez une correction de l'IA.
-* **Fiches de révision complètes** : Des fiches structurées, prêtes à l'emploi et exportables.
-* **Questions libres sur le document** : Posez des questions spécifiques sur le contenu de votre document et obtenez des réponses basées sur celui-ci.
-* **Export PDF** : Sauvegardez facilement tous les contenus générés (résumés, QCM, fiches) au format PDF.
-* **Mode Sombre** : Changez de thème pour un meilleur confort visuel.
-* **Support Multi-langues** : Interface disponible en Français, Anglais, Allemand, Espagnol.
-* **Suivi des Tokens** : Gardez un œil sur votre utilisation de l'API Gemini avec un affichage numérique et un diagramme circulaire pour les tokens d'entrée.
+* Menu déroulant discret (dans la modale API) pour choisir le modèle Ollama à utiliser.
+* Le modèle sélectionné est **mémorisé localement**.
+* Les appels à l’IA sont adaptés dynamiquement selon le modèle choisi.
 
+### ⚙️ Améliorations Techniques
+
+* Nouveau fichier `utils/ollamaCalls.js` pour gérer l'API Ollama.
+* **Correction d’un bug critique Webpack** (erreur sur `./src` lors du build).
+
+---
+
+## 🚀 Nouveautés de la V3
+
+* **Curseur de difficulté** pour adapter les QCM et questions ouvertes (de *Découverte* à *Expert*).
+* **Questions ouvertes corrigées par l’IA** : rédigez, soumettez, recevez une évaluation.
+* **Mode sombre intégral** avec sauvegarde locale.
+* **Interface multilingue** : Français, Anglais, Allemand, Espagnol.
+* **Compteur de tokens avec graphique circulaire** (pour l’API Gemini).
+
+---
+
+## ⭐ Fonctionnalités Clés
+
+* **Support de documents multiples** : PDF, Word, PowerPoint, Images (avec OCR).
+* **Choix du moteur IA** : Google Gemini (cloud) ou Ollama (local).
+* **Résumé intelligent** (court ou détaillé, au format Markdown).
+* **QCM personnalisables** : niveau de difficulté, réponses, explications.
+* **Flashcards interactives** : pour une révision active.
+* **Questions ouvertes** avec correction IA.
+* **Fiches de révision** exportables, prêtes à l’emploi.
+* **Questions libres** sur le contenu de vos documents.
+* **Export PDF** de tous les contenus générés.
+* **Mode sombre** : confort visuel amélioré.
+* **Interface multilingue**.
+* **Suivi de la consommation API (Gemini)** : tokens IN/OUT.
+
+---
 
 ## 📋 Prérequis
 
--   Node.js (version 16 ou supérieure)
--   NPM ou Yarn
--   Clé API Google Gemini (gratuite sur Google AI Studio)
+* **Node.js** (v16 ou supérieur)
+* **NPM** ou **Yarn**
+* Clé API **Google Gemini** *(via [Google AI Studio](https://makersuite.google.com/app))* (pour le mode cloud)
+* **Ollama** installé et actif avec au moins un modèle (ex: `ollama run llama3`)
+
+---
 
 ## 🛠️ Installation
 
-1.  **Cloner le projet**
-    ```bash
-    git clone https://github.com/GaetanAff/StudyBoost.git
-    cd StudyBoost
-    ```
-   
-2.  **Installer les dépendances**
-    ```bash
-    npm install
-    ```
-    (Le `package.json` liste déjà `express multer cors dotenv pdf-parse mammoth tesseract.js @google/generative-ai marked jspdf html2canvas nodemon webpack webpack-cli`, donc `npm install` suffit)
+```bash
+git clone https://github.com/GaetanAff/StudyBoost.git
+cd StudyBoost
+npm install
+```
 
-3.  **Démarrer l'application**
-    ```bash
-    # Mode développement
-    npm run dev
+### Lancement
 
-    # Mode production
-    npm start
-    ```
-   
-4.  **Ouvrir l'application**
-    ```
-    http://localhost:3000
-    ```
-   
+```bash
+# En mode développement
+npm run dev
+
+# En mode production
+npm start
+```
+
+Accédez à l’application via : [http://localhost:3000](http://localhost:3000)
+
+---
 
 ## 🔧 Configuration
 
-1.  **Obtenir une clé API Gemini** :
-    * Visitez [Google AI Studio](https://makersuite.google.com/app/apikey)
-    * Créez un compte Google si nécessaire
-    * Générez une nouvelle clé API
-    * Copiez la clé
+### 📦 Ollama (IA locale recommandée)
 
-2.  **Configurer dans l'application** :
-    * Cliquez sur le bouton "Clé API" en haut à droite
-    * Collez votre clé API Gemini
-    * Cliquez sur "Sauvegarder"
+1. **Installer Ollama**
+   ➜ [Télécharger depuis ollama.com](https://ollama.com)
+   ➜ Lancer le service.
 
-## 📚 Utilisation
+2. **Télécharger un modèle**
 
-1.  **Uploader un document**
-    * Cliquez sur la zone d'upload ou glissez-déposez vos fichiers
-    * Formats supportés : PDF, DOC, DOCX, PPT, PPTX, JPG, PNG
+   ```bash
+   ollama pull mistral
+   # ou
+   ollama pull llama3
+   ```
 
-2.  **Choisir une action**
-    * Résumé court/détaillé
-    * Génération de QCM
-    * Création de flashcards
-    * Fiche de révision
-    * Questions libres
+3. **Configurer dans StudyBoost**
 
-3.  **Personnaliser les options**
-    * Nombre de questions pour les QCM
-    * Nombre de flashcards
-    * Type de résumé souhaité
-    * **Niveau de difficulté** pour les QCM et questions ouvertes.
+   * Cliquez sur **"Clé API"**.
+   * Sélectionnez **"Ollama"**.
+   * Choisissez un modèle dans la liste déroulante (chargée automatiquement).
+   * Cliquez sur **"Tester"** pour vérifier la connexion.
+   * **Sauvegardez.**
 
-4.  **Exporter les résultats**
-    * Format PDF
-    * Copie dans le presse-papiers
+### ☁️ Google Gemini
 
-## 🏗️ Structure du projet
+1. **Obtenir une clé API**
+   ➜ [Google AI Studio](https://makersuite.google.com/app)
+
+2. **Configurer dans StudyBoost**
+
+   * Cliquez sur **"Clé API"**.
+   * Sélectionnez **"Gemini"**.
+   * Collez la clé API.
+   * **Sauvegardez.**
+
+---
+
+## 🏗️ Structure du Projet
 
 ```
 studyboost/
-├── server.js              # Serveur Express principal
-├── package.json           # Dépendances et scripts
+├── server.js               # Serveur Express
+├── package.json            # Dépendances
 ├── utils/
 │   ├── documentProcessor.js # Traitement des documents
-│   └── aiService.js       # Interface API Gemini
+│   ├── aiService.js         # API Google Gemini
+│   └── ollamaCalls.js       # API Ollama
 ├── public/
-│   ├── index.html         # Interface utilisateur
-│   ├── styles.css         # Styles CSS
-│   └── script.js          # Logique frontend
-├── uploads/               # Dossier temporaire (auto-créé)
-└── README.md             # Documentation
+│   ├── index.html
+│   ├── styles.css
+│   └── script.js
+├── uploads/                # Fichiers temporaires
+└── README.md
 ```
 
-## 🔧 Dépendances principales
-
-- **Backend** : Express, Multer, PDF-Parse, Mammoth, Tesseract.js
-- **IA** : @google/generative-ai
-- **Frontend** : Vanilla JS, Marked.js, jsPDF
+---
 
 ## 🚀 Déploiement
 
-### Déploiement local
 ```bash
 npm run build
 npm start
 ```
 
-### Déploiement sur Heroku
-```bash
-heroku create studyboost-app
-git push heroku main
-```
-
-### Déploiement sur Vercel
-```bash
-vercel --prod
-```
+---
 
 ## 🛡️ Sécurité
 
-- Les clés API sont stockées localement dans le navigateur
-- Les fichiers uploadés sont supprimés après traitement
-- Aucune donnée n'est conservée sur le serveur
-
-
-## 🤝 Contribution
-
-Les contributions sont les bienvenues ! N'hésitez pas à :
-- Signaler des bugs
-- Proposer de nouvelles fonctionnalités
-- Améliorer la documentation
-
-## 📞 Support
-
-Pour toute question ou problème :
-- Ouvrez une issue sur GitHub
-- Consultez la documentation de l'API Gemini
+* Les **clés API** sont stockées uniquement **dans votre navigateur**.
+* Les **fichiers uploadés** sont supprimés automatiquement après traitement.
+* L’utilisation d’**Ollama** garantit un **traitement 100% local**.
 
 ---
 
-Développé avec ❤️ pour faciliter l'apprentissage et la révision.
+## 🤝 Contributions
+
+Les contributions sont les bienvenues !
+
+* 🐛 Signalez un bug
+* 💡 Proposez une fonctionnalité
+* 📝 Améliorez la documentation
+
+> Ouvrez une issue sur GitHub pour toute suggestion ou problème.
+
+---
+
+## 📞 Support
+
+Pour toute question ou bug : [ouvrir une issue sur GitHub](https://github.com/GaetanAff/StudyBoost/issues)
+
+---
+
+Développé avec ❤️ pour rendre la révision plus intelligente et agréable.
+**Made by [GaetanAff](https://github.com/GaetanAff)**
+
