@@ -16,17 +16,26 @@ class StudyBoostApp {
                 this.usingOllama= false;
                 this.availableOllamaModels = [];
                 this.selectedOllamaModel = localStorage.getItem('ollama_model') || '';
-		
-		this.init();
-	}
+
+                this.sessions = JSON.parse(localStorage.getItem('studyboost_sessions') || '{}');
+                this.currentSessionId = localStorage.getItem('studyboost_current_session') || null;
+
+                this.init();
+        }
 	
-	init() {
-		this.setupEventListeners();
-		this.checkApiKey();
-		this.updateTokenDisplay();
-		this.setLanguage(this.currentLanguage); 
-		this.setInitialDarkMode();
-	}
+        init() {
+                this.setupEventListeners();
+                this.checkApiKey();
+                this.updateTokenDisplay();
+                this.setLanguage(this.currentLanguage);
+                this.setInitialDarkMode();
+
+                if (!this.currentSessionId) {
+                        this.createSession(this._('defaultSessionName'));
+                } else {
+                        this.loadSession(this.currentSessionId);
+                }
+        }
 	
 	setLanguage(lang) {
 		if (this.translations[lang]) {
@@ -189,12 +198,20 @@ class StudyBoostApp {
 		document.getElementById('darkModeToggle')?.addEventListener('click', () => this.toggleDarkMode());
                 document.getElementById('useOllama')?.addEventListener('click', () => this.useOllama());
                 document.getElementById('useGemini')?.addEventListener('click', () => this.useGemini());
-		document.getElementById('languageSwitcher')?.addEventListener('change', (e) => this.setLanguage(e.target.value));
+                document.getElementById('languageSwitcher')?.addEventListener('change', (e) => this.setLanguage(e.target.value));
                 document.getElementById('testApiKeyBtn')?.addEventListener('click', () => this.testApiKey());
                 document.getElementById('ollamaModelSelect')?.addEventListener('change', (e) => {
                         this.selectedOllamaModel = e.target.value;
                         localStorage.setItem('ollama_model', this.selectedOllamaModel);
                         this.testOllamaModel();
+                });
+                document.getElementById('sessionBtn')?.addEventListener('click', () => { this.renderSessionList(); this.showModal('sessionModal'); });
+                document.getElementById('createSessionBtn')?.addEventListener('click', () => {
+                        const nameInput = document.getElementById('newSessionName');
+                        const name = nameInput.value.trim() || this._('defaultSessionName');
+                        nameInput.value = '';
+                        this.createSession(name);
+                        this.hideModal('sessionModal');
                 });
 		
 		// *** AJOUT CRUCIAL : Listener pour le bouton de bascule de visibilité de la clé API ***
@@ -481,13 +498,17 @@ class StudyBoostApp {
 			});
 			const result = await response.json();
 			
-			if (result.success) {
-				this.currentDocument = {
-					text: result.text,
-					filename: result.filename
-				};
-				this.showDocumentProcessed(result.filename, result.text);
-			} else {
+                        if (result.success) {
+                                this.currentDocument = {
+                                        text: result.text,
+                                        filename: result.filename
+                                };
+                                this.showDocumentProcessed(result.filename, result.text);
+                                if (this.currentSessionId && this.sessions[this.currentSessionId]) {
+                                        this.sessions[this.currentSessionId].currentDocument = this.currentDocument;
+                                        this.saveSessions();
+                                }
+                        } else {
 				throw new Error(result.error || "Unknown upload error");
 			}
 		} catch (error) {
@@ -655,11 +676,13 @@ class StudyBoostApp {
 	}
 	
 	
-	async generateContent(type, options = {}) {
-		if (!this.currentDocument || !this.currentDocument.text) {
-			this.showNotification(this._('notificationDocumentMissing'), 'error');
-			return;
-		}
+        async generateContent(type, options = {}) {
+                if (!this.currentDocument || !this.currentDocument.text) {
+                        this.showNotification(this._('notificationDocumentMissing'), 'error');
+                        return;
+                }
+
+                this.lastOptions = options;
 		
 		this.showLoading('loadingTextSendingRequest'); 
 		
@@ -736,7 +759,7 @@ class StudyBoostApp {
 		}
 	}
 	
-	showResults(type, content) {
+        showResults(type, content, fromHistory = false) {
 		const resultsSection = document.getElementById('resultsSection');
 		const resultsTitle = document.getElementById('resultsTitle');
 		const resultsContent = document.getElementById('resultsContent');
@@ -844,9 +867,15 @@ class StudyBoostApp {
 			break;
 		}
 		
-		resultsSection.style.display = 'block';
-		resultsSection.scrollIntoView({ behavior: 'smooth' });
-	}
+                resultsSection.style.display = 'block';
+                resultsSection.scrollIntoView({ behavior: 'smooth' });
+
+                if (!fromHistory && this.currentSessionId && this.sessions[this.currentSessionId]) {
+                        this.sessions[this.currentSessionId].currentDocument = this.currentDocument;
+                        this.sessions[this.currentSessionId].actions.push({ type, content, options: this.lastOptions, timestamp: Date.now() });
+                        this.saveSessions();
+                }
+        }
 	
 	
 	formatQCM(qcmDataArray) {
@@ -933,7 +962,7 @@ class StudyBoostApp {
 		});
 	}
 	
-	exportResults() {
+        exportResults() {
 		const resultsContentElement = document.getElementById('resultsContent');
 		const titleElement = document.getElementById('resultsTitle');
 		
@@ -1019,6 +1048,61 @@ class StudyBoostApp {
                                 if (apiGroup) apiGroup.style.display = 'block';
                         }
                 }
+        }
+
+        /* ----- Session Management ----- */
+        saveSessions() {
+                localStorage.setItem('studyboost_sessions', JSON.stringify(this.sessions));
+                localStorage.setItem('studyboost_current_session', this.currentSessionId || '');
+        }
+
+        createSession(name) {
+                const id = 's' + Date.now();
+                this.sessions[id] = { id, name, currentDocument: null, actions: [] };
+                this.currentSessionId = id;
+                this.saveSessions();
+                this.renderSessionList();
+        }
+
+        loadSession(id) {
+                const sess = this.sessions[id];
+                if (!sess) return;
+                this.currentSessionId = id;
+                this.currentDocument = sess.currentDocument;
+                const lastAction = sess.actions[sess.actions.length - 1];
+                if (this.currentDocument) {
+                        this.showDocumentProcessed(this.currentDocument.filename, this.currentDocument.text);
+                } else {
+                        this.resetApp();
+                }
+                if (lastAction) {
+                        this.currentAction = lastAction.type;
+                        this.showResults(lastAction.type, lastAction.content, true);
+                }
+                this.saveSessions();
+        }
+
+        renderSessionList() {
+                const list = document.getElementById('sessionList');
+                if (!list) return;
+                list.innerHTML = '';
+                const sessionsArr = Object.values(this.sessions);
+                if (sessionsArr.length === 0) {
+                        list.textContent = this._('noSessionsMessage');
+                        return;
+                }
+                sessionsArr.forEach(sess => {
+                        const div = document.createElement('div');
+                        div.className = 'session-item';
+                        div.innerHTML = `<span><strong>${sess.name}</strong> (${sess.actions.length})</span>`;
+                        const btn = document.createElement('button');
+                        btn.className = 'btn-secondary load-session-btn';
+                        btn.textContent = this._('openSessionBtnLabel');
+                        btn.dataset.id = sess.id;
+                        btn.addEventListener('click', () => { this.loadSession(sess.id); this.hideModal('sessionModal'); });
+                        div.appendChild(btn);
+                        list.appendChild(div);
+                });
         }
         hideModal(modalId) {
                 const modalElement = document.getElementById(modalId);

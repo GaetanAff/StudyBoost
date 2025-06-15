@@ -24,6 +24,7 @@
 
 * Nouveau fichier `utils/ollamaCalls.js` pour gérer l'API Ollama.
 * **Correction d’un bug critique Webpack** (erreur sur `./src` lors du build).
+* **Nouveau système de sessions** pour retrouver facilement vos analyses précédentes.
 
 ---
 
@@ -51,6 +52,7 @@
 * **Mode sombre** : confort visuel amélioré.
 * **Interface multilingue**.
 * **Suivi de la consommation API (Gemini)** : tokens IN/OUT.
+* **Sessions sauvegardées** : reprenez vos travaux quand vous le souhaitez.
 
 ---
 

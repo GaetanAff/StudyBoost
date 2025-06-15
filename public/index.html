@@ -35,6 +35,9 @@
                     </div>
                     <button id="darkModeToggle" class="btn-icon" aria-label="Toggle dark mode">
                         <i class="fas fa-moon"></i> </button>
+                    <button id="sessionBtn" class="btn-secondary">
+                        <i class="fas fa-folder-open"></i> <span data-lang="sessionsBtnLabel">Sessions</span>
+                    </button>
                     <button id="apiKeyBtn" class="btn-secondary">
                         <i class="fas fa-key"></i> <span data-lang="apiKeyBtnLabel">Clé API</span>
                     </button>
@@ -220,6 +223,24 @@
                     </div>
                 <div class="modal-footer">
                     <button id="confirmOptions" class="btn-primary" data-lang="generateBtnLabel">Générer</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal" id="sessionModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 data-lang="sessionModalTitle">Sessions</h3>
+                    <button class="modal-close">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="newSessionName" data-lang="newSessionNameLabel">Nom de la session</label>
+                        <input type="text" id="newSessionName" class="form-control" placeholder-data-lang="newSessionNamePlaceholder">
+                    </div>
+                    <button id="createSessionBtn" class="btn-primary" data-lang="createSessionBtnLabel">Créer</button>
+                    <hr>
+                    <div id="sessionList"></div>
                 </div>
             </div>
         </div>

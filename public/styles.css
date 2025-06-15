@@ -68,6 +68,17 @@ body {
     transition: background-color 0.3s, color 0.3s;
 }
 
+.session-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid var(--border);
+}
+.session-item:last-child {
+    border-bottom: none;
+}
+
 .app-container {
     min-height: 100vh;
     display: flex;
