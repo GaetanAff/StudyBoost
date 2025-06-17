@@ -8,7 +8,7 @@ async function generateContentWithOllama(prompt, model = 'mistral') {
                         body: JSON.stringify({
                                 model,
                                 prompt,
-                                stream: true
+                                stream: false
                         })
                 });
 
