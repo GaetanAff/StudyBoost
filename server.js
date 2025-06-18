@@ -35,14 +35,14 @@ const storage = multer.diskStorage({
 const upload = multer({ 
   storage: storage,
   fileFilter: (req, file, cb) => {
-    const allowedTypes = /pdf|doc|docx|ppt|pptx|jpg|jpeg|png/;
+    const allowedTypes = /pdf|doc|docx|odt|ppt|pptx|jpg|jpeg|png/;
     const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
     const mimetype = allowedTypes.test(file.mimetype);
     
     if (mimetype && extname) {
       return cb(null, true);
     } else {
-      cb(new Error('Type de fichier non supporté. Formats autorisés : PDF, DOC, DOCX, PPT, PPTX, JPG, JPEG, PNG.'));
+      cb(new Error('Type de fichier non supporté. Formats autorisés : PDF, DOC, DOCX, ODT, PPT, PPTX, JPG, JPEG, PNG.'));
     }
   },
   limits: { fileSize: 10 * 1024 * 1024 } // 10MB max
