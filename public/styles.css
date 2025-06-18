@@ -369,6 +369,16 @@ body.dark-mode .status-error {
 .btn-thirdary { background: var(--gradient2); color: white; }
 .btn-thirdary:hover { transform: translateY(-1px); box-shadow: var(--shadow-lg); }
 
+.btn-thirdary.ollama-off {
+    background: linear-gradient(135deg, #ef4444, #b91c1c);
+    color: white;
+}
+.btn-thirdary.ollama-off:hover {
+    background: linear-gradient(135deg, #f87171, #dc2626);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 10px rgba(239, 68, 68, 0.3);
+}
+
 /* Main Content */
 .main-content { flex: 1; max-width: 1200px; margin: 0 auto; padding: 2rem; width: 100%; }
 

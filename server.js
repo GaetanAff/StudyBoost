@@ -3,6 +3,8 @@ const multer = require('multer');
 const cors = require('cors');
 const path = require('path');
 const fs =require('fs');
+const { exec } = require('child_process');
+const os = require('os');
 require('dotenv').config();
 
 const { processDocument } = require('./utils/documentProcessor');
@@ -91,6 +93,22 @@ app.get('/api/ollama-models', async (req, res) => {
     console.error('Erreur lors de la récupération des modèles Ollama:', error.message);
     res.status(500).json({ success: false, error: error.message });
   }
+});
+
+app.post('/api/start-ollama', (req, res) => {
+  console.log("Requête reçue pour démarrer Ollama...");
+  const command = os.platform() === 'win32'
+    ? 'start /b ollama serve'
+    : 'ollama serve > /dev/null 2>&1 &';
+
+  exec(command, (error) => {
+    if (error && os.platform() !== 'win32') {
+      console.error(`Erreur exec: ${error.message}`);
+      return res.status(500).json({ success: false, error: `La commande 'ollama' a échoué. Est-ce que Ollama est installé ? Erreur: ${error.message}` });
+    }
+    console.log('Commande de démarrage d\'Ollama envoyée.');
+    res.json({ success: true, message: "La commande de démarrage pour Ollama a été envoyée. Veuillez patienter quelques instants..." });
+  });
 });
 
 app.post('/api/generate', async (req, res) => {

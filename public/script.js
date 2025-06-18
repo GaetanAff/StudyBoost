@@ -30,6 +30,7 @@ class StudyBoostApp {
                 this.updateTokenDisplay();
                 this.setLanguage(this.currentLanguage);
                 this.setInitialDarkMode();
+                this.checkOllamaStatusOnLoad();
 
                 if (!this.currentSessionId) {
                         this.createSession(this._('defaultSessionName'));
@@ -367,34 +368,38 @@ class StudyBoostApp {
 		}
         }
 
-        async fetchOllamaModels() {
-                try {
-                        const response = await fetch('/api/ollama-models');
-                        const result = await response.json();
-                        if (response.ok && result.success && Array.isArray(result.models)) {
-                                this.availableOllamaModels = result.models;
-                                const select = document.getElementById('ollamaModelSelect');
-                                if (select) {
-                                        select.innerHTML = '';
-                                        result.models.forEach(m => {
-                                                const opt = document.createElement('option');
-                                                opt.value = m;
-                                                opt.textContent = m;
-                                                select.appendChild(opt);
-                                        });
-                                        if (!this.selectedOllamaModel) {
-                                                this.selectedOllamaModel = result.models[0] || '';
-                                        }
-                                        select.value = this.selectedOllamaModel;
-                                }
-                        } else {
-                                throw new Error(result.error || 'unable to load');
-                        }
-                } catch (err) {
-                        console.error('Erreur récupération modèles Ollama:', err);
-                        this.showNotification('Erreur récupération modèles Ollama: ' + err.message, 'error');
-                }
-        }
+       async fetchOllamaModels() {
+               this.showLoading('loadingTextDefault');
+               try {
+                       const response = await fetch('/api/ollama-models');
+                       const result = await response.json();
+                       if (response.ok && result.success && Array.isArray(result.models)) {
+                               this.availableOllamaModels = result.models;
+                               const select = document.getElementById('ollamaModelSelect');
+                               if (select) {
+                                       select.innerHTML = '';
+                                       result.models.forEach(m => {
+                                               const opt = document.createElement('option');
+                                               opt.value = m;
+                                               opt.textContent = m;
+                                               select.appendChild(opt);
+                                       });
+                                       if (!this.selectedOllamaModel || !result.models.includes(this.selectedOllamaModel)) {
+                                               this.selectedOllamaModel = result.models[0] || '';
+                                       }
+                                       select.value = this.selectedOllamaModel;
+                               }
+                               this.handleOllamaConnectionSuccess();
+                       } else {
+                               throw new Error(result.error || 'unable to load models');
+                       }
+               } catch (err) {
+                       console.error('Erreur récupération modèles Ollama:', err);
+                       this.handleOllamaConnectionError(err.message);
+               } finally {
+                       this.hideLoading();
+               }
+       }
 
         async testOllamaModel() {
                 if (!this.selectedOllamaModel) return;
@@ -429,7 +434,6 @@ class StudyBoostApp {
                 const apiGroup = document.getElementById('apiKeyInput')?.closest('.form-group');
                 if (container) container.style.display = 'block';
                 if (apiGroup) apiGroup.style.display = 'none';
-                this.showNotification(this._('notificationUsingOllama'), 'success');
         }
 
         useGemini() {
@@ -440,6 +444,59 @@ class StudyBoostApp {
                 if (apiGroup) apiGroup.style.display = 'block';
                 this.showNotification(this._('notificationUsingGemini'), 'success');
         }
+
+       async checkOllamaStatusOnLoad() {
+               try {
+                       const response = await fetch('/api/ollama-models');
+                       if (!response.ok) throw new Error('Ollama not responding');
+               } catch (error) {
+                       console.warn("Ollama n'était pas actif au chargement.");
+                       this.handleOllamaConnectionError();
+               }
+       }
+
+       handleOllamaConnectionError(errorMessage = '') {
+               const useOllamaBtn = document.getElementById('useOllama');
+               if (useOllamaBtn) {
+                       useOllamaBtn.classList.add('ollama-off');
+                       useOllamaBtn.innerHTML = `<i class="fas fa-power-off"></i> ${this._('ollamaOffLabel')}`;
+                       useOllamaBtn.onclick = () => this.requestOllamaStart();
+               }
+               if (errorMessage) {
+                       this.showNotification(`${this._('ollamaConnectionError')} ${errorMessage}`, 'error');
+               } else {
+                       this.showNotification(this._('ollamaConnectionError'), 'error');
+               }
+       }
+
+       handleOllamaConnectionSuccess() {
+               const useOllamaBtn = document.getElementById('useOllama');
+               if (useOllamaBtn) {
+                       useOllamaBtn.classList.remove('ollama-off');
+                       useOllamaBtn.innerHTML = `<i class="fas fa-database"></i> ${this._('ollamaBtnLabel')}`;
+                       useOllamaBtn.onclick = () => this.useOllama();
+               }
+               this.showNotification(this._('notificationUsingOllama'), 'success');
+       }
+
+       async requestOllamaStart() {
+               this.showLoading('ollamaStarting');
+               try {
+                       const response = await fetch('/api/start-ollama', { method: 'POST' });
+                       const result = await response.json();
+                       if (result.success) {
+                               this.showNotification(result.message, 'info');
+                               setTimeout(() => {
+                                       this.fetchOllamaModels();
+                               }, 5000);
+                       } else {
+                               throw new Error(result.error);
+                       }
+               } catch (error) {
+                       this.showNotification(`${this._('ollamaStartError')} ${error.message}`, 'error');
+                       this.hideLoading();
+               }
+       }
 
         saveApiKeyAndResetTokens() {
                 const container = document.getElementById('ollamaModelSelectContainer');
