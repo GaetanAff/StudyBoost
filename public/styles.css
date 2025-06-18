@@ -377,6 +377,15 @@ body.dark-mode .status-error {
     transform: translateY(-1px);
     box-shadow: 0 4px 10px rgba(239, 68, 68, 0.3);
 }
+.btn-thirdary.ollama-starting {
+    background: linear-gradient(135deg, #9ca3af, #6b7280);
+    color: white;
+}
+.btn-thirdary.ollama-starting:hover {
+    background: linear-gradient(135deg, #a1a1aa, #4b5563);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 10px rgba(156, 163, 175, 0.3);
+}
 
 /* Main Content */
 .main-content { flex: 1; max-width: 1200px; margin: 0 auto; padding: 2rem; width: 100%; }

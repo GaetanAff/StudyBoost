@@ -16,6 +16,7 @@ class StudyBoostApp {
                 this.usingOllama= false;
                 this.availableOllamaModels = [];
                 this.selectedOllamaModel = localStorage.getItem('ollama_model') || '';
+                this.startingOllama = false;
 
                 this.sessions = JSON.parse(localStorage.getItem('studyboost_sessions') || '{}');
                 this.currentSessionId = localStorage.getItem('studyboost_current_session') || null;
@@ -368,8 +369,11 @@ class StudyBoostApp {
 		}
         }
 
-        async fetchOllamaModels() {
-                this.showLoading('loadingTextDefault');
+        async fetchOllamaModels(options = {}) {
+                const { fromStart = false, silent = false } = options;
+                if (!fromStart) {
+                        this.showLoading('loadingTextDefault');
+                }
                 try {
                         const response = await fetch('/api/ollama-models');
                         const result = await response.json();
@@ -395,7 +399,7 @@ class StudyBoostApp {
                         }
                 } catch (err) {
                         console.error('Erreur récupération modèles Ollama:', err);
-                        this.handleOllamaConnectionError(err.message);
+                        this.handleOllamaConnectionError(err.message, silent);
                 } finally {
                         this.hideLoading();
                 }
@@ -407,50 +411,65 @@ class StudyBoostApp {
                         if (!response.ok) throw new Error('Ollama not responding');
                 } catch (error) {
                         console.warn("Ollama n'était pas actif au chargement.");
-                        this.handleOllamaConnectionError();
+                        this.handleOllamaConnectionError('', true);
                 }
         }
 
-        handleOllamaConnectionError(errorMessage = '') {
+       handleOllamaConnectionError(errorMessage = '', silent = false) {
                 const useOllamaBtn = document.getElementById('useOllama');
                 if (useOllamaBtn) {
                         useOllamaBtn.classList.add('ollama-off');
+                        useOllamaBtn.classList.remove('ollama-starting');
                         useOllamaBtn.innerHTML = `<i class="fas fa-power-off"></i> ${this._('ollamaOffLabel')}`;
                         useOllamaBtn.onclick = () => this.requestOllamaStart();
                 }
-                if (errorMessage) {
-                        this.showNotification(`${this._('ollamaConnectionError')} ${errorMessage}`, 'error');
-                } else {
-                        this.showNotification(this._('ollamaConnectionError'), 'error');
+                if (!silent) {
+                        if (this.startingOllama) {
+                                this.showNotification(this._('ollamaStartFailInstall'), 'error');
+                        } else {
+                                const msg = errorMessage ? `${this._('ollamaConnectionError')} ${errorMessage}` : this._('ollamaConnectionError');
+                                this.showNotification(msg, 'error');
+                        }
                 }
+                this.startingOllama = false;
         }
 
         handleOllamaConnectionSuccess() {
                 const useOllamaBtn = document.getElementById('useOllama');
                 if (useOllamaBtn) {
                         useOllamaBtn.classList.remove('ollama-off');
+                        useOllamaBtn.classList.remove('ollama-starting');
                         useOllamaBtn.innerHTML = `<i class="fas fa-database"></i> ${this._('ollamaBtnLabel')}`;
                         useOllamaBtn.onclick = () => this.useOllama();
                 }
                 this.showNotification(this._('notificationUsingOllama'), 'success');
+                this.startingOllama = false;
         }
 
         async requestOllamaStart() {
+                this.startingOllama = true;
+                const useOllamaBtn = document.getElementById('useOllama');
+                if (useOllamaBtn) {
+                        useOllamaBtn.classList.remove('ollama-off');
+                        useOllamaBtn.classList.add('ollama-starting');
+                        useOllamaBtn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> ${this._('ollamaStarting')}`;
+                        useOllamaBtn.onclick = null;
+                }
                 this.showLoading('ollamaStarting');
+                this.showNotification(this._('ollamaStartInit'), 'info');
                 try {
                         const response = await fetch('/api/start-ollama', { method: 'POST' });
                         const result = await response.json();
-                        if (result.success) {
-                                this.showNotification(result.message, 'info');
-                                setTimeout(() => { this.fetchOllamaModels(); }, 5000);
-                        } else {
+                        if (!response.ok || !result.success) {
                                 throw new Error(result.error || 'start failed');
                         }
                 } catch (error) {
-                        this.showNotification(`${this._('ollamaStartError')} ${error.message}`, 'error');
-                } finally {
                         this.hideLoading();
+                        this.handleOllamaConnectionError(error.message);
+                        return;
                 }
+
+                setTimeout(() => { this.fetchOllamaModels({ fromStart: true }); }, 5000);
         }
 
         async testOllamaModel() {
