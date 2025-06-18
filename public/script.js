@@ -17,6 +17,7 @@ class StudyBoostApp {
                 this.availableOllamaModels = [];
                 this.selectedOllamaModel = localStorage.getItem('ollama_model') || '';
                 this.startingOllama = false;
+                this.ollamaStartRetry = 0;
 
                 this.sessions = JSON.parse(localStorage.getItem('studyboost_sessions') || '{}');
                 this.currentSessionId = localStorage.getItem('studyboost_current_session') || null;
@@ -423,6 +424,15 @@ class StudyBoostApp {
                         useOllamaBtn.innerHTML = `<i class="fas fa-power-off"></i> ${this._('ollamaOffLabel')}`;
                         useOllamaBtn.onclick = () => this.requestOllamaStart();
                 }
+
+                if (this.startingOllama && this.ollamaStartRetry === 0) {
+                        this.ollamaStartRetry = 1;
+                        setTimeout(() => {
+                                this.fetchOllamaModels({ fromStart: true });
+                        }, 3000);
+                        return;
+                }
+
                 if (!silent) {
                         if (this.startingOllama) {
                                 this.showNotification(this._('ollamaStartFailInstall'), 'error');
@@ -444,10 +454,12 @@ class StudyBoostApp {
                 }
                 this.showNotification(this._('notificationUsingOllama'), 'success');
                 this.startingOllama = false;
+                this.ollamaStartRetry = 0;
         }
 
         async requestOllamaStart() {
                 this.startingOllama = true;
+                this.ollamaStartRetry = 0;
                 const useOllamaBtn = document.getElementById('useOllama');
                 if (useOllamaBtn) {
                         useOllamaBtn.classList.remove('ollama-off');
@@ -468,7 +480,7 @@ class StudyBoostApp {
 
                 setTimeout(() => {
                         this.fetchOllamaModels({ fromStart: true });
-                }, 2000);
+                }, 3000);
         }
 
         async testOllamaModel() {
