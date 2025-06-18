@@ -459,6 +459,8 @@ class StudyBoostApp {
                const useOllamaBtn = document.getElementById('useOllama');
                if (useOllamaBtn) {
                        useOllamaBtn.classList.add('ollama-off');
+                       useOllamaBtn.classList.remove('ollama-starting');
+                       useOllamaBtn.setAttribute('data-lang', 'ollamaOffLabel');
                        useOllamaBtn.innerHTML = `<i class="fas fa-power-off"></i> ${this._('ollamaOffLabel')}`;
                        useOllamaBtn.onclick = () => this.requestOllamaStart();
                }
@@ -474,7 +476,8 @@ class StudyBoostApp {
        handleOllamaConnectionSuccess() {
                const useOllamaBtn = document.getElementById('useOllama');
                if (useOllamaBtn) {
-                       useOllamaBtn.classList.remove('ollama-off');
+                       useOllamaBtn.classList.remove('ollama-off', 'ollama-starting');
+                       useOllamaBtn.setAttribute('data-lang', 'ollamaBtnLabel');
                        useOllamaBtn.innerHTML = `<i class="fas fa-database"></i> ${this._('ollamaBtnLabel')}`;
                        useOllamaBtn.onclick = () => this.useOllama();
                }
@@ -486,6 +489,7 @@ class StudyBoostApp {
                if (useOllamaBtn) {
                        useOllamaBtn.classList.remove('ollama-off');
                        useOllamaBtn.classList.add('ollama-starting');
+                       useOllamaBtn.setAttribute('data-lang', 'ollamaStarting');
                        useOllamaBtn.disabled = true;
                        useOllamaBtn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> ${this._('ollamaStarting')}`;
                }
