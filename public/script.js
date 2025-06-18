@@ -457,19 +457,18 @@ class StudyBoostApp {
                 }
                 this.showLoading('ollamaStarting');
                 this.showNotification(this._('ollamaStartInit'), 'info');
+
                 try {
                         const response = await fetch('/api/start-ollama', { method: 'POST' });
-                        const result = await response.json();
-                        if (!response.ok || !result.success) {
-                                throw new Error(result.error || 'start failed');
-                        }
+                        await response.json();
+                        // We ignore errors here to recheck after a delay
                 } catch (error) {
-                        this.hideLoading();
-                        this.handleOllamaConnectionError(error.message);
-                        return;
+                        console.warn('Ollama start command error:', error);
                 }
 
-                setTimeout(() => { this.fetchOllamaModels({ fromStart: true }); }, 5000);
+                setTimeout(() => {
+                        this.fetchOllamaModels({ fromStart: true });
+                }, 2000);
         }
 
         async testOllamaModel() {
