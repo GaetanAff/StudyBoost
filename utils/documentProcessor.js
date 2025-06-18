@@ -3,6 +3,8 @@ const mammoth = require('mammoth');
 const fs = require('fs');
 const path = require('path');
 const Tesseract = require('tesseract.js');
+const libre = require('libreoffice-convert');
+libre.convertAsync = require('util').promisify(libre.convert);
 
 async function processDocument(filePath) {
   const ext = path.extname(filePath).toLowerCase();
@@ -14,6 +16,8 @@ async function processDocument(filePath) {
       case '.doc':
       case '.docx':
         return await processWord(filePath);
+      case '.odt':
+        return await processODT(filePath);
       case '.jpg':
       case '.jpeg':
       case '.png':
@@ -36,6 +40,19 @@ async function processPDF(filePath) {
 async function processWord(filePath) {
   const result = await mammoth.extractRawText({ path: filePath });
   return result.value;
+}
+
+async function processODT(filePath) {
+  const ext = '.docx';
+  const inputPath = filePath;
+  const outputPath = path.join(__dirname, '../uploads/output.docx');
+
+  const odtBuf = await fs.promises.readFile(inputPath);
+  const docxBuf = await libre.convertAsync(odtBuf, ext, undefined);
+  fs.writeFileSync(outputPath, docxBuf);
+  const text = await processWord(outputPath);
+  fs.unlink(outputPath, () => {});
+  return text;
 }
 
 async function processImage(filePath) {

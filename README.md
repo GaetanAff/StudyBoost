@@ -53,7 +53,7 @@
 
 ## ⭐ Fonctionnalités Clés
 
-* **Support de documents multiples** : PDF, Word, PowerPoint, Images (avec OCR).
+* **Support de documents multiples** : PDF, Word, PowerPoint, ODT, Images (avec OCR).
 * **Choix du moteur IA** : Google Gemini (cloud) ou Ollama (local).
 * **Résumé intelligent** (court ou détaillé, au format Markdown).
 * **QCM personnalisables** : niveau de difficulté, réponses, explications.
