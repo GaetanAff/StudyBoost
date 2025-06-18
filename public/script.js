@@ -451,21 +451,23 @@ class StudyBoostApp {
                        if (!response.ok) throw new Error('Ollama not responding');
                } catch (error) {
                        console.warn("Ollama n'était pas actif au chargement.");
-                       this.handleOllamaConnectionError();
+                       this.handleOllamaConnectionError('', true);
                }
        }
 
-       handleOllamaConnectionError(errorMessage = '') {
+       handleOllamaConnectionError(errorMessage = '', silent = false) {
                const useOllamaBtn = document.getElementById('useOllama');
                if (useOllamaBtn) {
                        useOllamaBtn.classList.add('ollama-off');
                        useOllamaBtn.innerHTML = `<i class="fas fa-power-off"></i> ${this._('ollamaOffLabel')}`;
                        useOllamaBtn.onclick = () => this.requestOllamaStart();
                }
-               if (errorMessage) {
-                       this.showNotification(`${this._('ollamaConnectionError')} ${errorMessage}`, 'error');
-               } else {
-                       this.showNotification(this._('ollamaConnectionError'), 'error');
+               if (!silent) {
+                       if (errorMessage) {
+                               this.showNotification(`${this._('ollamaConnectionError')} ${errorMessage}`, 'error');
+                       } else {
+                               this.showNotification(this._('ollamaConnectionError'), 'error');
+                       }
                }
        }
 
@@ -480,22 +482,52 @@ class StudyBoostApp {
        }
 
        async requestOllamaStart() {
+               const useOllamaBtn = document.getElementById('useOllama');
+               if (useOllamaBtn) {
+                       useOllamaBtn.classList.remove('ollama-off');
+                       useOllamaBtn.classList.add('ollama-starting');
+                       useOllamaBtn.disabled = true;
+                       useOllamaBtn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> ${this._('ollamaStarting')}`;
+               }
                this.showLoading('ollamaStarting');
                try {
                        const response = await fetch('/api/start-ollama', { method: 'POST' });
                        const result = await response.json();
-                       if (result.success) {
-                               this.showNotification(result.message, 'info');
-                               setTimeout(() => {
-                                       this.fetchOllamaModels();
-                               }, 5000);
-                       } else {
-                               throw new Error(result.error);
+                       if (!result.success) throw new Error(result.error);
+
+                       this.showNotification(result.message, 'info');
+                       await this.waitForOllamaReady();
+
+                       this.hideLoading();
+                       if (useOllamaBtn) {
+                               useOllamaBtn.disabled = false;
+                               useOllamaBtn.classList.remove('ollama-starting');
                        }
+                       this.handleOllamaConnectionSuccess();
+                       this.useOllama();
                } catch (error) {
                        this.showNotification(`${this._('ollamaStartError')} ${error.message}`, 'error');
                        this.hideLoading();
+                       if (useOllamaBtn) {
+                               useOllamaBtn.disabled = false;
+                               useOllamaBtn.classList.remove('ollama-starting');
+                       }
+                       this.handleOllamaConnectionError(error.message);
                }
+       }
+
+       async waitForOllamaReady(attempts = 10, delay = 2000) {
+               for (let i = 0; i < attempts; i++) {
+                       try {
+                               const resp = await fetch('/api/ollama-models');
+                               const data = await resp.json();
+                               if (resp.ok && data.success) return true;
+                       } catch (e) {
+                               // ignore
+                       }
+                       await new Promise(r => setTimeout(r, delay));
+               }
+               throw new Error('Ollama not responding');
        }
 
         saveApiKeyAndResetTokens() {

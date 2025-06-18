@@ -379,6 +379,16 @@ body.dark-mode .status-error {
     box-shadow: 0 4px 10px rgba(239, 68, 68, 0.3);
 }
 
+.btn-thirdary.ollama-starting {
+    background: linear-gradient(135deg, #9ca3af, #6b7280);
+    color: white;
+    cursor: default;
+}
+.btn-thirdary.ollama-starting:hover {
+    box-shadow: none;
+    transform: none;
+}
+
 /* Main Content */
 .main-content { flex: 1; max-width: 1200px; margin: 0 auto; padding: 2rem; width: 100%; }
 
