@@ -89,6 +89,15 @@ npm install
 sudo apt-get install libreoffice -y
 ```
 
+Si la commande `soffice` n'est pas détectée, indiquez son chemin via la
+variable d'environnement `SOFFICE_PATH` :
+
+```bash
+export SOFFICE_PATH=/chemin/vers/soffice
+# Sous Windows
+set SOFFICE_PATH="C:\\Program Files\\LibreOffice\\program\\soffice.exe"
+```
+
 ### Lancement
 
 ```bash
