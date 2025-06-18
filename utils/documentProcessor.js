@@ -5,6 +5,7 @@ const path = require('path');
 const Tesseract = require('tesseract.js');
 const libre = require('libreoffice-convert');
 libre.convertAsync = require('util').promisify(libre.convert);
+const libreOptions = process.env.SOFFICE_PATH ? { sofficeBinaryPaths: [process.env.SOFFICE_PATH] } : {};
 
 async function processDocument(filePath) {
   const ext = path.extname(filePath).toLowerCase();
@@ -48,7 +49,7 @@ async function processODT(filePath) {
   const outputPath = path.join(__dirname, '../uploads/output.docx');
 
   const odtBuf = await fs.promises.readFile(inputPath);
-  const docxBuf = await libre.convertAsync(odtBuf, ext, undefined);
+  const docxBuf = await libre.convertAsync(odtBuf, ext, libreOptions);
   fs.writeFileSync(outputPath, docxBuf);
   const text = await processWord(outputPath);
   fs.unlink(outputPath, () => {});

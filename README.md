@@ -75,6 +75,7 @@
 * **NPM** ou **Yarn**
 * Clé API **Google Gemini** *(via [Google AI Studio](https://makersuite.google.com/app))* (pour le mode cloud)
 * **Ollama** installé et actif avec au moins un modèle (ex: `ollama run llama3`)
+* **LibreOffice** installé pour permettre la conversion des fichiers ODT/Word (commande `soffice`)
 
 ---
 
@@ -84,6 +85,8 @@
 git clone https://github.com/GaetanAff/StudyBoost.git
 cd StudyBoost
 npm install
+# Installer LibreOffice (pour la conversion des documents)
+sudo apt-get install libreoffice -y
 ```
 
 ### Lancement
