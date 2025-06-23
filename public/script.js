@@ -1273,7 +1273,8 @@ class StudyBoostApp {
                         deleteBtn.className = 'btn-secondary delete-session-btn';
                         deleteBtn.textContent = this._('deleteSessionBtnLabel');
                         deleteBtn.addEventListener('click', () => {
-                                if (confirm(this._('deleteSessionBtnLabel') + ' ?')) this.deleteSession(sess.id);
+                                if (confirm(this._('confirmDeleteSession')))
+                                        this.deleteSession(sess.id);
                         });
                         div.appendChild(deleteBtn);
 
@@ -1314,7 +1315,18 @@ class StudyBoostApp {
                         const menu = document.createElement('button');
                         menu.className = 'session-card-menu btn-icon';
                         menu.innerHTML = '<i class="fas fa-ellipsis-h"></i>';
+                        const del = document.createElement('button');
+                        del.className = 'session-card-delete btn-icon';
+                        del.innerHTML = '<i class="fas fa-trash"></i>';
+                        del.addEventListener('click', (e) => {
+                                e.stopPropagation();
+                                if (confirm(this._('confirmDeleteSession'))){
+                                        this.deleteSession(sess.id);
+                                        this.renderSessionHomePage();
+                                }
+                        });
                         card.appendChild(menu);
+                        card.appendChild(del);
                         card.appendChild(icon);
                         card.appendChild(title);
                         card.appendChild(info);
