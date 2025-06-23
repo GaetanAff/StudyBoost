@@ -107,6 +107,16 @@ studyboost/
 
 ---
 
+## 💻 Stack Technique
+
+*   **Backend** : Node.js, Express.js
+*   **Frontend** : HTML5, CSS3, JavaScript (Vanilla)
+*   **API IA** : Google Gemini, Ollama
+*   **Traitement de documents** : `pdf-parse`, `mammoth`, `tesseract.js`
+*   **Export PDF** : `jspdf`
+
+---
+
 ## 🛡️ Sécurité
 
 * Clés API stockées uniquement dans votre navigateur
@@ -129,3 +139,5 @@ Pour toute question : [ouvrir une issue sur GitHub](https://github.com/GaetanAff
 
 Développé avec ❤️ pour rendre la révision plus intelligente et agréable.
 **Made by [GaetanAff](https://github.com/GaetanAff)**
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) Ce projet est distribué sous la licence MIT. Voir le fichier `LICENSE` pour plus d'informations.
