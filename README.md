@@ -8,7 +8,7 @@
 
 ### 💾 Système de Sessions Amélioré
 
-* **Interface de gestion des sessions** : nouveau bouton "Sessions" avec modale dédiée
+* **Interface de gestion des sessions** : un bouton "Sessions" ouvre désormais une page dédiée avec toutes vos sessions
 * **Création et chargement de sessions** : sauvegardez et retrouvez facilement vos analyses précédentes
 * **Persistance locale** : toutes les sessions sont stockées dans localStorage
 * **Traductions complètes** : libellés de gestion des sessions traduits dans toutes les langues supportées

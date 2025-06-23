@@ -219,7 +219,7 @@ class StudyBoostApp {
                         this.selectedOllamaModel = e.target.value;
                         localStorage.setItem('ollama_model', this.selectedOllamaModel);
                 });
-                document.getElementById('sessionBtn')?.addEventListener('click', () => { this.renderSessionList(); this.showModal('sessionModal'); });
+                document.getElementById('sessionBtn')?.addEventListener('click', () => { this.renderSessionHomePage(); });
                 document.getElementById('createSessionBtn')?.addEventListener('click', () => {
                         const nameInput = document.getElementById('newSessionName');
                         const name = nameInput.value.trim() || this._('defaultSessionName');
@@ -973,6 +973,7 @@ class StudyBoostApp {
                         const sess = this.sessions[this.currentSessionId];
                         sess.currentDocument = this.currentDocument;
                         sess.actions.push({ type, content, options: this.lastOptions, timestamp: Date.now() });
+                        sess.updatedAt = Date.now();
                         this.currentActionIndex = sess.actions.length - 1;
                         this.saveSessions();
                 }
@@ -1163,7 +1164,18 @@ class StudyBoostApp {
 
         createSession(name) {
                 const id = 's' + Date.now();
-                this.sessions[id] = { id, name, currentDocument: null, actions: [] };
+                const icons = ['📚','📝','📄','🧠','📊','📑','🔖','📌','🗂️','🧩'];
+                const icon = icons[Math.floor(Math.random() * icons.length)];
+                const timestamp = Date.now();
+                this.sessions[id] = {
+                        id,
+                        name,
+                        icon,
+                        createdAt: timestamp,
+                        updatedAt: timestamp,
+                        currentDocument: null,
+                        actions: []
+                };
                 this.currentSessionId = id;
                 this.saveSessions();
                 this.renderSessionList();
@@ -1195,6 +1207,7 @@ class StudyBoostApp {
         renameSession(id, newName) {
                 if (this.sessions[id]) {
                         this.sessions[id].name = newName;
+                        this.sessions[id].updatedAt = Date.now();
                         if (this.currentSessionId === id) this.updateActiveSessionDisplay();
                         this.saveSessions();
                         this.renderSessionList();
@@ -1266,6 +1279,75 @@ class StudyBoostApp {
 
                         list.appendChild(div);
                 });
+        }
+
+        renderSessionHomePage() {
+                const home = document.getElementById('sessionsHomePage');
+                if (!home) return;
+                home.style.display = 'block';
+                ['uploadSection','contentSection','resultsSection'].forEach(id => {
+                        const el = document.getElementById(id);
+                        if (el) el.style.display = 'none';
+                });
+
+                const grid = document.getElementById('sessionsGrid');
+                if (!grid) return;
+                grid.innerHTML = '';
+                const sessionsArr = Object.values(this.sessions);
+                if (sessionsArr.length === 0) {
+                        grid.innerHTML = `<p>${this._('noSessionsMessage')}</p>`;
+                        return;
+                }
+                sessionsArr.sort((a,b) => (b.updatedAt || b.createdAt) - (a.updatedAt || a.createdAt));
+                const darkColors = ['#1e1e2f','#22223b','#2a213a','#1f2a48','#282a36'];
+                sessionsArr.forEach(sess => {
+                        const card = document.createElement('div');
+                        card.className = 'session-card';
+                        const icon = document.createElement('div');
+                        icon.className = 'session-card-icon';
+                        icon.textContent = sess.icon || '📄';
+                        const title = document.createElement('h3');
+                        title.textContent = sess.name;
+                        const info = document.createElement('p');
+                        const date = new Date(sess.updatedAt || sess.createdAt);
+                        info.textContent = `${date.toLocaleDateString()} · ${sess.actions.length} actions`;
+                        const menu = document.createElement('button');
+                        menu.className = 'session-card-menu btn-icon';
+                        menu.innerHTML = '<i class="fas fa-ellipsis-h"></i>';
+                        card.appendChild(menu);
+                        card.appendChild(icon);
+                        card.appendChild(title);
+                        card.appendChild(info);
+                        if (document.body.classList.contains('dark-mode')) {
+                                card.style.background = darkColors[Math.floor(Math.random()*darkColors.length)];
+                                card.style.color = '#fff';
+                        }
+                        card.addEventListener('click', (e) => {
+                                if (e.target === menu) return;
+                                this.openSessionFromHome(sess.id);
+                        });
+                        grid.appendChild(card);
+                });
+
+                document.getElementById('createSessionHomeBtn').onclick = () => {
+                        const name = prompt(this._('newSessionNameLabel')) || this._('defaultSessionName');
+                        this.createSession(name.trim());
+                        this.renderSessionHomePage();
+                };
+                const gridBtn = document.getElementById('gridViewBtn');
+                const listBtn = document.getElementById('listViewBtn');
+                gridBtn.onclick = () => {
+                        grid.classList.remove('list-view');
+                };
+                listBtn.onclick = () => {
+                        grid.classList.add('list-view');
+                };
+        }
+
+        openSessionFromHome(id) {
+                this.loadSession(id);
+                document.getElementById('sessionsHomePage').style.display = 'none';
+                document.getElementById('uploadSection').style.display = 'block';
         }
         hideModal(modalId) {
                 const modalElement = document.getElementById(modalId);

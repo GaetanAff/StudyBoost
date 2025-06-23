@@ -47,6 +47,22 @@
         </header>
 
         <main class="main-content">
+            <section id="sessionsHomePage" class="sessions-home-page" style="display:none;">
+                <h1 class="sessions-title" data-lang="sessionsHomeTitle">Bienvenue dans StudyBoost</h1>
+                <div class="sessions-toolbar">
+                    <button id="createSessionHomeBtn" class="btn-primary">
+                        <i class="fas fa-plus"></i> <span data-lang="createSessionBtnLabel">Créer</span>
+                    </button>
+                    <div class="toolbar-right">
+                        <button id="gridViewBtn" class="btn-icon" title="Vue grille"><i class="fas fa-th"></i></button>
+                        <button id="listViewBtn" class="btn-icon" title="Vue liste"><i class="fas fa-list"></i></button>
+                        <select id="sessionSortSelect" class="session-sort-select">
+                            <option>Les plus récents</option>
+                        </select>
+                    </div>
+                </div>
+                <div id="sessionsGrid" class="sessions-grid"></div>
+            </section>
             <section class="upload-section" id="uploadSection">
                 <div class="upload-card">
                     <div class="upload-icon">

@@ -394,6 +394,22 @@ body.dark-mode .status-error {
 /* Main Content */
 .main-content { flex: 1; max-width: 1200px; margin: 0 auto; padding: 2rem; width: 100%; }
 
+/* Sessions Home Page */
+.sessions-home-page { padding: 2rem 0; }
+.sessions-title { text-align: center; margin-bottom: 1rem; }
+.sessions-toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; }
+.sessions-toolbar .toolbar-right { display: flex; align-items: center; gap: 0.5rem; }
+.sessions-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 1rem; }
+.sessions-grid.list-view { display: block; }
+.sessions-grid.list-view .session-card { display: flex; align-items: center; }
+.sessions-grid.list-view .session-card-icon { margin-right: 1rem; margin-bottom: 0; }
+.session-card { position: relative; background: var(--surface); border-radius: 0.75rem; padding: 1rem; box-shadow: var(--shadow); cursor: pointer; transition: transform 0.2s; }
+.session-card:hover { transform: translateY(-2px); }
+.session-card-icon { font-size: 2rem; margin-bottom: 0.5rem; }
+.session-card-menu { position: absolute; top: 0.5rem; right: 0.5rem; background: none; border: none; color: var(--text-secondary); cursor: pointer; }
+.session-card h3 { margin-bottom: 0.25rem; font-size: 1.1rem; }
+.session-card p { color: var(--text-secondary); font-size: 0.85rem; }
+
 /* Upload Section */
 .upload-section { text-align: center; padding: 3rem 0; }
 .upload-card { background: var(--surface); border-radius: 1rem; padding: 3rem; box-shadow: var(--shadow); max-width: 600px; margin: 0 auto; transition: background-color 0.3s; }
