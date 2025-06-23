@@ -33,13 +33,11 @@ class StudyBoostApp {
                 this.setLanguage(this.currentLanguage);
                 this.setInitialDarkMode();
 
-                if (!this.currentSessionId) {
-                        this.createSession(this._('defaultSessionName'));
-                } else {
-                        this.loadSession(this.currentSessionId);
-                }
+                this.currentSessionId = null;
+                this.resetApp();
+                this.updateActiveSessionDisplay();
                 this.checkOllamaStatusOnLoad();
-        }
+       }
 	
 	setLanguage(lang) {
 		if (this.translations[lang]) {
@@ -69,17 +67,18 @@ class StudyBoostApp {
 			if (languageSwitcher) languageSwitcher.value = lang;
 			
 			// Re-translate difficulty labels if modal is open or options are visible
-			const difficultyLabelsContainer = document.querySelector('.difficulty-labels');
-			if (difficultyLabelsContainer) {
-				difficultyLabelsContainer.querySelectorAll('span[data-lang]').forEach(span => {
-					const key = span.dataset.lang;
-					if (this.translations[lang][key]) {
-						span.textContent = this.translations[lang][key];
-					}
-				});
-			}
-		}
-	}
+                        const difficultyLabelsContainer = document.querySelector('.difficulty-labels');
+                        if (difficultyLabelsContainer) {
+                                difficultyLabelsContainer.querySelectorAll('span[data-lang]').forEach(span => {
+                                        const key = span.dataset.lang;
+                                        if (this.translations[lang][key]) {
+                                                span.textContent = this.translations[lang][key];
+                                        }
+                                });
+                        }
+                        this.updateActiveSessionDisplay();
+                }
+        }
 	
 	_(key, replacements = {}) {
 		let translation = this.translations[this.currentLanguage]?.[key] || this.translations.en?.[key] || key;
@@ -1168,6 +1167,8 @@ class StudyBoostApp {
                 this.currentSessionId = id;
                 this.saveSessions();
                 this.renderSessionList();
+                this.resetApp();
+                this.updateActiveSessionDisplay();
         }
 
         loadSession(id) {
@@ -1188,6 +1189,39 @@ class StudyBoostApp {
                 }
                 this.updateHistoryButtons();
                 this.saveSessions();
+                this.updateActiveSessionDisplay();
+        }
+
+        renameSession(id, newName) {
+                if (this.sessions[id]) {
+                        this.sessions[id].name = newName;
+                        if (this.currentSessionId === id) this.updateActiveSessionDisplay();
+                        this.saveSessions();
+                        this.renderSessionList();
+                }
+        }
+
+        deleteSession(id) {
+                if (this.sessions[id]) {
+                        delete this.sessions[id];
+                        if (this.currentSessionId === id) {
+                                this.currentSessionId = null;
+                                this.resetApp();
+                        }
+                        this.saveSessions();
+                        this.renderSessionList();
+                        this.updateActiveSessionDisplay();
+                }
+        }
+
+        updateActiveSessionDisplay() {
+                const el = document.getElementById('activeSessionDisplay');
+                if (!el) return;
+                if (this.currentSessionId && this.sessions[this.currentSessionId]) {
+                        el.textContent = this._('activeSessionPrefix') + this.sessions[this.currentSessionId].name;
+                } else {
+                        el.textContent = this._('activeSessionPrefix') + this._('noActiveSession');
+                }
         }
 
         renderSessionList() {
@@ -1202,13 +1236,34 @@ class StudyBoostApp {
                 sessionsArr.forEach(sess => {
                         const div = document.createElement('div');
                         div.className = 'session-item';
-                        div.innerHTML = `<span><strong>${sess.name}</strong> (${sess.actions.length})</span>`;
-                        const btn = document.createElement('button');
-                        btn.className = 'btn-secondary load-session-btn';
-                        btn.textContent = this._('openSessionBtnLabel');
-                        btn.dataset.id = sess.id;
-                        btn.addEventListener('click', () => { this.loadSession(sess.id); this.hideModal('sessionModal'); });
-                        div.appendChild(btn);
+                        const nameSpan = document.createElement('span');
+                        nameSpan.innerHTML = `<strong>${sess.name}</strong> (${sess.actions.length})`;
+                        div.appendChild(nameSpan);
+
+                        const openBtn = document.createElement('button');
+                        openBtn.className = 'btn-secondary load-session-btn';
+                        openBtn.textContent = this._('openSessionBtnLabel');
+                        openBtn.dataset.id = sess.id;
+                        openBtn.addEventListener('click', () => { this.loadSession(sess.id); this.hideModal('sessionModal'); });
+                        div.appendChild(openBtn);
+
+                        const renameBtn = document.createElement('button');
+                        renameBtn.className = 'btn-secondary rename-session-btn';
+                        renameBtn.textContent = this._('renameSessionBtnLabel');
+                        renameBtn.addEventListener('click', () => {
+                                const newName = prompt(this._('newSessionNameLabel'), sess.name);
+                                if (newName) this.renameSession(sess.id, newName.trim());
+                        });
+                        div.appendChild(renameBtn);
+
+                        const deleteBtn = document.createElement('button');
+                        deleteBtn.className = 'btn-secondary delete-session-btn';
+                        deleteBtn.textContent = this._('deleteSessionBtnLabel');
+                        deleteBtn.addEventListener('click', () => {
+                                if (confirm(this._('deleteSessionBtnLabel') + ' ?')) this.deleteSession(sess.id);
+                        });
+                        div.appendChild(deleteBtn);
+
                         list.appendChild(div);
                 });
         }
