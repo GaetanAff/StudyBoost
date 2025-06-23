@@ -80,6 +80,33 @@ Accédez à l'application via : [http://localhost:3000](http://localhost:3000)
 
 ---
 
+## 🏗️ Structure du Projet
+
+```
+studyboost/
+├── public/                  # Fichiers front-end servis au client
+│   ├── index.html           # Structure principale de la page web
+│   ├── script.js            # Logique côté client, gestion des interactions et des sessions
+│   ├── styles.css           # Styles pour l'apparence de l'application, y compris le mode sombre
+│   └── translations.js      # Contient les traductions pour l'interface multilingue
+│
+├── uploads/                 # Répertoire temporaire pour les fichiers uploadés (listé dans .gitignore)
+│
+├── utils/                   # Modules utilitaires pour le backend
+│   ├── aiService.js         # Gère les appels aux API d'IA (Google Gemini et Ollama)
+│   ├── documentProcessor.js # Traite les documents uploadés (PDF, Word, images OCR, etc.)
+│   └── ollamaCalls.js       # Gère spécifiquement les appels à l'API Ollama pour les modèles locaux
+│
+├── .gitignore               # Spécifie les fichiers et dossiers ignorés par Git (ex: node_modules, uploads/)
+├── package-lock.json        # Enregistre les versions exactes de chaque dépendance installée
+├── package.json             # Définit les métadonnées du projet et liste les dépendances (Express, Multer, etc.)
+├── README.md                # Documentation complète du projet
+├── server.js                # Serveur principal Express.js qui gère les routes et la logique backend
+└── starter.sh               # Script shell pour démarrer facilement le serveur en mode développement
+```
+
+---
+
 ## 🛡️ Sécurité
 
 * Clés API stockées uniquement dans votre navigateur
