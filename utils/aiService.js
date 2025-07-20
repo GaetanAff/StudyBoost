@@ -82,6 +82,93 @@ function getLanguageInstructions(lang) {
 
 
 
+// Build a prompt string based on type, options and language
+function buildPrompt(type, text, options = {}, language = 'fr') {
+        const langInstructions = getLanguageInstructions(language);
+
+        let difficultyPromptPart = '';
+        if (options.difficultyLevel && (type === 'qcm' || type === 'open_question_generate')) {
+                const levels = langInstructions.difficultyLevels;
+                let difficultyDescription = '';
+                switch (parseInt(options.difficultyLevel)) {
+                        case 1: difficultyDescription = levels.level1; break;
+                        case 2: difficultyDescription = levels.level2; break;
+                        case 3: difficultyDescription = levels.level3; break;
+                        case 4: difficultyDescription = levels.level4; break;
+                        case 5: difficultyDescription = levels.level5; break;
+                        default: difficultyDescription = levels.level3;
+                }
+                difficultyPromptPart = `\nLe niveau de difficulté demandé pour les questions est : ${difficultyDescription}`;
+        }
+
+        let prompt = '';
+        switch (type) {
+                case 'summary_short':
+                        prompt = `${langInstructions.shortSummaryPrompt}\n\nTexte:\n${text}`;
+                        break;
+
+                case 'summary_long':
+                        prompt = `${langInstructions.longSummaryPrompt}\n\nTexte:\n${text}`;
+                        break;
+
+                case 'qcm': {
+                        const numQuestions = options.numQuestions || 10;
+                        prompt = `Génère exactement ${numQuestions} questions à choix multiples (QCM) basées sur le texte suivant.${difficultyPromptPart}
+Chaque QCM doit être un objet JSON avec les clés suivantes :
+- "question": (string) La question elle-même.
+- "options": (array of 4 strings) Une liste de quatre chaînes de caractères représentant les options.
+- "correct_answer": (string) La lettre de l'option correcte (A, B, C, ou D).
+- "explanation": (string) Une brève explication.
+
+                                ${langInstructions.qcmFormatInstruction}
+
+Texte de référence :\n\n${text}`;
+                        break;
+                }
+
+                case 'flashcards': {
+                        const numCards = options.numCards || 15;
+                        prompt = `Crée exactement ${numCards} flashcards basées sur les concepts clés du texte suivant.
+Chaque flashcard doit être un objet JSON avec les clés suivantes :
+- "front": (string) La question ou le terme clé.
+- "back": (string) La réponse ou la définition.
+
+                                ${langInstructions.flashcardFormatInstruction}
+
+Texte de référence :\n\n${text}`;
+                        break;
+                }
+
+                case 'revision_sheet':
+                        prompt = `${langInstructions.revisionSheetPromptStart}\n\nTexte de référence :\n\n${text}`;
+                        break;
+
+                case 'question':
+                        prompt = `${langInstructions.userQuestionPromptStart}\nQuestion: ${options.question}\n\nContenu de référence:\n${text}`;
+                        break;
+
+                case 'open_question_generate':
+                        prompt = `${langInstructions.openQuestionGeneratePrompt}${difficultyPromptPart}\n\nDocument:\n${text}`;
+                        break;
+
+                case 'open_question_correct':
+                        if (!options.originalQuestion || !options.userAnswer) {
+                                throw new Error("Original question and user answer are required for correction.");
+                        }
+                        prompt = langInstructions.openQuestionCorrectPromptStart
+                                .replace('{originalQuestion}', options.originalQuestion)
+                                .replace('{userAnswer}', options.userAnswer);
+                        prompt += `\n\nDocument de référence:\n${text}`;
+                        break;
+
+                default:
+                        console.error(`Type de contenu non supporté demandé: ${type}`);
+                        throw new Error(`Le type de contenu '${type}' n'est pas supporté.`);
+        }
+
+        return prompt;
+}
+
 // uses gemini AI (original code, untouched)
 
 
@@ -90,85 +177,7 @@ async function generateContent(text, type, options = {}, apiKey, language = 'fr'
 	const genAI = new GoogleGenerativeAI(apiKey);
 	const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" }); // Updated model
 
-	let prompt = '';
-	const langInstructions = getLanguageInstructions(language);
-
-	let difficultyPromptPart = '';
-	if (options.difficultyLevel && (type === 'qcm' || type === 'open_question_generate')) {
-		const levels = langInstructions.difficultyLevels;
-		let difficultyDescription = '';
-		switch (parseInt(options.difficultyLevel)) {
-			case 1: difficultyDescription = levels.level1; break;
-			case 2: difficultyDescription = levels.level2; break;
-			case 3: difficultyDescription = levels.level3; break;
-			case 4: difficultyDescription = levels.level4; break;
-			case 5: difficultyDescription = levels.level5; break;
-			default: difficultyDescription = levels.level3; // Default to medium
-		}
-		difficultyPromptPart = `\nLe niveau de difficulté demandé pour les questions est : ${difficultyDescription}`;
-	}
-
-	switch (type) {
-		case 'summary_short':
-			prompt = `${langInstructions.shortSummaryPrompt}\n\nTexte:\n${text}`;
-			break;
-
-		case 'summary_long':
-			prompt = `${langInstructions.longSummaryPrompt}\n\nTexte:\n${text}`;
-			break;
-
-		case 'qcm':
-			const numQuestions = options.numQuestions || 10;
-			prompt = `Génère exactement ${numQuestions} questions à choix multiples (QCM) basées sur le texte suivant.${difficultyPromptPart}
-Chaque QCM doit être un objet JSON avec les clés suivantes :
-- "question": (string) La question elle-même.
-- "options": (array of 4 strings) Une liste de quatre chaînes de caractères représentant les options.
-- "correct_answer": (string) La lettre de l'option correcte (A, B, C, ou D).
-- "explanation": (string) Une brève explication.
-
-				${langInstructions.qcmFormatInstruction}
-
-Texte de référence :\n\n${text}`;
-			break;
-
-		case 'flashcards':
-			const numCards = options.numCards || 15;
-			prompt = `Crée exactement ${numCards} flashcards basées sur les concepts clés du texte suivant.
-Chaque flashcard doit être un objet JSON avec les clés suivantes :
-- "front": (string) La question ou le terme clé.
-- "back": (string) La réponse ou la définition.
-
-				${langInstructions.flashcardFormatInstruction}
-
-Texte de référence :\n\n${text}`;
-			break;
-
-		case 'revision_sheet':
-			prompt = `${langInstructions.revisionSheetPromptStart}\n\nTexte de référence :\n\n${text}`;
-			break;
-
-		case 'question':
-			prompt = `${langInstructions.userQuestionPromptStart}\nQuestion: ${options.question}\n\nContenu de référence:\n${text}`;
-			break;
-
-		case 'open_question_generate':
-			prompt = `${langInstructions.openQuestionGeneratePrompt}${difficultyPromptPart}\n\nDocument:\n${text}`;
-			break;
-
-		case 'open_question_correct':
-			if (!options.originalQuestion || !options.userAnswer) {
-				throw new Error("Original question and user answer are required for correction.");
-			}
-			prompt = langInstructions.openQuestionCorrectPromptStart
-				.replace('{originalQuestion}', options.originalQuestion)
-				.replace('{userAnswer}', options.userAnswer);
-			prompt += `\n\nDocument de référence:\n${text}`;
-			break;
-
-		default:
-			console.error(`Type de contenu non supporté demandé: ${type}`);
-			throw new Error(`Le type de contenu '${type}' n'est pas supporté.`);
-	}
+        const prompt = buildPrompt(type, text, options, language);
 
 	try {
 		const result = await model.generateContent(prompt);
@@ -259,87 +268,7 @@ async function testApiKey(apiKey) {
 async function ollamaGenerateContent(text, type, options = {}, modelName = 'mistral', language = 'fr') {
         const api = ollamaCalls
 	
-	// defines prompt
-	
-	let prompt = '';
-	const langInstructions = getLanguageInstructions(language);
-
-	let difficultyPromptPart = '';
-	if (options.difficultyLevel && (type === 'qcm' || type === 'open_question_generate')) {
-		const levels = langInstructions.difficultyLevels;
-		let difficultyDescription = '';
-		switch (parseInt(options.difficultyLevel)) {
-			case 1: difficultyDescription = levels.level1; break;
-			case 2: difficultyDescription = levels.level2; break;
-			case 3: difficultyDescription = levels.level3; break;
-			case 4: difficultyDescription = levels.level4; break;
-			case 5: difficultyDescription = levels.level5; break;
-			default: difficultyDescription = levels.level3; // Default to medium
-		}
-		difficultyPromptPart = `\nLe niveau de difficulté demandé pour les questions est : ${difficultyDescription}`;
-	}
-
-	switch (type) {
-		case 'summary_short':
-			prompt = `${langInstructions.shortSummaryPrompt}\n\nTexte:\n${text}`;
-			break;
-
-		case 'summary_long':
-			prompt = `${langInstructions.longSummaryPrompt}\n\nTexte:\n${text}`;
-			break;
-
-		case 'qcm':
-			const numQuestions = options.numQuestions || 10;
-			prompt = `Génère exactement ${numQuestions} questions à choix multiples (QCM) basées sur le texte suivant.${difficultyPromptPart}
-Chaque QCM doit être un objet JSON avec les clés suivantes :
-- "question": (string) La question elle-même.
-- "options": (array of 4 strings) Une liste de quatre chaînes de caractères représentant les options.
-- "correct_answer": (string) La lettre de l'option correcte (A, B, C, ou D).
-- "explanation": (string) Une brève explication.
-
-				${langInstructions.qcmFormatInstruction}
-
-Texte de référence :\n\n${text}`;
-			break;
-
-		case 'flashcards':
-			const numCards = options.numCards || 15;
-			prompt = `Crée exactement ${numCards} flashcards basées sur les concepts clés du texte suivant.
-Chaque flashcard doit être un objet JSON avec les clés suivantes :
-- "front": (string) La question ou le terme clé.
-- "back": (string) La réponse ou la définition.
-
-				${langInstructions.flashcardFormatInstruction}
-
-Texte de référence :\n\n${text}`;
-			break;
-
-		case 'revision_sheet':
-			prompt = `${langInstructions.revisionSheetPromptStart}\n\nTexte de référence :\n\n${text}`;
-			break;
-
-		case 'question':
-			prompt = `${langInstructions.userQuestionPromptStart}\nQuestion: ${options.question}\n\nContenu de référence:\n${text}`;
-			break;
-
-		case 'open_question_generate':
-			prompt = `${langInstructions.openQuestionGeneratePrompt}${difficultyPromptPart}\n\nDocument:\n${text}`;
-			break;
-
-		case 'open_question_correct':
-			if (!options.originalQuestion || !options.userAnswer) {
-				throw new Error("Original question and user answer are required for correction.");
-			}
-			prompt = langInstructions.openQuestionCorrectPromptStart
-				.replace('{originalQuestion}', options.originalQuestion)
-				.replace('{userAnswer}', options.userAnswer);
-			prompt += `\n\nDocument de référence:\n${text}`;
-			break;
-
-		default:
-			console.error(`Type de contenu non supporté demandé: ${type}`);
-			throw new Error(`Le type de contenu '${type}' n'est pas supporté.`);
-	}
+        const prompt = buildPrompt(type, text, options, language);
 
 
 	// prompt defined, start to interact with the AI
