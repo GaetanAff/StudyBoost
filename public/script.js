@@ -681,7 +681,7 @@ class StudyBoostApp {
 			optionsHtml = `
 		<div class="form-group">
 		    <label for="numCardsInput">${this._('optionsFlashcardsLabel')}</label>
-		    <input type="number" id="numCardsInput" value="15" min="5" max="25" class="form-control">
+		    <input type="number" id="numCardsInput" value="15" min="5" max="50" class="form-control">
 		</div>`;
 		} else if (action === 'open_question_generate') {
 			title.textContent = this._('actionOpenQuestion'); // Or a more specific title like "Options for Open Questions"
@@ -721,7 +721,7 @@ class StudyBoostApp {
 		} else if (this.currentAction === 'flashcards') {
 			const numInput = document.getElementById('numCardsInput');
 			options.numCards = parseInt(numInput.value);
-			if (isNaN(options.numCards) || options.numCards < 5 || options.numCards > 25) {
+			if (isNaN(options.numCards) || options.numCards < 5 || options.numCards > 50) {
 				this.showNotification(this._('optionsFlashcardsError'), 'error');
 				isValid = false;
 			}
@@ -1432,4 +1432,5 @@ class StudyBoostApp {
 
 document.addEventListener('DOMContentLoaded', () => {
 	new StudyBoostApp();
+
 });
